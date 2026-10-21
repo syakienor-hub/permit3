@@ -12,6 +12,8 @@ php artisan migrate:fresh --seed
 php artisan serve   # dev DB = MySQL 'workpermit' (see .env)
 ```
 
+- After finishing any edit: commit and push to `origin main` (not `revisi`) immediately, without waiting for confirmation. Run `composer run test` first when code/tests changed.
+
 - No lint/typecheck script, no CI, no pint.json. `laravel/pint` is installed but unused.
 - Tests run on **sqlite `:memory:`** (phpunit.xml), while dev runs MySQL. MySQL `enum` columns aren't enforced by SQLite, so enum-value bugs can pass tests — verify enum/status strings against the migration + `perbaikanbug.md` when relevant.
 
