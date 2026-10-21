@@ -11,7 +11,7 @@
         </div>
     </div>
 
-    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm">
+    <div class="table-card">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-4 md:px-6 py-4 border-b border-gray-100">
             <h3 class="text-sm font-semibold text-gray-800">Daftar Permit Aktif</h3>
 
@@ -46,31 +46,31 @@
             </div>
         @else
             <div class="overflow-x-auto">
-                <table class="w-full text-left text-sm min-w-[760px]">
+                <table class="data-table min-w-[760px]">
                     <thead>
-                        <tr class="text-xs text-gray-400 uppercase tracking-wide border-b border-gray-100 bg-gray-50/60">
-                            <th class="px-6 py-3 font-semibold">No. Permit</th>
-                            <th class="px-6 py-3 font-semibold">Nama Pekerjaan</th>
-                            <th class="px-6 py-3 font-semibold">Pengaju</th>
-                            <th class="px-6 py-3 font-semibold">Site</th>
-                            <th class="px-6 py-3 font-semibold">Tgl. Update</th>
-                            <th class="px-6 py-3 font-semibold text-right">Aksi</th>
+                        <tr>
+                            <th>No. Permit</th>
+                            <th>Nama Pekerjaan</th>
+                            <th>Pengaju</th>
+                            <th>Site</th>
+                            <th>Tgl. Update</th>
+                            <th class="text-right">Aksi</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-50">
+                    <tbody>
                         @foreach($permits as $permit)
-                        <tr class="hover:bg-red-50/30 transition-colors">
-                            <td class="px-6 py-3.5">
+                        <tr class="transition-colors">
+                            <td>
                                 <span class="font-semibold text-inka-navy">{{ $permit->no_permit }}</span>
                             </td>
-                            <td class="px-6 py-3.5 text-gray-700">
+                            <td class="text-gray-700">
                                 <p class="font-medium">{{ $permit->nama_pekerjaan }}</p>
                                 <p class="text-xs text-gray-400 mt-0.5">{{ $permit->kontraktor }}</p>
                             </td>
-                            <td class="px-6 py-3.5 text-gray-600">{{ optional($permit->user)->name ?? $permit->divisi_pengaju ?? '-' }}</td>
-                            <td class="px-6 py-3.5 text-gray-500 text-xs">{{ $permit->site }}</td>
-                            <td class="px-6 py-3.5 text-gray-400 text-xs">{{ $permit->updated_at->format('d/m/Y H:i') }}</td>
-                            <td class="px-6 py-3.5 text-right">
+                            <td class="text-gray-600">{{ optional($permit->user)->name ?? $permit->divisi_pengaju ?? '-' }}</td>
+                            <td class="text-gray-500">{{ $permit->site }}</td>
+                            <td class="text-gray-400">{{ $permit->updated_at->format('d/m/Y H:i') }}</td>
+                            <td class="text-right">
                                 <a href="/admin/cancellations/{{ $permit->id }}"
                                    class="inline-flex items-center gap-1 bg-red-100 text-red-700 text-[11px] font-bold px-3 py-1.5 rounded-lg hover:bg-red-600 hover:text-white transition-colors">
                                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>

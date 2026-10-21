@@ -52,7 +52,7 @@
     </form>
 
     {{-- ===== TABEL HISTORY ===== --}}
-    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm">
+    <div class="table-card">
 
         {{-- Header --}}
         <div class="flex items-center justify-between px-4 md:px-6 py-4 border-b border-gray-100">
@@ -88,21 +88,21 @@
         @else
             {{-- Desktop/laptop: tabel tetap seperti semula --}}
             <div class="overflow-x-auto hidden md:block">
-                <table class="w-full text-left text-sm min-w-[880px]">
+                <table class="data-table min-w-[880px]">
                     <thead>
-                        <tr class="text-xs text-gray-400 uppercase tracking-wide border-b border-gray-100 bg-gray-50/60">
-                            <th class="px-6 py-3 font-semibold">No. Permit</th>
-                            <th class="px-6 py-3 font-semibold">Site</th>
-                            <th class="px-6 py-3 font-semibold">Tipe</th>
-                            <th class="px-6 py-3 font-semibold">Klasifikasi Pekerjaan</th>
-                            <th class="px-6 py-3 font-semibold">Kontraktor</th>
-                            <th class="px-6 py-3 font-semibold">Lokasi</th>
-                            <th class="px-6 py-3 font-semibold">Status</th>
-                            <th class="px-6 py-3 font-semibold">Tanggal Permit</th>
-                            <th class="px-6 py-3 font-semibold text-right">Aksi</th>
+                        <tr>
+                            <th>No. Permit</th>
+                            <th>Site</th>
+                            <th>Tipe</th>
+                            <th>Klasifikasi Pekerjaan</th>
+                            <th>Kontraktor</th>
+                            <th>Lokasi</th>
+                            <th>Status</th>
+                            <th>Tanggal Permit</th>
+                            <th class="text-right">Aksi</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-50">
+                    <tbody>
                         @foreach($permits as $permit)
                         @php
                             $statusMap = [
@@ -118,29 +118,27 @@
                             $badge = $statusMap[$permit->status] ?? 'bg-gray-100 text-gray-600';
                             $canEdit = in_array($permit->status, ['Draft', 'Revision']);
                         @endphp
-                        <tr class="hover:bg-blue-50/30 transition-colors cursor-pointer"
+                        <tr class="transition-colors cursor-pointer"
                             onclick="window.location='/divisi/permits/{{ $permit->id }}'">
-                            <td class="px-6 py-3.5 whitespace-nowrap">
+                            <td class="whitespace-nowrap">
                                 <a href="/divisi/permits/{{ $permit->id }}"
                                    class="font-semibold text-inka-navy hover:underline"
                                    onclick="event.stopPropagation()">
                                     {{ $permit->no_permit }}
                                 </a>
                             </td>
-                            <td class="px-6 py-3.5 whitespace-nowrap"><x-permit-site-badge :site="$permit->site" /></td>
-                            <td class="px-6 py-3.5 whitespace-nowrap"><x-permit-tipe-badge :tipe="$permit->tipe" /></td>
-                            <td class="px-6 py-3.5"><x-permit-klasifikasi-badges :permit="$permit" /></td>
-                            <td class="px-6 py-3.5 text-gray-600 text-xs">{{ $permit->kontraktor }}</td>
-                            <td class="px-6 py-3.5 text-gray-600 text-xs">{{ $permit->lokasi ?? '—' }}</td>
-                            <td class="px-6 py-3.5 whitespace-nowrap">
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold {{ $badge }}">
-                                    {{ str_starts_with($permit->status, 'Review') ? 'Menunggu ' . $permit->status : $permit->status }}
-                                </span>
+                            <td class="whitespace-nowrap"><x-permit-site-badge :site="$permit->site" /></td>
+                            <td class="whitespace-nowrap"><x-permit-tipe-badge :tipe="$permit->tipe" /></td>
+                            <td><x-permit-klasifikasi-badges :permit="$permit" /></td>
+                            <td class="text-gray-600">{{ $permit->kontraktor }}</td>
+                            <td class="text-gray-600">{{ $permit->lokasi ?? '—' }}</td>
+                            <td class="whitespace-nowrap">
+                                <x-permit-status-badge :status="$permit->status" />
                             </td>
-                            <td class="px-6 py-3.5 whitespace-nowrap">
+                            <td class="whitespace-nowrap">
                                 <x-permit-tanggal :permit="$permit" />
                             </td>
-                            <td class="px-6 py-3.5 text-right whitespace-nowrap" onclick="event.stopPropagation()">
+                            <td class="text-right whitespace-nowrap" onclick="event.stopPropagation()">
                                 <a href="/divisi/permits/{{ $permit->id }}"
                                    class="inline-flex items-center gap-1 text-xs font-semibold text-inka-navy hover:underline">
                                     {{ $canEdit ? 'Edit' : 'Lihat Detail' }}
@@ -171,9 +169,7 @@
                 <a href="/divisi/permits/{{ $permit->id }}" class="block px-4 py-4 active:bg-blue-50/50">
                     <div class="flex items-center justify-between gap-2 mb-1.5">
                         <span class="font-semibold text-inka-navy text-sm">{{ $permit->no_permit }}</span>
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold {{ $mBadge }} shrink-0">
-                            {{ str_starts_with($permit->status, 'Review') ? 'Menunggu ' . $permit->status : $permit->status }}
-                        </span>
+                        <x-permit-status-badge :status="$permit->status" class="shrink-0" />
                     </div>
                     <p class="text-sm text-gray-800 font-medium truncate">{{ $permit->nama_pekerjaan ?? $permit->kontraktor }}</p>
                     <p class="text-xs text-gray-400 mt-0.5 truncate">{{ $permit->kontraktor }} &middot; {{ $permit->lokasi ?? '—' }}</p>

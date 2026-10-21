@@ -1,3 +1,44 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer components {
+    /* Kartu pembungkus tabel: kelengkungan seragam di semua halaman. */
+    .table-card {
+        @apply overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm;
+    }
+
+    /* Tabel data: header, garis, padding, ukuran teks, dan hover seragam. */
+    .data-table {
+        @apply w-full text-left text-sm text-gray-600;
+    }
+
+    .data-table thead tr {
+        @apply border-b border-gray-100 bg-gray-50/70 text-[11px] uppercase tracking-wider text-gray-400;
+    }
+
+    .data-table th {
+        @apply px-6 py-3.5 font-semibold;
+    }
+
+    .data-table tbody {
+        @apply divide-y divide-gray-100;
+    }
+
+    .data-table tbody tr {
+        @apply transition-colors;
+    }
+
+    .data-table tbody tr:hover {
+        @apply bg-gray-50/70;
+    }
+
+    .data-table td {
+        @apply px-6 py-3.5 align-middle;
+    }
+
+    /* Badge seragam untuk status, site, tipe, dan klasifikasi di dalam tabel. */
+    .badge {
+        @apply inline-flex items-center gap-1 whitespace-nowrap rounded-full border px-2.5 py-1 text-[11px] font-semibold;
+    }
+}

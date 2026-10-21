@@ -21,7 +21,6 @@
         'tegangan_tinggi'=> 'bg-rose-50 text-rose-700 border-rose-200/70',
         'radiasi'        => 'bg-emerald-50 text-emerald-700 border-emerald-200/70',
     ];
-
     $nameMap = [
         'panas'          => 'Pekerjaan Panas',
         'ketinggian'     => 'Pekerjaan Ketinggian',
@@ -42,7 +41,7 @@
                 $displayName = $nameMap[$code] ?? (is_string($val) && !isset($nameMap[$val]) ? $val : ($nameMap[$val] ?? ucwords(str_replace('_', ' ', $code))));
                 $color = $colorMap[$code] ?? 'bg-slate-50 text-slate-700 border-slate-200';
             @endphp
-            <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold border {{ $color }}">
+            <span class="badge {{ $color }}">
                 {{ $displayName }}
             </span>
         @endforeach

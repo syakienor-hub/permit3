@@ -38,7 +38,7 @@
     @endif
 
     {{-- Main Content --}}
-    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+    <div class="table-card">
         
         {{-- Filters & Search --}}
         <div class="p-5 border-b border-gray-100 bg-gray-50/50">
@@ -69,36 +69,36 @@
 
         {{-- Table --}}
         <div class="overflow-x-auto">
-            <table class="w-full text-left text-sm text-gray-600 min-w-[760px]">
-                <thead class="bg-gray-50/50 text-xs uppercase text-gray-500 border-b border-gray-100">
+            <table class="data-table min-w-[760px]">
+                <thead>
                     <tr>
-                        <th class="px-6 py-4 font-semibold">Nama Divisi</th>
-                        <th class="px-6 py-4 font-semibold">Username</th>
-                        <th class="px-6 py-4 font-semibold">Email</th>
-                        <th class="px-6 py-4 font-semibold">Status</th>
-                        <th class="px-6 py-4 font-semibold">Tanggal Dibuat</th>
-                        <th class="px-6 py-4 font-semibold text-right">Aksi</th>
+                        <th>Nama Divisi</th>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Status</th>
+                        <th>Tanggal Dibuat</th>
+                        <th class="text-right">Aksi</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-100">
+                <tbody>
                     @forelse($users as $user)
-                    <tr class="hover:bg-gray-50/50 transition-colors group">
-                        <td class="px-6 py-4 font-medium text-gray-900">{{ $user->name }}</td>
-                        <td class="px-6 py-4">{{ $user->username }}</td>
-                        <td class="px-6 py-4">{{ $user->email ?? '—' }}</td>
-                        <td class="px-6 py-4">
+                    <tr class="transition-colors group">
+                        <td class="font-medium text-gray-900">{{ $user->name }}</td>
+                        <td>{{ $user->username }}</td>
+                        <td>{{ $user->email ?? '—' }}</td>
+                        <td>
                             @if($user->is_active)
-                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium bg-green-50 text-green-700 border border-green-200">
+                                <span class="badge bg-green-50 text-green-700 border-green-200/70">
                                     <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span> Aktif
                                 </span>
                             @else
-                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium bg-red-50 text-red-700 border border-red-200">
+                                <span class="badge bg-red-50 text-red-700 border-red-200/70">
                                     <span class="w-1.5 h-1.5 rounded-full bg-red-500"></span> Nonaktif
                                 </span>
                             @endif
                         </td>
-                        <td class="px-6 py-4 text-gray-500">{{ $user->created_at->format('d/m/Y') }}</td>
-                        <td class="px-6 py-4 text-right">
+                        <td class="text-gray-500">{{ $user->created_at->format('d/m/Y') }}</td>
+                        <td class="text-right">
                             <div class="flex items-center justify-end gap-2">
                                 
                                 {{-- Edit Btn --}}

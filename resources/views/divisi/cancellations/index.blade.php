@@ -13,7 +13,7 @@
     </div>
 
     {{-- ===== TABEL ===== --}}
-    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm">
+    <div class="table-card">
         <div class="flex items-center justify-between px-4 md:px-6 py-4 border-b border-gray-100">
             <div>
                 <h3 class="text-sm font-semibold text-gray-800">Daftar Permit Aktif</h3>
@@ -32,26 +32,26 @@
             </div>
         @else
             <div class="overflow-x-auto">
-                <table class="w-full text-left text-sm min-w-[720px]">
+                <table class="data-table min-w-[720px]">
                     <thead>
-                        <tr class="text-xs text-gray-400 uppercase tracking-wide border-b border-gray-100 bg-gray-50/60">
-                            <th class="px-6 py-3 font-semibold">No. Permit</th>
-                            <th class="px-6 py-3 font-semibold">Nama Pekerjaan</th>
-                            <th class="px-6 py-3 font-semibold">Kontraktor</th>
-                            <th class="px-6 py-3 font-semibold">Status</th>
-                            <th class="px-6 py-3 font-semibold">Tgl. Update</th>
-                            <th class="px-6 py-3 font-semibold text-right">Aksi</th>
+                        <tr>
+                            <th>No. Permit</th>
+                            <th>Nama Pekerjaan</th>
+                            <th>Kontraktor</th>
+                            <th>Status</th>
+                            <th>Tgl. Update</th>
+                            <th class="text-right">Aksi</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-50">
+                    <tbody>
                         @foreach($permits as $permit)
-                        <tr class="hover:bg-red-50/30 transition-colors">
-                            <td class="px-6 py-3.5">
+                        <tr class="transition-colors">
+                            <td>
                                 <span class="font-semibold text-inka-navy">{{ $permit->no_permit }}</span>
                             </td>
-                            <td class="px-6 py-3.5 text-gray-700">{{ $permit->nama_pekerjaan }}</td>
-                            <td class="px-6 py-3.5 text-gray-500 text-xs">{{ $permit->kontraktor }}</td>
-                            <td class="px-6 py-3.5">
+                            <td class="text-gray-700">{{ $permit->nama_pekerjaan }}</td>
+                            <td class="text-gray-500">{{ $permit->kontraktor }}</td>
+                            <td>
                                 @php
                                     $statusMap = [
                                         'Draft'                    => 'bg-gray-100 text-gray-600',
@@ -63,12 +63,12 @@
                                     ];
                                     $badge = $statusMap[$permit->status] ?? 'bg-gray-100 text-gray-600';
                                 @endphp
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold {{ $badge }}">{{ str_starts_with($permit->status, 'Review') ? 'Menunggu ' . $permit->status : $permit->status }}</span>
+                                <x-permit-status-badge :status="$permit->status" />
                             </td>
-                            <td class="px-6 py-3.5 text-gray-400 text-xs">
+                            <td class="text-gray-400">
                                 {{ $permit->updated_at->format('d/m/Y H:i') }}
                             </td>
-                            <td class="px-6 py-3.5 text-right">
+                            <td class="text-right">
                                 <a href="/divisi/cancellations/{{ $permit->id }}"
                                    class="inline-flex items-center gap-1 bg-red-100 text-red-700 text-[11px] font-bold px-3 py-1.5 rounded-lg hover:bg-red-600 hover:text-white transition-colors">
                                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>

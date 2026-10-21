@@ -26,24 +26,24 @@
         @endif
 
         {{-- Main Content --}}
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <div class="table-card">
             <div class="overflow-x-auto">
-                <table class="w-full text-left text-sm text-gray-600 min-w-[560px]">
-                    <thead class="bg-gray-50/50 text-xs uppercase text-gray-500 border-b border-gray-100">
+                <table class="data-table min-w-[560px]">
+                    <thead>
                         <tr>
-                            <th class="px-6 py-4 font-semibold w-16">No</th>
-                            <th class="px-6 py-4 font-semibold">Nama Divisi</th>
-                            <th class="px-6 py-4 font-semibold">Tgl Dibuat</th>
-                            <th class="px-6 py-4 font-semibold text-right">Aksi</th>
+                            <th class="w-16">No</th>
+                            <th>Nama Divisi</th>
+                            <th>Tgl Dibuat</th>
+                            <th class="text-right">Aksi</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-100">
+                    <tbody>
                         @forelse($divisions as $index => $division)
-                        <tr class="hover:bg-gray-50/50 transition-colors group">
-                            <td class="px-6 py-4">{{ $index + 1 }}</td>
-                            <td class="px-6 py-4 font-medium text-gray-900">{{ $division->name }}</td>
-                            <td class="px-6 py-4 text-gray-500">{{ $division->created_at->format('d/m/Y') }}</td>
-                            <td class="px-6 py-4 text-right">
+                        <tr class="transition-colors group">
+                            <td>{{ $index + 1 }}</td>
+                            <td class="font-medium text-gray-900">{{ $division->name }}</td>
+                            <td class="text-gray-500">{{ $division->created_at->format('d/m/Y') }}</td>
+                            <td class="text-right">
                                 <div class="flex items-center justify-end gap-2">
                                     <a href="/superadmin/divisions/{{ $division->id }}/edit" class="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="Edit Divisi">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>

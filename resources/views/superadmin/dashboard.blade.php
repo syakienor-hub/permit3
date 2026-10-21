@@ -76,7 +76,7 @@
     </div>
 
     {{-- Section: Akun Divisi Terbaru --}}
-    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+    <div class="table-card">
         
         <div class="px-4 md:px-6 py-5 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-gray-50/50">
             <h2 class="text-xl font-bold text-gray-900">Akun Divisi Terbaru</h2>
@@ -97,34 +97,34 @@
             </div>
         @else
             <div class="overflow-x-auto">
-                <table class="w-full text-left text-base text-gray-600 min-w-[720px]">
-                    <thead class="bg-gray-50/50 text-sm uppercase text-gray-500 border-b border-gray-100">
+                <table class="data-table min-w-[720px]">
+                    <thead>
                         <tr>
-                            <th class="px-6 py-4 font-semibold">Nama Divisi</th>
-                            <th class="px-6 py-4 font-semibold">Username</th>
-                            <th class="px-6 py-4 font-semibold">Email</th>
-                            <th class="px-6 py-4 font-semibold">Status</th>
-                            <th class="px-6 py-4 font-semibold">Tanggal Dibuat</th>
+                            <th>Nama Divisi</th>
+                            <th>Username</th>
+                            <th>Email</th>
+                            <th>Status</th>
+                            <th>Tanggal Dibuat</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-100">
+                    <tbody>
                         @foreach($users as $user)
-                        <tr class="hover:bg-gray-50/50 transition-colors">
-                            <td class="px-6 py-4 font-medium text-gray-900">{{ $user->name }}</td>
-                            <td class="px-6 py-4">{{ $user->username }}</td>
-                            <td class="px-6 py-4">{{ $user->email ?? '—' }}</td>
-                            <td class="px-6 py-4">
+                        <tr class="transition-colors">
+                            <td class="font-medium text-gray-900">{{ $user->name }}</td>
+                            <td>{{ $user->username }}</td>
+                            <td>{{ $user->email ?? '—' }}</td>
+                            <td>
                                 @if($user->is_active)
-                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-sm font-medium bg-green-50 text-green-700 border border-green-200">
+                                    <span class="badge bg-green-50 text-green-700 border-green-200/70">
                                         <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span> Aktif
                                     </span>
                                 @else
-                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-sm font-medium bg-red-50 text-red-700 border border-red-200">
+                                    <span class="badge bg-red-50 text-red-700 border-red-200/70">
                                         <span class="w-1.5 h-1.5 rounded-full bg-red-500"></span> Nonaktif
                                     </span>
                                 @endif
                             </td>
-                            <td class="px-6 py-4">{{ $user->created_at->format('d/m/Y') }}</td>
+                            <td>{{ $user->created_at->format('d/m/Y') }}</td>
                         </tr>
                         @endforeach
                     </tbody>
