@@ -278,7 +278,6 @@
                 Monitoring Permit
             </a>
             <a href="#alur" class="hover:text-[var(--navy-950)] transition-colors">Alur Pengajuan</a>
-            <a href="/cek-permit" class="hover:text-[var(--navy-950)] transition-colors">Cek Status</a>
             <a href="#tentang" class="hover:text-[var(--navy-950)] transition-colors">Tentang Kami</a>
         </div>
         <div class="hidden sm:flex items-center gap-2.5 shrink-0">
@@ -301,7 +300,6 @@
                 Monitoring Permit
             </a>
             <a href="#alur" @click="mobileOpen = false" class="py-3 border-b border-gray-100">Alur Pengajuan</a>
-            <a href="/cek-permit" @click="mobileOpen = false" class="py-3 border-b border-gray-100">Cek Status Permit</a>
             <a href="#tentang" @click="mobileOpen = false" class="py-3 border-b border-gray-100">Tentang Kami</a>
         </nav>
         <div class="flex flex-col gap-2.5 mt-3 sm:hidden">
@@ -338,8 +336,8 @@
                     Masuk Petugas
                 </a>
             @endauth
-            <a href="#monitoring" class="btn btn-outline-light btn-lg w-full sm:w-auto">
-                Monitoring Permit
+            <a href="/cek-permit" class="btn btn-outline-light btn-lg w-full sm:w-auto">
+                Cek Status
             </a>
         </div>
         <p class="text-xs text-white/100 mt-6 md:mt-[36px] hero-animate px-2" id="hero-note">
