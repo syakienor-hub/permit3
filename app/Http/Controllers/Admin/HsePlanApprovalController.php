@@ -49,6 +49,43 @@ class HsePlanApprovalController extends Controller
         return view('admin.hse-plans.index', compact('hsePlans', 'counts'));
     }
 
+    public function history(Request $request)
+    {
+        $query = HsePlan::query()
+            ->with('reviewer')
+            ->whereIn('status', [HsePlan::STATUS_APPROVED, HsePlan::STATUS_REJECTED]);
+
+        if ($request->filled('site')) {
+            $query->forSite($request->site);
+        }
+
+        if ($request->filled('status') && in_array($request->status, [HsePlan::STATUS_APPROVED, HsePlan::STATUS_REJECTED], true)) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->filled('search')) {
+            $term = '%' . trim((string) $request->search) . '%';
+            $query->where(function ($sub) use ($term) {
+                $sub->where('no_hse_plan', 'like', $term)
+                    ->orWhere('no_po', 'like', $term)
+                    ->orWhere('nama_kontraktor', 'like', $term)
+                    ->orWhere('deskripsi_pekerjaan', 'like', $term);
+            });
+        }
+
+        $hsePlans = $query
+            ->orderByRaw('COALESCE(reviewed_at, updated_at) DESC')
+            ->paginate(15)
+            ->withQueryString();
+
+        $counts = [
+            'approved' => HsePlan::where('status', HsePlan::STATUS_APPROVED)->count(),
+            'rejected' => HsePlan::where('status', HsePlan::STATUS_REJECTED)->count(),
+        ];
+
+        return view('admin.hse-plans.history', compact('hsePlans', 'counts'));
+    }
+
     public function show($id)
     {
         $hsePlan = HsePlan::with(['documents', 'reviewer'])->findOrFail($id);

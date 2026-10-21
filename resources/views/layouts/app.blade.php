@@ -105,24 +105,37 @@
                         <svg class="sidebar-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
                         Dashboard
                     </a>
-                    <a href="/admin/approvals" class="sidebar-link {{ request()->is('admin/approvals*') ? 'active' : '' }}">
+                    <div class="sidebar-section">
+                        <span class="sidebar-section-dot bg-accent-orange"></span>
+                        Safety Permit
+                    </div>
+                    <a href="/admin/approvals" class="sidebar-link sidebar-sublink {{ request()->is('admin/approvals*') ? 'active' : '' }}">
                         <svg class="sidebar-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                         Review Permit
                     </a>
-                    @if($role === 'manager')
-                        <a href="/admin/hse-plans" class="sidebar-link {{ request()->is('admin/hse-plans*') ? 'active' : '' }}">
-                            <svg class="sidebar-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                            HSE Plan
-                        </a>
-                    @endif
-                    <a href="/admin/history" class="sidebar-link {{ request()->is('admin/history*') ? 'active' : '' }}">
+                    <a href="/admin/history" class="sidebar-link sidebar-sublink {{ request()->is('admin/history*') ? 'active' : '' }}">
                         <svg class="sidebar-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
                         History
                     </a>
-                    <a href="/admin/cancellations" class="sidebar-link {{ request()->is('admin/cancellations*') ? 'active' : '' }}">
+                    <a href="/admin/cancellations" class="sidebar-link sidebar-sublink {{ request()->is('admin/cancellations*') ? 'active' : '' }}">
                         <svg class="sidebar-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
                         Pembatalan Permit
                     </a>
+
+                    @if($role === 'manager')
+                        <div class="sidebar-section">
+                            <span class="sidebar-section-dot bg-blue-400"></span>
+                            HSE Plan
+                        </div>
+                        <a href="/admin/hse-plans" class="sidebar-link sidebar-sublink {{ request()->is('admin/hse-plans') || (request()->is('admin/hse-plans/*') && !request()->is('admin/hse-plans/history*')) ? 'active' : '' }}">
+                            <svg class="sidebar-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            Review HSE
+                        </a>
+                        <a href="/admin/hse-plans/history" class="sidebar-link sidebar-sublink {{ request()->is('admin/hse-plans/history*') ? 'active' : '' }}">
+                            <svg class="sidebar-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                            History
+                        </a>
+                    @endif
 
                 @endif
 
@@ -247,6 +260,26 @@
                 width: 18px;
                 height: 18px;
                 flex-shrink: 0;
+            }
+            .sidebar-section {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                padding: 18px 12px 6px;
+                font-size: 0.625rem;
+                font-weight: 700;
+                letter-spacing: 0.14em;
+                text-transform: uppercase;
+                color: #6b7280;
+            }
+            .sidebar-section-dot {
+                width: 6px;
+                height: 6px;
+                border-radius: 9999px;
+                flex-shrink: 0;
+            }
+            .sidebar-sublink {
+                padding-left: 26px;
             }
         </style>
 

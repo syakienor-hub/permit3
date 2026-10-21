@@ -166,6 +166,49 @@ class HsePlanTest extends TestCase
             ->assertForbidden();
     }
 
+    public function test_manager_dashboard_combines_safety_permit_and_hse_plan(): void
+    {
+        $manager = User::factory()->create(['role' => 'manager']);
+        $hsePlan = $this->makeHsePlan();
+
+        $this->actingAs($manager)
+            ->get('/admin/dashboard')
+            ->assertOk()
+            ->assertSee('Safety Permit')
+            ->assertSee('HSE Plan')
+            ->assertSee('Review HSE')
+            ->assertSee($hsePlan->no_hse_plan)
+            ->assertSee($hsePlan->nama_kontraktor);
+    }
+
+    public function test_manager_can_view_hse_plan_history(): void
+    {
+        $manager = User::factory()->create(['role' => 'manager']);
+
+        $approved = $this->makeHsePlan([
+            'status' => HsePlan::STATUS_APPROVED,
+            'reviewed_by' => $manager->id,
+            'reviewed_at' => now(),
+        ]);
+        $rejected = $this->makeHsePlan([
+            'status' => HsePlan::STATUS_REJECTED,
+            'reviewed_by' => $manager->id,
+            'reviewed_at' => now(),
+            'rejection_reason' => 'Dokumen JSA belum lengkap.',
+        ]);
+        $pending = $this->makeHsePlan();
+
+        $this->actingAs($manager)
+            ->get('/admin/hse-plans/history')
+            ->assertOk()
+            ->assertSee('History HSE Plan')
+            ->assertSee($approved->no_hse_plan)
+            ->assertSee($rejected->no_hse_plan)
+            ->assertSee('Disetujui')
+            ->assertSee('Ditolak')
+            ->assertDontSee($pending->no_hse_plan);
+    }
+
     public function test_hse_plan_seeder_creates_five_varied_examples(): void
     {
         Storage::fake('local');
