@@ -15,6 +15,38 @@
     </div>
     @endif
 
+    @php
+        $siteQuery = request('site') ? '?site=' . urlencode(request('site')) : '';
+        $todayQuery = '?date=today' . (request('site') ? '&site=' . urlencode(request('site')) : '');
+    @endphp
+
+    {{-- ===== KARTU STATISTIK ===== --}}
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+        <a href="/admin/approvals{{ $siteQuery }}"
+           class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 hover:shadow-md hover:border-blue-200 transition-all">
+            <div class="flex items-center justify-between gap-2 mb-3">
+                <p class="text-xs font-semibold text-gray-400 uppercase tracking-wide">Menunggu Review</p>
+                <span class="w-8 h-8 rounded-xl bg-blue-50 flex items-center justify-center shrink-0">
+                    <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                </span>
+            </div>
+            <p class="text-3xl sm:text-4xl font-bold text-blue-500">{{ $counts['pending'] }}</p>
+            <p class="text-xs text-gray-400 mt-1">Permit menunggu persetujuan Anda</p>
+        </a>
+
+        <a href="/admin/approvals{{ $todayQuery }}"
+           class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 hover:shadow-md hover:border-gray-200 transition-all">
+            <div class="flex items-center justify-between gap-2 mb-3">
+                <p class="text-xs font-semibold text-gray-400 uppercase tracking-wide">Masuk Hari Ini</p>
+                <span class="w-8 h-8 rounded-xl bg-gray-100 flex items-center justify-center shrink-0">
+                    <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                </span>
+            </div>
+            <p class="text-3xl sm:text-4xl font-bold text-gray-700">{{ $counts['today'] }}</p>
+            <p class="text-xs text-gray-400 mt-1">Antrean Safety Permit hari ini</p>
+        </a>
+    </div>
+
     {{-- ===== FILTER BAR ===== --}}
     <form method="GET" action="/admin/approvals" class="bg-white rounded-2xl border border-gray-100 shadow-sm px-4 md:px-6 py-4 mb-5 flex flex-wrap items-center gap-3">
         <div class="relative flex-1 min-w-[200px]">

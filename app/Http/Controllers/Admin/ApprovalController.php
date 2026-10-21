@@ -63,13 +63,23 @@ class ApprovalController extends Controller
     public function index(Request $request)
     {
         $config = $this->getRoleConfig();
+        $statsQuery = Permit::visibleTo(Auth::user());
         $query = Permit::with(['user', 'classifications'])->visibleTo(Auth::user());
 
         // Manager melihat semua site + boleh filter per site.
         // Staff otomatis ter-scope ke site-nya via visibleTo().
         if (Auth::user()->role === 'manager' && $request->filled('site')) {
+            $statsQuery->forSite($request->site);
             $query->forSite($request->site);
         }
+
+        $counts = [
+            'pending' => (clone $statsQuery)->where('status', $config['expectedStatus'])->count(),
+            'today' => (clone $statsQuery)
+                ->where('status', $config['expectedStatus'])
+                ->whereDate('updated_at', today())
+                ->count(),
+        ];
 
         if ($request->date === 'today') {
             $query->whereDate('updated_at', today())->where('status', $config['expectedStatus']);
@@ -90,7 +100,7 @@ class ApprovalController extends Controller
 
         $permits = $query->orderBy($config['sortCol'], 'asc')->paginate(15)->withQueryString();
 
-        return view('admin.approvals.index', compact('permits', 'config'));
+        return view('admin.approvals.index', compact('permits', 'config', 'counts'));
     }
 
     public function show($id)
