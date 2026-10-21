@@ -16,7 +16,7 @@
         .header-meta { width: 30%; padding: 5px 7px; font-size: 9.5px; }
         .header-meta table { width: 100%; }
         .header-meta td { border: none; padding: 1px 0; vertical-align: top; }
-        .logo { display: block; width: 105px; height: auto; margin: 0 auto; position: relative; left: 10px; top: 8px; }
+        .logo { display: block; width: 105px; height: auto; margin: 0 auto; position: relative; left: 10px; top: 4px; }
         .form-box { border: 1px solid #000; padding: 12px 16px; min-height: 920px; }
         .form-box-page-two { border: 1px solid #000; padding: 12px 16px; min-height: 920px; }
         .field-table { width: 100%; margin-bottom: 4px; }
