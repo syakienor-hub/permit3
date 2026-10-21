@@ -34,30 +34,49 @@
         </a>
     </div>
 
+    <form method="GET" action="/admin/hse-plans" class="bg-white rounded-2xl border border-gray-100 shadow-sm px-4 md:px-6 py-4 mb-5 flex flex-wrap items-center gap-3">
+        <div class="relative flex-1 min-w-[200px]">
+            <svg class="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+            </svg>
+            <input type="text" name="search" value="{{ request('search') }}"
+                placeholder="Cari no. HSE Plan, pekerjaan, kontraktor..."
+                class="w-full pl-9 pr-4 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-inka-navy/20 focus:border-inka-navy">
+        </div>
+
+        <select name="status" class="border border-gray-200 rounded-xl text-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-inka-navy/20 focus:border-inka-navy text-gray-600">
+            <option value="">Status: Menunggu Review</option>
+            <option value="Semua" @selected(request('status') === 'Semua')>Semua Status</option>
+            @foreach([\App\Models\HsePlan::STATUS_REVIEW, \App\Models\HsePlan::STATUS_APPROVED, \App\Models\HsePlan::STATUS_REJECTED] as $status)
+                <option value="{{ $status }}" @selected(request('status') === $status)>{{ $status }}</option>
+            @endforeach
+        </select>
+
+        <select name="site" class="border border-gray-200 rounded-xl text-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-inka-navy/20 focus:border-inka-navy text-gray-600">
+            <option value="">Site: Semua</option>
+            @foreach(\App\Models\HsePlan::SITES as $site)
+                <option value="{{ $site }}" @selected(request('site') === $site)>Site {{ $site }}</option>
+            @endforeach
+        </select>
+
+        <button type="submit"
+            class="px-4 py-2 bg-inka-navy text-white text-sm font-semibold rounded-xl hover:opacity-90 transition-opacity">
+            Cari
+        </button>
+
+        @if(request('search') || request('status') || request('site'))
+            <a href="/admin/hse-plans" class="text-sm text-gray-400 hover:text-gray-600 transition-colors">
+                Reset
+            </a>
+        @endif
+    </form>
+
     <div class="table-card">
-        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3 px-4 md:px-6 py-4 border-b border-gray-100">
+        <div class="flex items-center justify-between px-4 md:px-6 py-4 border-b border-gray-100">
             <div>
-                <h3 class="text-base font-semibold text-gray-800">Daftar HSE Plan</h3>
-                <p class="text-sm text-gray-400 mt-0.5">Pengajuan HSE Plan dari kontraktor dan divisi pengaju</p>
+                <h3 class="text-sm font-semibold text-gray-800">Daftar HSE Plan</h3>
+                <p class="text-xs text-gray-400 mt-0.5">Pengajuan HSE Plan dari kontraktor dan divisi pengaju</p>
             </div>
-            <form method="GET" action="/admin/hse-plans" class="flex flex-col sm:flex-row gap-2 sm:items-center">
-                <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nomor, kontraktor..."
-                    class="form-input !py-2 !text-sm sm:w-56">
-                <select name="site" class="form-input !py-2 !text-sm sm:w-36">
-                    <option value="">Semua Site</option>
-                    @foreach(\App\Models\HsePlan::SITES as $site)
-                        <option value="{{ $site }}" @selected(request('site') === $site)>{{ $site }}</option>
-                    @endforeach
-                </select>
-                <select name="status" class="form-input !py-2 !text-sm sm:w-40">
-                    <option value="">Menunggu Review</option>
-                    <option value="Semua" @selected(request('status') === 'Semua')>Semua Status</option>
-                    @foreach([\App\Models\HsePlan::STATUS_REVIEW, \App\Models\HsePlan::STATUS_APPROVED, \App\Models\HsePlan::STATUS_REJECTED] as $status)
-                        <option value="{{ $status }}" @selected(request('status') === $status)>{{ $status }}</option>
-                    @endforeach
-                </select>
-                <button type="submit" class="px-4 py-2 rounded-xl bg-inka-navy text-white text-sm font-semibold hover:opacity-90 transition-opacity">Cari</button>
-            </form>
         </div>
 
         @if($hsePlans->isEmpty())
