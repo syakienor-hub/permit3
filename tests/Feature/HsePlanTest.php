@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\HsePlan;
 use App\Models\HsePlanDocument;
 use App\Models\User;
+use Database\Seeders\HsePlanSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -151,6 +152,29 @@ class HsePlanTest extends TestCase
         $this->actingAs($staff)
             ->get('/admin/hse-plans')
             ->assertForbidden();
+    }
+
+    public function test_hse_plan_seeder_creates_five_varied_examples(): void
+    {
+        Storage::fake('local');
+        User::factory()->create(['role' => 'manager']);
+
+        $this->seed(HsePlanSeeder::class);
+
+        $this->assertSame(5, HsePlan::count());
+        $this->assertEqualsCanonicalizing(
+            [
+                HsePlan::STATUS_REVIEW,
+                HsePlan::STATUS_REVIEW,
+                HsePlan::STATUS_APPROVED,
+                HsePlan::STATUS_REJECTED,
+                HsePlan::STATUS_APPROVED,
+            ],
+            HsePlan::pluck('status')->all()
+        );
+        $this->assertSame(5, HsePlan::has('documents')->count());
+        $this->assertDatabaseHas('hse_plans', ['no_hse_plan' => '001/HSEPLAN/HSE/' . date('Y')]);
+        $this->assertDatabaseHas('hse_plans', ['no_hse_plan' => '005/HSEPLAN/HSE/' . date('Y')]);
     }
 
     private function validPayload(): array

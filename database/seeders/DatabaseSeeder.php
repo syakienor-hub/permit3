@@ -12,6 +12,7 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             ClassificationSeeder::class,
             PermitSeeder::class,
+            HsePlanSeeder::class,
         ]);
     }
 }
