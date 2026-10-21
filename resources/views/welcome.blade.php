@@ -263,7 +263,7 @@
 <body class="bg-[var(--paper)] text-[var(--ink-900)]">
 
 <!-- ================= HEADER ================= -->
-<header class="nav" x-data="{ mobileOpen: false }">
+<header class="nav" x-data="{ mobileOpen: false, activeNav: window.location.hash ? window.location.hash.substring(1) : null }">
     <div class="max-w-[1080px] mx-auto px-4 md:px-6 flex items-center h-[60px] md:h-[68px] gap-3">
         <div class="flex items-center gap-2.5 mr-auto min-w-0">
             <img src="{{ asset('assets/images/logoinka.svg') }}" alt="INKA" class="h-6 md:h-7 w-auto shrink-0">
@@ -273,12 +273,15 @@
             </div>
         </div>
         <div class="hidden md:flex items-center gap-6 mr-4 text-sm font-semibold text-[var(--ink-600)]">
-            <a href="#monitoring" class="hover:text-[var(--navy-950)] transition-colors flex items-center gap-1.5 text-inka-navy font-bold">
-                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            <a href="#monitoring" @click="activeNav = 'monitoring'" class="hover:text-[var(--navy-950)] transition-colors flex items-center gap-1.5"
+                :class="activeNav === 'monitoring' ? 'text-inka-navy font-bold' : ''">
+                <span x-show="activeNav === 'monitoring'" class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                 Monitoring Permit
             </a>
-            <a href="#alur" class="hover:text-[var(--navy-950)] transition-colors">Alur Pengajuan</a>
-            <a href="#tentang" class="hover:text-[var(--navy-950)] transition-colors">Tentang Kami</a>
+            <a href="#alur" @click="activeNav = 'alur'" class="hover:text-[var(--navy-950)] transition-colors"
+                :class="activeNav === 'alur' ? 'text-inka-navy font-bold' : ''">Alur Pengajuan</a>
+            <a href="#tentang" @click="activeNav = 'tentang'" class="hover:text-[var(--navy-950)] transition-colors"
+                :class="activeNav === 'tentang' ? 'text-inka-navy font-bold' : ''">Tentang Kami</a>
         </div>
         <div class="hidden sm:flex items-center gap-2.5 shrink-0">
             <a href="/ajukan-permit" class="btn btn-amber">Ajukan Permit</a>
@@ -295,12 +298,15 @@
     </div>
     <div x-show="mobileOpen" x-cloak class="md:hidden border-t border-[var(--border)] bg-white px-4 pt-2 pb-4">
         <nav class="flex flex-col text-sm font-semibold text-[var(--ink-600)]">
-            <a href="#monitoring" @click="mobileOpen = false" class="flex items-center gap-2 py-3 border-b border-gray-100 text-inka-navy font-bold">
-                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            <a href="#monitoring" @click="activeNav = 'monitoring'; mobileOpen = false" class="flex items-center gap-2 py-3 border-b border-gray-100"
+                :class="activeNav === 'monitoring' ? 'text-inka-navy font-bold' : ''">
+                <span x-show="activeNav === 'monitoring'" class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                 Monitoring Permit
             </a>
-            <a href="#alur" @click="mobileOpen = false" class="py-3 border-b border-gray-100">Alur Pengajuan</a>
-            <a href="#tentang" @click="mobileOpen = false" class="py-3 border-b border-gray-100">Tentang Kami</a>
+            <a href="#alur" @click="activeNav = 'alur'; mobileOpen = false" class="py-3 border-b border-gray-100"
+                :class="activeNav === 'alur' ? 'text-inka-navy font-bold' : ''">Alur Pengajuan</a>
+            <a href="#tentang" @click="activeNav = 'tentang'; mobileOpen = false" class="py-3 border-b border-gray-100"
+                :class="activeNav === 'tentang' ? 'text-inka-navy font-bold' : ''">Tentang Kami</a>
         </nav>
         <div class="flex flex-col gap-2.5 mt-3 sm:hidden">
             <a href="/ajukan-permit" class="btn btn-amber btn-lg w-full">Ajukan Permit</a>
