@@ -379,11 +379,25 @@ class ApprovalController extends Controller
         return redirect('/admin/approvals')->with('success', $message);
     }
 
+    public function viewPdf($id)
+    {
+        $permit = $this->pdfPermit($id);
+
+        return $this->permitPdf($permit)->stream($this->permitPdfName($permit));
+    }
+
     public function downloadPdf($id)
+    {
+        $permit = $this->pdfPermit($id);
+
+        return $this->permitPdf($permit)->download($this->permitPdfName($permit));
+    }
+
+    private function pdfPermit($id): Permit
     {
         $permit = Permit::findOrFail($id);
 
-        // Staff hanya boleh mengunduh PDF dari site-nya sendiri.
+        // Staff hanya boleh mengakses PDF dari site-nya sendiri.
         if (Auth::user()->role === 'staff' && $permit->site !== Auth::user()->site) {
             abort(403, 'Permit bukan wewenang site Anda.');
         }
@@ -393,11 +407,19 @@ class ApprovalController extends Controller
             abort(403, 'Permit tidak tersedia untuk diakses.');
         }
 
-        $pdf = Pdf::loadView('divisi.permits.pdf', compact('permit'))
+        return $permit;
+    }
+
+    private function permitPdf(Permit $permit)
+    {
+        return Pdf::loadView('divisi.permits.pdf', compact('permit'))
             ->setPaper('A4', 'portrait')
             ->setOptions(['defaultFont' => 'sans-serif']);
+    }
 
-        return $pdf->download('Permit-' . str_replace('/', '-', $permit->no_permit) . '.pdf');
+    private function permitPdfName(Permit $permit): string
+    {
+        return 'Permit-' . str_replace('/', '-', $permit->no_permit) . '.pdf';
     }
 
     public function downloadDocument($permitId, $documentId)

@@ -8,7 +8,21 @@ use Barryvdh\DomPDF\Facade\Pdf;
 
 class PermitController extends Controller
 {
+    public function viewPdf($id)
+    {
+        $permit = $this->pdfPermit($id);
+
+        return $this->permitPdf($permit)->stream($this->permitPdfName($permit));
+    }
+
     public function downloadPdf($id)
+    {
+        $permit = $this->pdfPermit($id);
+
+        return $this->permitPdf($permit)->download($this->permitPdfName($permit));
+    }
+
+    private function pdfPermit($id): Permit
     {
         $permit = Permit::findOrFail($id);
 
@@ -17,10 +31,18 @@ class PermitController extends Controller
             abort(403, 'Permit tidak tersedia untuk diakses.');
         }
 
-        $pdf = Pdf::loadView('divisi.permits.pdf', compact('permit'))
+        return $permit;
+    }
+
+    private function permitPdf(Permit $permit)
+    {
+        return Pdf::loadView('divisi.permits.pdf', compact('permit'))
             ->setPaper('A4', 'portrait')
             ->setOptions(['defaultFont' => 'sans-serif']);
+    }
 
-        return $pdf->download('Permit-' . str_replace('/', '-', $permit->no_permit) . '.pdf');
+    private function permitPdfName(Permit $permit): string
+    {
+        return 'Permit-' . str_replace('/', '-', $permit->no_permit) . '.pdf';
     }
 }

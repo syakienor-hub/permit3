@@ -93,15 +93,30 @@ class HsePlanApprovalController extends Controller
         return view('admin.hse-plans.show', compact('hsePlan'));
     }
 
+    public function viewPdf($id)
+    {
+        $hsePlan = HsePlan::with('reviewer')->findOrFail($id);
+
+        return $this->hsePlanPdf($hsePlan)->stream($this->hsePlanPdfName($hsePlan));
+    }
+
     public function downloadPdf($id)
     {
         $hsePlan = HsePlan::with('reviewer')->findOrFail($id);
 
-        $pdf = Pdf::loadView('admin.hse-plans.pdf', compact('hsePlan'))
+        return $this->hsePlanPdf($hsePlan)->download($this->hsePlanPdfName($hsePlan));
+    }
+
+    private function hsePlanPdf(HsePlan $hsePlan)
+    {
+        return Pdf::loadView('admin.hse-plans.pdf', compact('hsePlan'))
             ->setPaper('A4', 'portrait')
             ->setOptions(['defaultFont' => 'sans-serif']);
+    }
 
-        return $pdf->download('HSE-Plan-' . str_replace('/', '-', $hsePlan->no_hse_plan) . '.pdf');
+    private function hsePlanPdfName(HsePlan $hsePlan): string
+    {
+        return 'HSE-Plan-' . str_replace('/', '-', $hsePlan->no_hse_plan) . '.pdf';
     }
 
     public function approve(Request $request, $id)

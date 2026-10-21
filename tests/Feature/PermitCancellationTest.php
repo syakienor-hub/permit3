@@ -146,7 +146,7 @@ class PermitCancellationTest extends TestCase
         $this->assertSame($manager->name, $permit->cancellation_signatures[0]['name']);
     }
 
-    public function test_admin_can_download_pdf_for_cancelled_permit(): void
+    public function test_admin_can_view_and_download_pdf_for_cancelled_permit(): void
     {
         $manager = User::factory()->create([
             'role' => 'manager',
@@ -169,6 +169,12 @@ class PermitCancellationTest extends TestCase
             ->get("/admin/permits/{$permit->id}/pdf")
             ->assertOk()
             ->assertHeader('content-type', 'application/pdf');
+
+        $this->actingAs($manager)
+            ->get("/admin/permits/{$permit->id}/pdf/download")
+            ->assertOk()
+            ->assertHeader('content-type', 'application/pdf')
+            ->assertDownload('Permit-' . str_replace('/', '-', $permit->no_permit) . '.pdf');
     }
 
     private function makePermit(array $attributes = []): Permit

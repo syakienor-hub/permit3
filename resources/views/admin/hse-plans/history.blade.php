@@ -121,7 +121,7 @@
                                     </a>
                                 </td>
                                 <td class="text-right whitespace-nowrap" onclick="event.stopPropagation()">
-                                    <a href="/admin/hse-plans/{{ $hsePlan->id }}/pdf"
+                                    <a href="/admin/hse-plans/{{ $hsePlan->id }}/pdf" target="_blank"
                                        class="inline-block px-3 py-1.5 border border-red-200 text-red-600 text-[11px] font-bold rounded-lg hover:border-red-400 hover:text-red-700 transition-colors">
                                         PDF
                                     </a>

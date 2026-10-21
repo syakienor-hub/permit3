@@ -21,18 +21,36 @@ class PermitShowController extends Controller
         return view('divisi.permits.show', compact('permit'));
     }
 
+    public function viewPdf($id)
+    {
+        $permit = $this->ownedPermit($id);
+
+        return $this->permitPdf($permit)->stream($this->permitPdfName($permit));
+    }
+
     public function downloadPdf($id)
     {
-        $userId = Auth::id();
+        $permit = $this->ownedPermit($id);
 
-        $permit = Permit::where('user_id', $userId)
-                         ->where('id', $id)
-                         ->firstOrFail();
+        return $this->permitPdf($permit)->download($this->permitPdfName($permit));
+    }
 
-        $pdf = Pdf::loadView('divisi.permits.pdf', compact('permit'))
+    private function ownedPermit($id): Permit
+    {
+        return Permit::where('user_id', Auth::id())
+            ->where('id', $id)
+            ->firstOrFail();
+    }
+
+    private function permitPdf(Permit $permit)
+    {
+        return Pdf::loadView('divisi.permits.pdf', compact('permit'))
             ->setPaper('A4', 'portrait')
             ->setOptions(['defaultFont' => 'sans-serif']);
+    }
 
-        return $pdf->download('Permit-' . str_replace('/', '-', $permit->no_permit) . '.pdf');
+    private function permitPdfName(Permit $permit): string
+    {
+        return 'Permit-' . str_replace('/', '-', $permit->no_permit) . '.pdf';
     }
 }

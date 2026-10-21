@@ -88,7 +88,8 @@ Route::middleware(['auth', 'prevent-back-history', 'role:superadmin'])->group(fu
     Route::delete('/superadmin/users/{id}', [\App\Http\Controllers\SuperAdmin\UserController::class, 'destroy']);
     Route::patch('/superadmin/users/{id}/status', [\App\Http\Controllers\SuperAdmin\UserController::class, 'updateStatus']);
     Route::patch('/superadmin/users/{id}/reset-password', [\App\Http\Controllers\SuperAdmin\UserController::class, 'resetPassword']);
-    Route::get('/superadmin/permits/{id}/pdf', [\App\Http\Controllers\SuperAdmin\PermitController::class, 'downloadPdf']);
+    Route::get('/superadmin/permits/{id}/pdf', [\App\Http\Controllers\SuperAdmin\PermitController::class, 'viewPdf']);
+    Route::get('/superadmin/permits/{id}/pdf/download', [\App\Http\Controllers\SuperAdmin\PermitController::class, 'downloadPdf']);
 });
 
 // ===== DIVISI (role:divisi) =====
@@ -101,7 +102,8 @@ Route::middleware(['auth', 'prevent-back-history', 'role:divisi'])->group(functi
     Route::get('/divisi/permits/create', [\App\Http\Controllers\Divisi\PermitController::class, 'create']);
     Route::post('/divisi/permits', [\App\Http\Controllers\Divisi\PermitController::class, 'store']);
     Route::get('/divisi/permits/{id}', [\App\Http\Controllers\Divisi\PermitShowController::class, 'show']);
-    Route::get('/divisi/permits/{id}/pdf', [\App\Http\Controllers\Divisi\PermitShowController::class, 'downloadPdf']);
+    Route::get('/divisi/permits/{id}/pdf', [\App\Http\Controllers\Divisi\PermitShowController::class, 'viewPdf']);
+    Route::get('/divisi/permits/{id}/pdf/download', [\App\Http\Controllers\Divisi\PermitShowController::class, 'downloadPdf']);
     Route::get('/divisi/permits/{id}/edit', [\App\Http\Controllers\Divisi\PermitController::class, 'edit']);
     Route::put('/divisi/permits/{id}', [\App\Http\Controllers\Divisi\PermitController::class, 'update']);
     Route::get('/divisi/permits/{permitId}/documents/{documentId}/download', [\App\Http\Controllers\Divisi\PermitController::class, 'downloadDocument'])->name('permits.documents.download');
@@ -112,7 +114,8 @@ Route::middleware(['auth', 'prevent-back-history', 'role:manager'])->group(funct
     Route::get('/admin/hse-plans', [\App\Http\Controllers\Admin\HsePlanApprovalController::class, 'index']);
     Route::get('/admin/hse-plans/history', [\App\Http\Controllers\Admin\HsePlanApprovalController::class, 'history']);
     Route::get('/admin/hse-plans/{id}', [\App\Http\Controllers\Admin\HsePlanApprovalController::class, 'show']);
-    Route::get('/admin/hse-plans/{id}/pdf', [\App\Http\Controllers\Admin\HsePlanApprovalController::class, 'downloadPdf']);
+    Route::get('/admin/hse-plans/{id}/pdf', [\App\Http\Controllers\Admin\HsePlanApprovalController::class, 'viewPdf']);
+    Route::get('/admin/hse-plans/{id}/pdf/download', [\App\Http\Controllers\Admin\HsePlanApprovalController::class, 'downloadPdf']);
     Route::post('/admin/hse-plans/{id}/approve', [\App\Http\Controllers\Admin\HsePlanApprovalController::class, 'approve']);
     Route::post('/admin/hse-plans/{id}/reject', [\App\Http\Controllers\Admin\HsePlanApprovalController::class, 'reject']);
     Route::get('/admin/hse-plans/{hsePlanId}/documents/{documentId}/download', [\App\Http\Controllers\Admin\HsePlanApprovalController::class, 'downloadDocument'])
@@ -132,7 +135,8 @@ Route::middleware(['auth', 'prevent-back-history', 'role:staff,manager'])->group
     Route::get('/admin/cancellations', [\App\Http\Controllers\Admin\CancellationController::class, 'index']);
     Route::get('/admin/cancellations/{id}', [\App\Http\Controllers\Admin\CancellationController::class, 'show']);
     Route::post('/admin/cancellations/{id}', [\App\Http\Controllers\Admin\CancellationController::class, 'cancel']);
-    Route::get('/admin/permits/{id}/pdf', [\App\Http\Controllers\Admin\ApprovalController::class, 'downloadPdf']);
+    Route::get('/admin/permits/{id}/pdf', [\App\Http\Controllers\Admin\ApprovalController::class, 'viewPdf']);
+    Route::get('/admin/permits/{id}/pdf/download', [\App\Http\Controllers\Admin\ApprovalController::class, 'downloadPdf']);
 });
 
 Route::middleware('auth')->group(function () {
