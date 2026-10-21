@@ -2,7 +2,7 @@
     <x-slot name="title">History Permit</x-slot>
 
     {{-- ===== FILTER BAR ===== --}}
-    <form method="GET" action="/divisi/history" class="bg-white rounded-2xl border border-gray-100 shadow-sm px-6 py-4 mb-5 flex flex-wrap items-center gap-3">
+    <form method="GET" action="/divisi/history" class="bg-white rounded-2xl border border-gray-100 shadow-sm px-4 md:px-6 py-4 mb-5 flex flex-wrap items-center gap-3">
 
         {{-- Search --}}
         <div class="relative flex-1 min-w-[200px]">
@@ -55,7 +55,7 @@
     <div class="bg-white rounded-2xl border border-gray-100 shadow-sm">
 
         {{-- Header --}}
-        <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+        <div class="flex items-center justify-between px-4 md:px-6 py-4 border-b border-gray-100">
             <div>
                 <h3 class="text-sm font-semibold text-gray-800">Seluruh Permit</h3>
                 <p class="text-xs text-gray-400 mt-0.5">
@@ -86,8 +86,9 @@
                 </a>
             </div>
         @else
-            <div class="overflow-x-auto">
-                <table class="w-full text-left text-sm">
+            {{-- Desktop/laptop: tabel tetap seperti semula --}}
+            <div class="overflow-x-auto hidden md:block">
+                <table class="w-full text-left text-sm min-w-[880px]">
                     <thead>
                         <tr class="text-xs text-gray-400 uppercase tracking-wide border-b border-gray-100 bg-gray-50/60">
                             <th class="px-6 py-3 font-semibold">No. Permit</th>
@@ -159,9 +160,38 @@
                 </table>
             </div>
 
+            {{-- HP saja: card vertikal pengganti tabel lebar (tanpa scroll horizontal, layout ringan).
+                 Laptop/desktop tetap pakai tabel di atas. --}}
+            <div class="md:hidden divide-y divide-gray-50">
+                @foreach($permits as $permit)
+                @php
+                    $mBadge = $statusMap[$permit->status] ?? 'bg-gray-100 text-gray-600';
+                    $mCanEdit = in_array($permit->status, ['Draft', 'Revision']);
+                @endphp
+                <a href="/divisi/permits/{{ $permit->id }}" class="block px-4 py-4 active:bg-blue-50/50">
+                    <div class="flex items-center justify-between gap-2 mb-1.5">
+                        <span class="font-semibold text-inka-navy text-sm">{{ $permit->no_permit }}</span>
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold {{ $mBadge }} shrink-0">
+                            {{ str_starts_with($permit->status, 'Review') ? 'Menunggu ' . $permit->status : $permit->status }}
+                        </span>
+                    </div>
+                    <p class="text-sm text-gray-800 font-medium truncate">{{ $permit->nama_pekerjaan ?? $permit->kontraktor }}</p>
+                    <p class="text-xs text-gray-400 mt-0.5 truncate">{{ $permit->kontraktor }} &middot; {{ $permit->lokasi ?? '—' }}</p>
+                    <div class="flex items-center gap-1.5 mt-2">
+                        <x-permit-site-badge :site="$permit->site" />
+                        <x-permit-tipe-badge :tipe="$permit->tipe" />
+                    </div>
+                    <div class="flex items-center justify-between mt-2.5">
+                        <x-permit-tanggal :permit="$permit" />
+                        <span class="text-xs font-semibold text-inka-navy">{{ $mCanEdit ? 'Edit ›' : 'Lihat Detail ›' }}</span>
+                    </div>
+                </a>
+                @endforeach
+            </div>
+
             {{-- Pagination --}}
             @if($permits->hasPages())
-            <div class="px-6 py-4 border-t border-gray-100">
+            <div class="px-4 md:px-6 py-4 border-t border-gray-100">
                 {{ $permits->links() }}
             </div>
             @endif

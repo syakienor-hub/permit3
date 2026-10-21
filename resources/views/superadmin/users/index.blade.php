@@ -69,7 +69,7 @@
 
         {{-- Table --}}
         <div class="overflow-x-auto">
-            <table class="w-full text-left text-sm text-gray-600">
+            <table class="w-full text-left text-sm text-gray-600 min-w-[760px]">
                 <thead class="bg-gray-50/50 text-xs uppercase text-gray-500 border-b border-gray-100">
                     <tr>
                         <th class="px-6 py-4 font-semibold">Nama Divisi</th>

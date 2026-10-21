@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Mail\PermitDibatalkanMail;
 use App\Mail\PermitMasukMail;
 use App\Models\Permit;
 use App\Models\User;
@@ -28,25 +29,34 @@ class PermitMailNotifier
         self::sendToRole($permit, 'manager');
     }
 
+    /**
+     * Kirim notifikasi ke HSE bahwa permit dibatalkan oleh pemohon publik.
+     */
+    public static function notifyCancellation(Permit $permit): void
+    {
+        try {
+            $recipients = array_values(array_unique(array_merge(
+                self::recipientsForRole($permit, 'staff'),
+                self::recipientsForRole($permit, 'manager'),
+            )));
+
+            if (empty($recipients)) {
+                Log::warning("PermitMailNotifier: tidak ada penerima aktif untuk pembatalan permit {$permit->no_permit}.");
+                return;
+            }
+
+            Mail::to($recipients)->send(new PermitDibatalkanMail($permit));
+        } catch (\Throwable $e) {
+            Log::warning('PermitMailNotifier gagal mengirim email pembatalan: ' . $e->getMessage(), [
+                'permit_id' => $permit->id,
+            ]);
+        }
+    }
+
     protected static function sendToRole(Permit $permit, string $role): void
     {
         try {
-            $query = User::where('role', $role)
-                ->where('is_active', true)
-                ->whereNotNull('email')
-                ->where('email', '!=', '');
-
-            // Staff HSE hanya menerima notif untuk site-nya sendiri.
-            // Manager (site null) menerima semua site.
-            if ($role === 'staff' && ! empty($permit->site)) {
-                $query->where('site', $permit->site);
-            }
-
-            $recipients = $query->pluck('email')
-                ->filter()
-                ->unique()
-                ->values()
-                ->all();
+            $recipients = self::recipientsForRole($permit, $role);
 
             if (empty($recipients)) {
                 Log::warning("PermitMailNotifier: tidak ada penerima aktif untuk role {$role}, permit {$permit->no_permit} dilewati.");
@@ -61,5 +71,28 @@ class PermitMailNotifier
                 'role' => $role,
             ]);
         }
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    protected static function recipientsForRole(Permit $permit, string $role): array
+    {
+        $query = User::where('role', $role)
+            ->where('is_active', true)
+            ->whereNotNull('email')
+            ->where('email', '!=', '');
+
+        // Staff HSE hanya menerima notif untuk site-nya sendiri.
+        // Manager (site null) menerima semua site.
+        if ($role === 'staff' && ! empty($permit->site)) {
+            $query->where('site', $permit->site);
+        }
+
+        return $query->pluck('email')
+            ->filter()
+            ->unique()
+            ->values()
+            ->all();
     }
 }

@@ -2,7 +2,7 @@
     <x-slot name="title">History Permit ({{ $roleName }})</x-slot>
 
     {{-- ===== FILTER BAR ===== --}}
-    <form method="GET" action="/admin/history" class="bg-white rounded-2xl border border-gray-100 shadow-sm px-6 py-4 mb-5 flex flex-wrap items-center gap-3">
+    <form method="GET" action="/admin/history" class="bg-white rounded-2xl border border-gray-100 shadow-sm px-4 md:px-6 py-4 mb-5 flex flex-wrap items-center gap-3">
         <div class="relative flex-1 min-w-[200px]">
             <svg class="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
             <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari no. permit, divisi, kontraktor..." class="w-full pl-9 pr-4 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-inka-navy/20 focus:border-inka-navy">
@@ -38,7 +38,7 @@
 
     {{-- ===== TABEL HISTORY ===== --}}
     <div class="bg-white rounded-2xl border border-gray-100 shadow-sm">
-        <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+        <div class="flex items-center justify-between px-4 md:px-6 py-4 border-b border-gray-100">
             <h3 class="text-sm font-semibold text-gray-800">Semua Data Permit (Global)</h3>
         </div>
         @if($permits->isEmpty())
@@ -49,8 +49,9 @@
                 <p class="text-sm font-semibold text-gray-700">Tidak ada permit ditemukan.</p>
             </div>
         @else
-            <div class="overflow-x-auto">
-                <table class="w-full text-left text-sm">
+            {{-- Desktop/laptop: tabel tetap --}}
+            <div class="overflow-x-auto hidden md:block">
+                <table class="w-full text-left text-sm min-w-[1020px]">
                     <thead>
                         <tr class="text-xs text-gray-400 uppercase tracking-wide border-b border-gray-100 bg-gray-50/60">
                             <th class="px-6 py-3 font-semibold">No. Permit</th>
@@ -105,8 +106,26 @@
                     </tbody>
                 </table>
             </div>
+            {{-- HP saja: card vertikal pengganti tabel 1020px --}}
+            <div class="md:hidden divide-y divide-gray-50">
+                @foreach($permits as $permit)
+                @php $mBadgeH = $statusMap[$permit->status] ?? 'bg-gray-100 text-gray-600'; @endphp
+                <a href="/admin/approvals/{{ $permit->id }}" class="block px-4 py-4 active:bg-blue-50/50">
+                    <div class="flex items-center justify-between gap-2 mb-1.5">
+                        <span class="font-semibold text-gray-800 text-sm">{{ $permit->no_permit }}</span>
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold {{ $mBadgeH }} shrink-0">{{ $permit->status }}</span>
+                    </div>
+                    <p class="text-sm text-gray-800 font-medium truncate">{{ $permit->nama_pekerjaan }}</p>
+                    <p class="text-xs text-gray-400 mt-0.5 truncate">{{ optional($permit->user)->name ?? $permit->divisi_pengaju ?? '—' }} &middot; {{ $permit->lokasi ?? '—' }}</p>
+                    <div class="flex items-center justify-between mt-2.5">
+                        <x-permit-tanggal :permit="$permit" />
+                        <span class="text-xs font-semibold text-inka-navy">Detail ›</span>
+                    </div>
+                </a>
+                @endforeach
+            </div>
             @if($permits->hasPages())
-            <div class="px-6 py-4 border-t border-gray-100">{{ $permits->links() }}</div>
+            <div class="px-4 md:px-6 py-4 border-t border-gray-100">{{ $permits->links() }}</div>
             @endif
         @endif
     </div>

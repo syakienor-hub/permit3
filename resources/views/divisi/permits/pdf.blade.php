@@ -346,6 +346,7 @@
         <tr>
             <td width="60%" style="border-right: none; padding-right: 0;">
                 <div>Izin kerja dibatalkan</div>
+                <div style="margin-top: 6px;">Alasan &nbsp;: {{ $permit->cancellation_reason ?: '..................................' }}</div>
                 <div style="margin-top: 6px;">Tanggal &nbsp;: {{ $permit->cancelled_at ? \Carbon\Carbon::parse($permit->cancelled_at)->format('d/m/Y') : '..................................' }} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Jam : {{ $permit->cancelled_at ? \Carbon\Carbon::parse($permit->cancelled_at)->format('H:i') : '......................' }}</div>
             </td>
             <td width="40%" style="padding: 0; border: none;">
@@ -356,31 +357,26 @@
                     </tr>
                     @php
                         $csigs = is_string($permit->cancellation_signatures) ? json_decode($permit->cancellation_signatures, true) : ($permit->cancellation_signatures ?? []);
-                        $cso = ''; $cso_sig = '';
-                        $csm = ''; $csm_sig = '';
-                        foreach($csigs as $s) {
-                            if($s['role'] == 'Safety Officer') { $cso = $s['name']; $cso_sig = $s['signature']; }
-                            if($s['role'] == 'SM QM & SHE') { $csm = $s['name']; $csm_sig = $s['signature']; }
-                        }
                     @endphp
+                    @forelse($csigs as $s)
                     <tr>
                         <td style="border: none; border-right: 1px solid #000; border-bottom: 1px solid #000; padding: 0;">
-                            <div style="border-bottom: 1px solid #000; font-size: 7px; padding: 1px 2px;">Safety Officer</div>
-                            <div class="text-center" style="padding: 5px 2px 2px;">Staff HSE  </div>
+                            <div style="border-bottom: 1px solid #000; font-size: 7px; padding: 1px 2px;">{{ $s['role'] ?? '-' }}</div>
+                            <div class="text-center" style="padding: 5px 2px 2px;">{{ $s['name'] ?? '-' }}</div>
                         </td>
                         <td class="text-center sig-cell" style="border: none; border-bottom: 1px solid #000; height: 32px; vertical-align: middle;">
-                            @if($csm_sig)<img src="{{ $csm_sig }}" class="sig-img" style="max-height: 28px;">@endif
+                            @if(!empty($s['signature']))<img src="{{ $s['signature'] }}" class="sig-img" style="max-height: 28px;">@endif
                         </td>
                     </tr>
+                    @empty
                     <tr>
                         <td style="border: none; border-right: 1px solid #000; border-bottom: 1px solid #000; padding: 0;">
-                            <div style="border-bottom: 1px solid #000; font-size: 7px; padding: 1px 2px;">Manager HSE</div>
-                            <div class="text-center" style="padding: 5px 2px 2px;">Dimas Ali Akbar</div>
+                            <div style="border-bottom: 1px solid #000; font-size: 7px; padding: 1px 2px;">&nbsp;</div>
+                            <div class="text-center" style="padding: 5px 2px 2px;">&nbsp;</div>
                         </td>
-                        <td class="text-center sig-cell" style="border: none; border-bottom: 1px solid #000; height: 32px; vertical-align: middle;">
-                            @if($csm_sig)<img src="{{ $csm_sig }}" class="sig-img" style="max-height: 28px;">@endif
-                        </td>
+                        <td class="text-center sig-cell" style="border: none; border-bottom: 1px solid #000; height: 32px; vertical-align: middle;">&nbsp;</td>
                     </tr>
+                    @endforelse
                 </table>
             </td>
         </tr>

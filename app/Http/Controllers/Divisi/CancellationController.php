@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Divisi;
 
 use App\Http\Controllers\Controller;
 use App\Models\Permit;
+use App\Services\PermitCancellationService;
+use DomainException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -39,37 +41,24 @@ class CancellationController extends Controller
     /**
      * Memproses pembatalan permit.
      */
-    public function cancel(Request $request, $id)
+    public function cancel(Request $request, $id, PermitCancellationService $cancellations)
     {
         $request->validate([
             'cancellation_reason' => 'required|string|max:500',
-            'tanda_tangan' => 'required|string',
+            'tanda_tangan' => 'required|string|max:2000000',
         ]);
 
         $permit = Permit::byDivisi(Auth::id())->findOrFail($id);
 
-        if (in_array($permit->status, ['Closed', 'Cancelled'])) {
-            return redirect('/divisi/cancellations')->with('error', 'Permit yang sudah ditutup atau dibatalkan tidak dapat dibatalkan lagi.');
+        try {
+            $cancellations->cancel($permit, $request->cancellation_reason, [
+                'role' => 'Pemohon (Divisi)',
+                'name' => Auth::user()->name,
+                'signature' => $request->tanda_tangan,
+            ]);
+        } catch (DomainException $e) {
+            return redirect('/divisi/cancellations')->with('error', $e->getMessage());
         }
-
-        $nama = Auth::user()->name;
-
-        // Simpan tanda tangan pemohon yang membatalkan
-        $signatures = $permit->cancellation_signatures ?? [];
-        $signatures[] = [
-            'role' => 'Pemohon (Divisi)',
-            'name' => $nama,
-            'signature' => $request->tanda_tangan,
-            'date' => now()->toDateTimeString(),
-        ];
-
-        // Langsung batalkan permit
-        $permit->forceFill([
-            'status' => 'Cancelled',
-            'cancelled_at' => now(),
-            'cancellation_reason' => $request->cancellation_reason,
-            'cancellation_signatures' => $signatures,
-        ])->save();
 
         return redirect('/divisi/history')->with('success', 'Izin kerja berhasil dibatalkan secara langsung.');
     }

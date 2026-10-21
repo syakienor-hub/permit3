@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Safety Permit INKA Madiun — Sistem Monitoring K3 Kontraktor</title>
 
+    <link rel="icon" type="image/png" href="{{ asset('assets/images/logok3.png') }}">
+
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <style>
@@ -43,9 +45,37 @@
         .hero {
             position: relative;
             background: linear-gradient(180deg, rgba(13,21,38,.5), rgba(18,32,64,.6)), url('{{ asset('assets/images/bg-landingpage.jpeg') }}');
-            background-size: 120%;
+            background-size: cover;
             background-position: center 58%;
-            color: #fff; overflow: hidden; padding: 86px 0; text-align: center;
+            color: #fff; overflow: hidden; padding: 60px 0; text-align: center;
+        }
+
+        /* HP saja: pakai hero versi ringan (~87KB WebP vs 1.7MB JPEG).
+           Laptop/desktop tetap pakai bg-landingpage.jpeg asli di atas. */
+        @media (max-width: 767px) {
+            .hero {
+                background-image: linear-gradient(180deg, rgba(13,21,38,.5), rgba(18,32,64,.6)), url('{{ asset('assets/images/bg-landingpage-mobile.webp') }}');
+            }
+            /* Matikan efek GPU berat hanya di HP */
+            .nav {
+                backdrop-filter: none;
+                -webkit-backdrop-filter: none;
+                background: #fff;
+            }
+            .hero::before { display: none; }
+            .eyebrow .dot { animation: none; }
+            .reveal, .reveal-left, .reveal-right, .reveal-scale, .hero-animate {
+                opacity: 1 !important;
+                transform: none !important;
+                transition: none !important;
+            }
+            .flow-step:hover .sn { transform: none; }
+            .about-stat:hover { transform: none; box-shadow: none; }
+            .btn-amber:hover { transform: none; }
+        }
+
+        @media (min-width: 768px) {
+            .hero { padding: 86px 0; }
         }
 
         .hero::before {
@@ -216,7 +246,10 @@
         }
         @media (max-width: 560px) {
             .flow-grid { grid-template-columns: 1fr; }
-            .about-stats { grid-template-columns: 1fr 1fr; }
+            .about-stats { grid-template-columns: 1fr 1fr; gap: 12px; }
+            .flow-note { margin-top: 28px; padding: 14px 16px; font-size: 12.5px; }
+            .about-visual { padding: 20px; }
+            .btn-lg { width: 100%; }
         }
 
         /* Staggered animation delays for flow steps */
@@ -230,13 +263,13 @@
 <body class="bg-[var(--paper)] text-[var(--ink-900)]">
 
 <!-- ================= HEADER ================= -->
-<header class="nav">
-    <div class="max-w-[1080px] mx-auto px-6 flex items-center h-[68px] gap-5">
-        <div class="flex items-center gap-3 mr-auto">
-            <img src="{{ asset('assets/images/logoinka.svg') }}" alt="INKA" class="h-7 w-auto">
-            <div class="border-l border-[var(--border)] pl-3">
-                <span class="text-sm font-bold">Safety Permit</span>
-                <span class="block text-[10px] font-semibold text-[var(--ink-600)] tracking-wide">INKA MADIUN</span>
+<header class="nav" x-data="{ mobileOpen: false }">
+    <div class="max-w-[1080px] mx-auto px-4 md:px-6 flex items-center h-[60px] md:h-[68px] gap-3">
+        <div class="flex items-center gap-2.5 mr-auto min-w-0">
+            <img src="{{ asset('assets/images/logoinka.svg') }}" alt="INKA" class="h-6 md:h-7 w-auto shrink-0">
+            <div class="border-l border-[var(--border)] pl-2.5 md:pl-3 whitespace-nowrap">
+                <span class="text-[13px] md:text-sm font-bold">Safety Permit</span>
+                <span class="block text-[9px] md:text-[10px] font-semibold text-[var(--ink-600)] tracking-wide">INKA MADIUN</span>
             </div>
         </div>
         <div class="hidden md:flex items-center gap-6 mr-4 text-sm font-semibold text-[var(--ink-600)]">
@@ -247,7 +280,7 @@
             <a href="#alur" class="hover:text-[var(--navy-950)] transition-colors">Alur Pengajuan</a>
             <a href="#tentang" class="hover:text-[var(--navy-950)] transition-colors">Tentang Kami</a>
         </div>
-        <div class="flex items-center gap-2.5">
+        <div class="hidden sm:flex items-center gap-2.5 shrink-0">
             <a href="/ajukan-permit" class="btn btn-amber">Ajukan Permit</a>
             @auth
                 <a href="{{ route('dashboard') }}" class="btn btn-solid">Dashboard</a>
@@ -255,82 +288,122 @@
                 <a href="{{ route('login') }}" class="btn btn-solid">Masuk</a>
             @endauth
         </div>
+        <button type="button" @click="mobileOpen = !mobileOpen" class="md:hidden w-10 h-10 -mr-1 flex items-center justify-center rounded-lg hover:bg-gray-100 text-[var(--navy-950)] shrink-0" aria-label="Buka menu">
+            <svg x-show="!mobileOpen" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+            <svg x-show="mobileOpen" x-cloak class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+    </div>
+    <div x-show="mobileOpen" x-cloak class="md:hidden border-t border-[var(--border)] bg-white px-4 pt-2 pb-4">
+        <nav class="flex flex-col text-sm font-semibold text-[var(--ink-600)]">
+            <a href="#monitoring" @click="mobileOpen = false" class="flex items-center gap-2 py-3 border-b border-gray-100 text-inka-navy font-bold">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                Monitoring Permit
+            </a>
+            <a href="#alur" @click="mobileOpen = false" class="py-3 border-b border-gray-100">Alur Pengajuan</a>
+            <a href="#tentang" @click="mobileOpen = false" class="py-3 border-b border-gray-100">Tentang Kami</a>
+        </nav>
+        <div class="flex flex-col gap-2.5 mt-3 sm:hidden">
+            <a href="/ajukan-permit" class="btn btn-amber btn-lg w-full">Ajukan Permit</a>
+            @auth
+                <a href="{{ route('dashboard') }}" class="btn btn-solid btn-lg w-full">Dashboard</a>
+            @else
+                <a href="{{ route('login') }}" class="btn btn-solid btn-lg w-full">Masuk</a>
+            @endauth
+        </div>
     </div>
 </header>
 
 <!-- ================= HERO ================= -->
 <section class="hero">
-    <div class="max-w-[660px] mx-auto px-6 hero-inner">
+    <div class="max-w-[660px] mx-auto px-4 md:px-6 hero-inner">
         <div class="eyebrow hero-animate" id="hero-eyebrow"><span class="dot"></span> SISTEM ONLINE · MONITORING REALTIME</div>
-        <h1 class="text-[38px] md:text-[50px] leading-[1.2] font-extrabold tracking-[-.01em] mb-4 hero-animate" id="hero-title">
+        <h1 class="text-[30px] sm:text-[38px] md:text-[50px] leading-[1.2] font-extrabold tracking-[-.01em] mb-4 hero-animate" id="hero-title">
             SIMONIKA  <span class="text-[var(--amber-500)]"> </span>
         </h1>
-        <p class="text-[15.5px] text-white/100 mb-8 hero-animate" id="hero-sub">
+        <p class="text-sm sm:text-[15.5px] text-white/100 mb-6 md:mb-8 hero-animate px-1" id="hero-sub">
         Sistem Informasi Monitoring dan Izin Kerja INKA Madiun        </p>
-        <div class="flex gap-3 justify-center flex-wrap hero-animate" id="hero-actions">
-            <a href="/ajukan-permit" class="btn btn-amber btn-lg">
+        <div class="flex flex-col sm:flex-row gap-3 justify-center items-stretch sm:items-center sm:flex-wrap hero-animate px-2 sm:px-0" id="hero-actions">
+            <a href="/ajukan-permit" class="btn btn-amber btn-lg w-full sm:w-auto">
                 Ajukan Safety Permit
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
             </a>
             @auth
-                <a href="{{ route('dashboard') }}" class="btn btn-outline-light btn-lg">
+                <a href="{{ route('dashboard') }}" class="btn btn-outline-light btn-lg w-full sm:w-auto">
                     Ke Dashboard
                 </a>
             @else
-                <a href="{{ route('login') }}" class="btn btn-outline-light btn-lg">
+                <a href="{{ route('login') }}" class="btn btn-outline-light btn-lg w-full sm:w-auto">
                     Masuk Petugas
                 </a>
             @endauth
-            <a href="#monitoring" class="btn btn-outline-light btn-lg">
+            <a href="#monitoring" class="btn btn-outline-light btn-lg w-full sm:w-auto">
                 Monitoring Permit
             </a>
         </div>
-        <p class="text-xs text-white/100 mt-[36px] hero-animate" id="hero-note">
+        <p class="text-xs text-white/100 mt-6 md:mt-[36px] hero-animate px-2" id="hero-note">
             Tanpa akun. Isi form pengajuan langsung — permit otomatis masuk verifikasi Staff HSE.
         </p>
     </div>
 </section>
 
-<section class="pt-8 pb-16 bg-gray-50">
-    <div class="max-w-6xl mx-auto px-6">
-        <p class="text-center italic text-black-500 mb-10">
+<section class="pt-6 pb-12 md:pt-8 md:pb-16 bg-gray-50">
+    <div class="max-w-6xl mx-auto px-4 md:px-6">
+        <p class="text-center italic text-black-500 mb-8 md:mb-10 text-sm md:text-base px-2">
             Pastikan setiap pekerjaan dimulai dengan izin yang tervalidasi demi lingkungan kerja yang aman dan tertib.
         </p>
 
-        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 md:gap-6">
             <div>
                 <div class="overflow-hidden rounded-lg shadow-sm">
-                    <img src="{{ asset('assets/images/brief1.jpeg') }}" alt="Galeri 1" class="w-full h-40 object-cover [object-position:100%_80%] scale-110 hover:scale-125 transition-transform duration-300">
+                    <picture>
+                        <source media="(max-width: 767px)" srcset="{{ asset('assets/images/brief1-mobile.webp') }}" type="image/webp">
+                        <img src="{{ asset('assets/images/brief1.jpeg') }}" alt="Galeri 1" loading="lazy" decoding="async" class="w-full h-32 sm:h-40 object-cover [object-position:100%_80%] md:scale-110 md:hover:scale-125 md:transition-transform md:duration-300">
+                    </picture>
                 </div>
                 <p class="text-center text-sm font-medium text-gray-700 mt-3">Safety Briefing</p>
             </div>
             <div>
                 <div class="overflow-hidden rounded-lg shadow-sm">
-                    <img src="{{ asset('assets/images/brief2.jpeg') }}" alt="Galeri 2" class="w-full h-40 object-cover [object-position:70 10%_20%] scale-110 hover:scale-125 transition-transform duration-300">
+                    <picture>
+                        <source media="(max-width: 767px)" srcset="{{ asset('assets/images/brief2-mobile.webp') }}" type="image/webp">
+                        <img src="{{ asset('assets/images/brief2.jpeg') }}" alt="Galeri 2" loading="lazy" decoding="async" class="w-full h-32 sm:h-40 object-cover [object-position:70 10%_20%] md:scale-110 md:hover:scale-125 md:transition-transform md:duration-300">
+                    </picture>
                 </div>
                 <p class="text-center text-sm font-medium text-gray-700 mt-3"> Safety Induction </p>
             </div>
             <div>
                 <div class="overflow-hidden rounded-lg shadow-sm">
-                    <img src="{{ asset('assets/images/brief3.jpeg') }}" alt="Galeri 3" class="w-full h-40 object-cover [object-position:center_80%] scale-110 hover:scale-125 transition-transform duration-300">
+                    <picture>
+                        <source media="(max-width: 767px)" srcset="{{ asset('assets/images/brief3-mobile.webp') }}" type="image/webp">
+                        <img src="{{ asset('assets/images/brief3.jpeg') }}" alt="Galeri 3" loading="lazy" decoding="async" class="w-full h-32 sm:h-40 object-cover [object-position:center_80%] md:scale-110 md:hover:scale-125 md:transition-transform md:duration-300">
+                    </picture>
                 </div>
                 <p class="text-center text-sm font-medium text-gray-700 mt-3">Audit Eksternal</p>
             </div>
             <div>
                 <div class="overflow-hidden rounded-lg shadow-sm">
-                    <img src="{{ asset('assets/images/brief4.jpeg') }}" alt="Galeri 4" class="w-full h-40 object-cover scale-110 hover:scale-125 transition-transform duration-300">
+                    <picture>
+                        <source media="(max-width: 767px)" srcset="{{ asset('assets/images/brief4-mobile.webp') }}" type="image/webp">
+                        <img src="{{ asset('assets/images/brief4.jpeg') }}" alt="Galeri 4" loading="lazy" decoding="async" class="w-full h-32 sm:h-40 object-cover md:scale-110 md:hover:scale-125 md:transition-transform md:duration-300">
+                    </picture>
                 </div>
                 <p class="text-center text-sm font-medium text-gray-700 mt-3">Lean Manufacturing</p>
             </div>
             <div>
                 <div class="overflow-hidden rounded-lg shadow-sm">
-                    <img src="{{ asset('assets/images/brief5.jpeg') }}" alt="Galeri 5" class="w-full h-40 object-cover [object-position:100%_80%] scale-110 hover:scale-125 transition-transform duration-300">
+                    <picture>
+                        <source media="(max-width: 767px)" srcset="{{ asset('assets/images/brief5-mobile.webp') }}" type="image/webp">
+                        <img src="{{ asset('assets/images/brief5.jpeg') }}" alt="Galeri 5" loading="lazy" decoding="async" class="w-full h-32 sm:h-40 object-cover [object-position:100%_80%] md:scale-110 md:hover:scale-125 md:transition-transform md:duration-300">
+                    </picture>
                 </div>
                 <p class="text-center text-sm font-medium text-gray-700 mt-3">Safety Patrol</p>
             </div>
             <div>
                 <div class="overflow-hidden rounded-lg shadow-sm">
-                    <img src="{{ asset('assets/images/brief6.jpeg') }}" alt="Galeri 6" class="w-full h-40 object-cover [object-position:38%_100%] scale-110 hover:scale-125 transition-transform duration-300">
+                    <picture>
+                        <source media="(max-width: 767px)" srcset="{{ asset('assets/images/brief6-mobile.webp') }}" type="image/webp">
+                        <img src="{{ asset('assets/images/brief6.jpeg') }}" alt="Galeri 6" loading="lazy" decoding="async" class="w-full h-32 sm:h-40 object-cover [object-position:38%_100%] md:scale-110 md:hover:scale-125 md:transition-transform md:duration-300">
+                    </picture>
                 </div>
                 <p class="text-center text-sm font-medium text-gray-700 mt-3">Patroli 5R</p>
             </div>
@@ -339,10 +412,11 @@
 </section>
 
 <!-- ================= MONITORING PERMIT TERKINI ================= -->
-<section class="py-20 px-6 bg-[var(--paper)]" id="monitoring" x-data="{
+<section class="py-12 md:py-20 px-4 md:px-6 bg-[var(--paper)]" id="monitoring" x-data="{
     isModalOpen: false,
     activePermit: {
         no_permit: '',
+        site: '',
         tipe: '',
         nama_pekerjaan: '',
         divisi: '',
@@ -370,7 +444,7 @@
                 <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                 Monitoring Real-Time
             </div>
-            <h2 class="text-[28px] font-extrabold tracking-[-.01em] mb-3 text-[var(--navy-950)]">
+            <h2 class="text-[22px] sm:text-[28px] font-extrabold tracking-[-.01em] mb-3 text-[var(--navy-950)]">
                 Monitoring Izin Kerja (Safety Permit)
             </h2>
             <p class="text-[14.5px] text-[var(--ink-600)]">
@@ -380,7 +454,7 @@
 
         <!-- Table Card -->
         <div class="bg-white rounded-2xl border border-[var(--border)] shadow-sm overflow-hidden reveal">
-            <div class="px-6 py-4 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-gray-50/50">
+            <div class="px-4 md:px-6 py-4 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-gray-50/50">
                 <div class="flex items-center gap-3">
                     <div class="w-9 h-9 rounded-xl bg-blue-50 text-inka-navy border border-blue-100 flex items-center justify-center font-bold">
                         <svg class="w-5 h-5 text-inka-navy" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
@@ -394,7 +468,7 @@
                     Total: <span class="text-inka-navy font-bold">{{ $permits->total() }}</span> Permit Terdaftar
                 </div>
             </div>
-            <form method="GET" action="{{ url('/') }}#monitoring" class="px-6 py-3 border-b border-gray-100 bg-white flex flex-wrap items-center gap-3">
+            <form method="GET" action="{{ url('/') }}#monitoring" class="px-4 md:px-6 py-3 border-b border-gray-100 bg-white flex flex-wrap items-center gap-x-3 gap-y-2">
                 <label class="text-xs font-semibold text-gray-500">Filter site:</label>
                 <select name="site" onchange="this.form.submit()" class="text-xs font-semibold border border-gray-200 rounded-lg px-3 py-1.5 text-gray-700 focus:outline-none focus:border-inka-navy">
                     <option value="">Semua Site</option>
@@ -402,7 +476,13 @@
                         <option value="{{ $s }}" {{ request('site') === $s ? 'selected' : '' }}>{{ $s }}</option>
                     @endforeach
                 </select>
-                @if(request('site'))
+                <label class="text-xs font-semibold text-gray-500">Filter tipe:</label>
+                <select name="tipe" onchange="this.form.submit()" class="text-xs font-semibold border border-gray-200 rounded-lg px-3 py-1.5 text-gray-700 focus:outline-none focus:border-inka-navy">
+                    <option value="">Semua Tipe</option>
+                    <option value="Internal" {{ request('tipe') === 'Internal' ? 'selected' : '' }}>Internal</option>
+                    <option value="Eksternal" {{ request('tipe') === 'Eksternal' ? 'selected' : '' }}>Eksternal</option>
+                </select>
+                @if(request('site') || request('tipe'))
                 <a href="{{ url('/') }}#monitoring" class="text-xs text-gray-400 hover:text-gray-600">Reset</a>
                 @endif
             </form>
@@ -413,8 +493,9 @@
                     <p class="text-sm font-semibold text-gray-600">Belum ada permit kerja yang terdaftar.</p>
                 </div>
             @else
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-sm">
+                {{-- Desktop/laptop: tabel tetap --}}
+                <div class="overflow-x-auto -mx-4 md:mx-0 px-4 md:px-0 hidden md:block">
+                    <table class="w-full text-left text-sm min-w-[900px]">
                         <thead>
                             <tr class="text-xs text-gray-400 uppercase tracking-wide border-b border-gray-100 bg-gray-50/70">
                                 <th class="px-5 py-3.5 font-semibold">No. Permit</th>
@@ -425,7 +506,7 @@
                                 <th class="px-5 py-3.5 font-semibold">Kontraktor</th>
                                 <th class="px-5 py-3.5 font-semibold">Lokasi</th>
                                 <th class="px-5 py-3.5 font-semibold">Tanggal Permit</th>
-                                <th class="px-5 py-3.5 font-semibold text-right">Aksi</th>
+                                <th class="px-5 py-3.5 font-semibold text-left">Aksi</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-100">
@@ -514,7 +595,7 @@
                                 <td class="px-5 py-3.5 whitespace-nowrap">
                                     <x-permit-tanggal :permit="$permit" />
                                 </td>
-                                <td class="px-5 py-3.5 text-right whitespace-nowrap">
+                                <td class="px-5 py-3.5 text-left whitespace-nowrap">
                                     <button type="button"
                                             @click="openModal({{ json_encode($modalPayload) }})"
                                             class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-inka-navy text-white hover:opacity-90 transition-all shadow-sm">
@@ -526,6 +607,39 @@
                             @endforeach
                         </tbody>
                     </table>
+                </div>
+
+                {{-- HP saja: card vertikal, tanpa tabel 900px (anti scroll-jank).
+                     Laptop/desktop tetap pakai tabel di atas. Data sama, modal sama. --}}
+                <div class="md:hidden divide-y divide-gray-100">
+                    @foreach($permits as $permit)
+                    @php
+                        $mKlas = [];
+                        if ($permit->relationLoaded('classifications') && $permit->classifications->isNotEmpty()) {
+                            $mKlas = $permit->classifications->pluck('name')->toArray();
+                        } elseif (!empty($permit->klasifikasi_pekerjaan) && is_array($permit->klasifikasi_pekerjaan)) {
+                            $mMap = ['panas'=>'Pekerjaan Panas','ketinggian'=>'Pekerjaan Ketinggian','ruang_terbatas'=>'Ruang Terbatas','galian'=>'Pekerjaan Galian','tegangan_tinggi'=>'Pekerjaan Tegangan Tinggi','radiasi'=>'Radiasi'];
+                            foreach ($permit->klasifikasi_pekerjaan as $k) { $mKlas[] = $mMap[$k] ?? ucwords(str_replace('_',' ',$k)); }
+                        }
+                        $mMulai = $permit->tanggal_mulai ? $permit->tanggal_mulai->format('d/m/Y') : null;
+                        $mSelesai = $permit->tanggal_selesai ? $permit->tanggal_selesai->format('d/m/Y') : null;
+                        $mTgl = ($mMulai && $mSelesai) ? (($mMulai === $mSelesai) ? $mMulai : "$mMulai – $mSelesai") : ($mMulai ?? $mSelesai ?? ($permit->submitted_at ? $permit->submitted_at->format('d/m/Y') : '—'));
+                        $mStatusMap = ['Draft'=>'bg-gray-100 text-gray-600','Submitted'=>'bg-blue-100 text-blue-700','Review Staff'=>'bg-orange-100 text-orange-700','Review Manager'=>'bg-orange-100 text-orange-700','Revision'=>'bg-red-100 text-red-700','Active'=>'bg-green-100 text-green-700','Closed'=>'bg-slate-100 text-slate-600','Cancelled'=>'bg-red-600 text-white'];
+                        $mPayload = ['no_permit'=>$permit->no_permit,'site'=>$permit->site ?? 'Madiun','tipe'=>$permit->tipe,'nama_pekerjaan'=>$permit->nama_pekerjaan,'divisi'=>optional($permit->user)->name ?? $permit->divisi_pengaju ?? '—','kontraktor'=>$permit->kontraktor,'lokasi'=>$permit->lokasi ?? '—','tanggal_permit'=>$mTgl,'penanggung_jawab'=>$permit->penanggung_jawab ?? '—','status'=>$permit->status,'status_badge'=>$mStatusMap[$permit->status] ?? 'bg-gray-100 text-gray-600','klasifikasi'=>$mKlas];
+                    @endphp
+                    <button type="button" @click="openModal({{ json_encode($mPayload) }})" class="block w-full text-left px-4 py-4 active:bg-blue-50/50">
+                        <div class="flex items-center justify-between gap-2 mb-1">
+                            <span class="font-bold text-inka-navy text-sm">{{ $permit->no_permit }}</span>
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold {{ $mStatusMap[$permit->status] ?? 'bg-gray-100 text-gray-600' }}">{{ $permit->status }}</span>
+                        </div>
+                        <p class="text-sm text-gray-800 font-medium leading-snug">{{ $permit->nama_pekerjaan }}</p>
+                        <p class="text-xs text-gray-400 mt-0.5 truncate">{{ $permit->kontraktor }} &middot; {{ $permit->lokasi ?? '—' }} &middot; {{ $mTgl }}</p>
+                        <div class="flex items-center gap-1.5 mt-2">
+                            <x-permit-site-badge :site="$permit->site" />
+                            <x-permit-tipe-badge :tipe="$permit->tipe" />
+                        </div>
+                    </button>
+                    @endforeach
                 </div>
 
                 @if($permits->hasPages())
@@ -550,8 +664,8 @@
              x-transition:leave="ease-in duration-150"
              x-transition:leave-start="opacity-100"
              x-transition:leave-end="opacity-0"
-             class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity"
-             @click="closeModal()"></div>
+              class="fixed inset-0 bg-slate-900/60 md:backdrop-blur-sm transition-opacity"
+              @click="closeModal()"></div>
 
         <!-- Dialog Window -->
         <div x-show="isModalOpen"
@@ -564,9 +678,12 @@
              class="relative w-full max-w-2xl bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-10 my-8">
             
             <!-- Modal Header -->
-            <div class="px-6 py-4 border-b border-gray-100 bg-gray-50/90 flex items-center justify-between">
+            <div class="px-4 sm:px-6 py-4 border-b border-gray-100 bg-gray-50/90 flex items-center justify-between gap-2">
                 <div class="flex items-center gap-2.5 flex-wrap">
                     <span class="font-bold text-gray-900 text-lg" x-text="activePermit.no_permit"></span>
+                    <span class="px-2 py-0.5 rounded-full text-xs font-semibold"
+                          :class="activePermit.site === 'Banyuwangi' ? 'bg-emerald-100 text-emerald-700' : 'bg-indigo-100 text-indigo-700'"
+                          x-text="activePermit.site || 'Madiun'"></span>
                     <span class="px-2 py-0.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-700" x-text="activePermit.tipe"></span>
                     <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold"
                           :class="activePermit.status_badge || 'bg-gray-100 text-gray-600'"
@@ -578,7 +695,7 @@
             </div>
 
             <!-- Modal Body -->
-            <div class="p-6 space-y-5 max-h-[75vh] overflow-y-auto">
+            <div class="p-4 sm:p-6 space-y-5 max-h-[75vh] overflow-y-auto">
                 <!-- Klasifikasi Badges -->
                 <div>
                     <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Klasifikasi Pekerjaan</p>
@@ -633,7 +750,7 @@
             </div>
 
             <!-- Modal Footer -->
-            <div class="px-6 py-3.5 border-t border-gray-100 bg-gray-50 flex items-center justify-between gap-3">
+            <div class="px-4 sm:px-6 py-3.5 border-t border-gray-100 bg-gray-50 flex items-center justify-between gap-3">
                 <button type="button" @click="closeModal()" class="px-4 py-2 rounded-xl text-sm font-semibold text-gray-600 hover:bg-gray-200/60 transition-colors">
                     Tutup
                 </button>
@@ -648,11 +765,11 @@
 </section>
 
 <!-- ================= ALUR PENGAJUAN ================= -->
-<section class="py-20 px-6" id="alur">
+<section class="py-12 md:py-20 px-4 md:px-6" id="alur">
     <div class="max-w-[1080px] mx-auto">
-        <div class="max-w-[560px] mx-auto text-center mb-[46px] reveal">
+        <div class="max-w-[560px] mx-auto text-center mb-8 md:mb-[46px] reveal">
             <div class="sec-tag">Alur Pengajuan</div>
-            <h2 class="text-[28px] font-extrabold tracking-[-.01em] mb-3 text-[var(--navy-950)]">Bagaimana Cara Mengajukan Izin Kerja</h2>
+            <h2 class="text-[22px] sm:text-[28px] font-extrabold tracking-[-.01em] mb-3 text-[var(--navy-950)]">Bagaimana Cara Mengajukan Izin Kerja</h2>
             <p class="text-[14.5px] text-[var(--ink-600)]">Tanpa akun — isi form langsung di landing page, permit otomatis masuk verifikasi HSE.</p>
         </div>
 
@@ -695,11 +812,11 @@
 </section>
 
 <!-- ================= TENTANG KAMI ================= -->
-<section class="py-20 px-6 bg-white border-y border-[var(--border)]" id="tentang">
-    <div class="max-w-[1080px] mx-auto about-grid grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+<section class="py-12 md:py-20 px-4 md:px-6 bg-white border-y border-[var(--border)]" id="tentang">
+    <div class="max-w-[1080px] mx-auto about-grid grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
         <div class="reveal-left">
             <div class="sec-tag">Tentang Kami</div>
-            <h2 class="text-[26px] font-extrabold tracking-[-.01em] mb-[14px] text-[var(--navy-950)]">Dibangun untuk Tim HSE yang Ingin Bekerja Lebih Cepat dan Aman</h2>
+            <h2 class="text-[22px] sm:text-[26px] font-extrabold tracking-[-.01em] mb-[14px] text-[var(--navy-950)]">Dibangun untuk Tim HSE yang Ingin Bekerja Lebih Cepat dan Aman</h2>
             <p class="text-sm text-[var(--ink-600)] mb-3.5 leading-relaxed">Safety Permit INKA Madiun adalah sistem monitoring keselamatan kerja kontraktor yang menggantikan proses manual berbasis kertas dengan alur digital yang lebih rapi dan mudah diaudit.</p>
             <p class="text-sm text-[var(--ink-600)] mb-3.5 leading-relaxed">Kami percaya keselamatan kerja seharusnya tidak menghambat kecepatan operasional. Karena itu Safety Permit INKA Madiun dirancang agar divisi bisa mengelola data kontraktor dan mengajukan izin kerja dengan cepat, sementara tim HSE tetap punya kendali penuh atas setiap persetujuan.</p>
             <a href="#" class="btn btn-solid" style="margin-top:8px;">Pelajari Lebih Lanjut</a>
@@ -716,9 +833,9 @@
 </section>
 
 <!-- ================= FOOTER ================= -->
-<footer class="bg-[var(--navy-950)] text-white px-6 pt-12 pb-6">
+<footer class="bg-[var(--navy-950)] text-white px-4 md:px-6 pt-10 md:pt-12 pb-6">
     <div class="max-w-[1080px] mx-auto">
-        <div class="flex justify-between items-start flex-wrap gap-8 mb-8">
+        <div class="flex flex-col sm:flex-row justify-between items-start gap-8 mb-8">
             <div>
                 <div class="flex items-center gap-3" style="color:#fff;">
                     <img src="{{ asset('assets/images/logoinka.svg') }}" alt="INKA" class="h-7 w-auto brightness-0 invert opacity-80">
@@ -761,6 +878,14 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", function() {
+        // HP: CSS sudah memaksa semua reveal terlihat (tanpa animasi),
+        // jadi lewati timeout + IntersectionObserver agar hemat CPU/baterai.
+        // Laptop/desktop tetap pakai animasi seperti semula.
+        if (window.matchMedia('(max-width: 767px)').matches) {
+            document.querySelectorAll('.hero-animate, .reveal, .reveal-left, .reveal-right, .reveal-scale')
+                .forEach(el => el.classList.add('is-visible', 'hero-visible'));
+            return;
+        }
         // Hero entrance animation with staggered delays
         const heroEls = document.querySelectorAll('.hero-animate');
         heroEls.forEach((el, i) => {

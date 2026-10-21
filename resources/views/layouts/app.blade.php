@@ -7,6 +7,8 @@
 
         <title>{{ isset($title) ? $title . ' — ' : '' }}Safety Permit INKA Madiun</title>
 
+        <link rel="icon" type="image/png" href="{{ asset('assets/images/logok3.png') }}">
+
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -15,7 +17,10 @@
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="font-sans antialiased bg-slate-50 text-gray-900 flex h-screen overflow-hidden">
+    <body class="font-sans antialiased bg-slate-50 text-gray-900 flex app-shell overflow-hidden" x-data="{ sidebarOpen: false }">
+
+        {{-- Overlay HP saat sidebar terbuka --}}
+        <div x-show="sidebarOpen" x-cloak @click="sidebarOpen = false" class="fixed inset-0 bg-slate-900/50 z-20 lg:hidden"></div>
 
         {{-- ===== SIDEBAR ===== --}}
         @php 
@@ -44,7 +49,7 @@
                 }
             }
         @endphp
-        <aside id="sidebar" class="w-64 bg-inka-navy text-white flex flex-col shrink-0 z-30 transition-transform duration-200">
+        <aside id="sidebar" x-bind:class="sidebarOpen && 'sidebar-open'" class="fixed inset-y-0 left-0 w-64 bg-inka-navy text-white flex flex-col shrink-0 z-30 transition-transform duration-200 lg:static lg:translate-x-0">
 
             {{-- Logo --}}
             <div class="h-16 flex items-center gap-3 px-5 border-b border-white/10 shrink-0">
@@ -108,6 +113,10 @@
                         <svg class="sidebar-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
                         History
                     </a>
+                    <a href="/admin/cancellations" class="sidebar-link {{ request()->is('admin/cancellations*') ? 'active' : '' }}">
+                        <svg class="sidebar-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                        Pembatalan Permit
+                    </a>
 
                 @endif
 
@@ -131,9 +140,13 @@
         <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
 
             {{-- Header --}}
-            <header class="h-16 bg-white border-b border-gray-100 flex items-center justify-between px-6 shrink-0 shadow-sm relative z-20">
-                <div class="flex items-center gap-3">
-                    <h2 class="text-base font-semibold text-gray-800">{{ $title ?? 'Dashboard' }}</h2>
+            <header class="h-16 bg-white border-b border-gray-100 flex items-center justify-between px-4 md:px-6 shrink-0 shadow-sm relative z-20">
+                <div class="flex items-center gap-2.5 min-w-0">
+                    <button type="button" @click="sidebarOpen = !sidebarOpen" class="lg:hidden w-10 h-10 -ml-1 flex items-center justify-center rounded-lg hover:bg-gray-100 text-gray-600 shrink-0" aria-label="Buka menu">
+                        <svg x-show="!sidebarOpen" x-cloak class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+                        <svg x-show="sidebarOpen" x-cloak class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                    <h2 class="text-base font-semibold text-gray-800 truncate">{{ $title ?? 'Dashboard' }}</h2>
                 </div>
                 
                 {{-- Notification Bell --}}
@@ -148,7 +161,7 @@
                     </button>
                     
                     {{-- Dropdown --}}
-                    <div x-show="open" x-transition style="display: none;" class="absolute right-0 mt-2 w-80 bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden z-50">
+                    <div x-show="open" x-transition style="display: none;" class="absolute right-0 mt-2 w-72 sm:w-80 max-w-[calc(100vw-2rem)] bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden z-50">
                         <div class="px-4 py-3 border-b border-gray-50 bg-gray-50/50">
                             <h3 class="text-sm font-semibold text-gray-800">Notifikasi Approval</h3>
                             <p class="text-[11px] text-gray-500">Anda memiliki {{ $pendingCount }} permit menunggu review.</p>
@@ -183,13 +196,28 @@
             </header>
 
             {{-- Content --}}
-            <main class="flex-1 overflow-y-auto p-6">
+            <main class="flex-1 overflow-y-auto p-4 md:p-6">
                 {{ $slot }}
             </main>
 
         </div>
 
         <style>
+            [x-cloak] { display: none !important; }
+            /* Cegah sidebar HP sekilas terlihat tiap pindah halaman:
+               sebelum Alpine siap, sidebar dipaksa tersembunyi via CSS murni
+               (tanpa menunggu JS). Laptop/desktop tidak tersentuh (lg: ke atas
+               dikendalikan Tailwind seperti semula). */
+            @media (max-width: 1023.98px) {
+                #sidebar { transform: translateX(-100%); }
+                #sidebar.sidebar-open { transform: translateX(0); }
+            }
+            /* Tinggi shell pakai dynamic viewport agar pas dengan tinggi layar
+               terlihat di HP (100vh ikut menghitung area di balik address bar
+               browser sehingga tombol di paling bawah terpotong & tak terjangkau).
+               Laptop/desktop tidak berubah (dvh == vh di sana). */
+            html, body { height: 100%; }
+            body.app-shell { height: 100vh; height: 100dvh; }
             .sidebar-link {
                 display: flex;
                 align-items: center;

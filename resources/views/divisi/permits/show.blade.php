@@ -16,27 +16,27 @@
     @endphp
 
     {{-- Breadcrumb + aksi --}}
-    <div class="flex items-center justify-between mb-5">
-        <div class="flex items-center gap-2 text-sm text-gray-400">
-            <a href="/divisi/dashboard" class="hover:text-gray-600 transition-colors">Dashboard</a>
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
+        <div class="flex items-center gap-2 text-sm text-gray-400 min-w-0">
+            <a href="/divisi/dashboard" class="hover:text-gray-600 transition-colors shrink-0">Dashboard</a>
             <span>/</span>
-            <a href="/divisi/history" class="hover:text-gray-600 transition-colors">History</a>
+            <a href="/divisi/history" class="hover:text-gray-600 transition-colors shrink-0">History</a>
             <span>/</span>
-            <span class="font-semibold text-gray-700">{{ $permit->no_permit }}</span>
+            <span class="font-semibold text-gray-700 truncate">{{ $permit->no_permit }}</span>
         </div>
-        <div class="flex items-center gap-3">
+        <div class="flex flex-col sm:flex-row sm:items-center gap-2.5 sm:gap-3">
             <a href="/divisi/history"
-               class="px-4 py-2 text-sm font-semibold text-gray-600 border border-gray-200 rounded-xl hover:border-gray-300 transition-colors">
+               class="px-4 py-2 text-sm font-semibold text-center text-gray-600 border border-gray-200 rounded-xl hover:border-gray-300 transition-colors">
                 ← Kembali
             </a>
             <a href="/divisi/permits/{{ $permit->id }}/pdf" target="_blank"
-               class="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-red-600 bg-red-50 border border-red-200 rounded-xl hover:bg-red-100 transition-colors">
+               class="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-semibold text-red-600 bg-red-50 border border-red-200 rounded-xl hover:bg-red-100 transition-colors">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                 Unduh PDF
             </a>
             @if($canEdit)
             <a href="/divisi/permits/{{ $permit->id }}/edit"
-               class="inline-flex items-center gap-2 bg-inka-navy text-white text-sm font-semibold px-4 py-2 rounded-xl hover:opacity-90 transition-opacity">
+               class="inline-flex items-center justify-center gap-2 bg-inka-navy text-white text-sm font-semibold px-4 py-2 rounded-xl hover:opacity-90 transition-opacity">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                 </svg>
@@ -47,11 +47,14 @@
     </div>
 
     {{-- Header kartu --}}
-    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm px-6 py-5 mb-5 flex flex-wrap items-center justify-between gap-4">
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm px-4 md:px-6 py-5 mb-5 flex flex-wrap items-center justify-between gap-4">
         <div>
             <p class="text-xs text-gray-400 mb-1">Nomor Permit</p>
-            <p class="text-xl font-bold text-gray-800">{{ $permit->no_permit }}</p>
-            <div class="mt-1 flex items-center gap-2"><x-permit-tipe-badge :tipe="$permit->tipe" /><x-permit-site-badge :site="$permit->site" /></div>
+            <div class="flex flex-wrap items-center gap-2">
+                <p class="text-xl font-bold text-gray-800">{{ $permit->no_permit }}</p>
+                <x-permit-tipe-badge :tipe="$permit->tipe" />
+                <x-permit-site-badge :site="$permit->site" />
+            </div>
         </div>
         <span class="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-semibold {{ $badge }}">
             {{ str_starts_with($permit->status, 'Review') ? 'Menunggu ' . $permit->status : $permit->status }}
@@ -59,7 +62,7 @@
     </div>
 
     @if($permit->status === 'Revision' && $permit->catatan_revisi)
-    <div class="bg-red-50 border border-red-200 rounded-2xl px-6 py-4 mb-5 flex gap-3">
+    <div class="bg-red-50 border border-red-200 rounded-2xl px-4 md:px-6 py-4 mb-5 flex gap-3">
         <svg class="w-5 h-5 text-red-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
         </svg>
@@ -71,7 +74,7 @@
     @endif
 
     @if($permit->status === 'Cancelled')
-    <div class="bg-red-50 border border-red-200 rounded-2xl px-6 py-5 mb-5">
+    <div class="bg-red-50 border border-red-200 rounded-2xl px-4 md:px-6 py-5 mb-5">
         <div class="flex items-center gap-2 mb-3">
             <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path></svg>
             <h3 class="text-sm font-bold text-red-800">Izin Kerja Dibatalkan</h3>
@@ -101,11 +104,11 @@
 
         {{-- A. Klasifikasi --}}
         <div class="bg-white rounded-2xl border border-gray-100 shadow-sm">
-            <div class="px-6 py-4 border-b border-gray-100">
+            <div class="px-4 md:px-6 py-4 border-b border-gray-100">
                 <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">A</span>
                 <h3 class="text-sm font-semibold text-gray-800 mt-0.5">Klasifikasi Pekerjaan</h3>
             </div>
-            <div class="px-6 py-4">
+            <div class="px-4 md:px-6 py-4">
                 @if($permit->klasifikasi_pekerjaan && count($permit->klasifikasi_pekerjaan))
                     <div class="flex flex-wrap gap-2">
                         @foreach($permit->klasifikasi_pekerjaan as $k)
@@ -120,11 +123,11 @@
 
         {{-- B. Informasi Pekerjaan --}}
         <div class="bg-white rounded-2xl border border-gray-100 shadow-sm">
-            <div class="px-6 py-4 border-b border-gray-100">
+            <div class="px-4 md:px-6 py-4 border-b border-gray-100">
                 <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">B</span>
                 <h3 class="text-sm font-semibold text-gray-800 mt-0.5">Informasi Pekerjaan</h3>
             </div>
-            <div class="px-6 py-4 space-y-3 text-sm">
+            <div class="px-4 md:px-6 py-4 space-y-3 text-sm">
                 @php
                     $info = [
                         'Nama Pekerjaan'    => $permit->nama_pekerjaan,
@@ -138,7 +141,7 @@
                 @endphp
                 @foreach($info as $label => $value)
                 <div class="flex gap-3">
-                    <span class="text-xs text-gray-400 w-36 shrink-0 pt-0.5">{{ $label }}</span>
+                    <span class="text-xs text-gray-400 w-28 sm:w-36 shrink-0 pt-0.5">{{ $label }}</span>
                     <span class="text-gray-700 font-medium">{{ $value ?: '—' }}</span>
                 </div>
                 @endforeach
@@ -147,11 +150,11 @@
 
         {{-- C. Bahaya Pekerjaan --}}
         <div class="bg-white rounded-2xl border border-gray-100 shadow-sm">
-            <div class="px-6 py-4 border-b border-gray-100">
+            <div class="px-4 md:px-6 py-4 border-b border-gray-100">
                 <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">C</span>
                 <h3 class="text-sm font-semibold text-gray-800 mt-0.5">Bahaya Pekerjaan</h3>
             </div>
-            <div class="px-6 py-4">
+            <div class="px-4 md:px-6 py-4">
                 @if($permit->bahaya_pekerjaan && count($permit->bahaya_pekerjaan))
                     <div class="flex flex-wrap gap-2">
                         @foreach($permit->bahaya_pekerjaan as $b)
@@ -169,11 +172,11 @@
 
         {{-- D. Tindakan Pencegahan --}}
         <div class="bg-white rounded-2xl border border-gray-100 shadow-sm">
-            <div class="px-6 py-4 border-b border-gray-100">
+            <div class="px-4 md:px-6 py-4 border-b border-gray-100">
                 <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">D</span>
                 <h3 class="text-sm font-semibold text-gray-800 mt-0.5">Tindakan Pencegahan</h3>
             </div>
-            <div class="px-6 py-4">
+            <div class="px-4 md:px-6 py-4">
                 @if($permit->tindakan_pencegahan && count($permit->tindakan_pencegahan))
                     <div class="flex flex-wrap gap-2">
                         @foreach($permit->tindakan_pencegahan as $t)
@@ -188,11 +191,11 @@
 
         {{-- E. APD --}}
         <div class="bg-white rounded-2xl border border-gray-100 shadow-sm md:col-span-2">
-            <div class="px-6 py-4 border-b border-gray-100">
+            <div class="px-4 md:px-6 py-4 border-b border-gray-100">
                 <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">E</span>
                 <h3 class="text-sm font-semibold text-gray-800 mt-0.5">Alat Pelindung Diri (APD)</h3>
             </div>
-            <div class="px-6 py-4">
+            <div class="px-4 md:px-6 py-4">
                 @if($permit->apd && count($permit->apd))
                     <div class="flex flex-wrap gap-2">
                         @foreach($permit->apd as $a)
@@ -210,14 +213,14 @@
 
     </div>
 
-    {{-- F. Dokumen Pendukung (Eksternal) --}}
-    @if($permit->tipe === 'Eksternal' && $permit->documents && count($permit->documents) > 0)
+    {{-- F. Dokumen Pendukung --}}
+    @if($permit->documents && count($permit->documents) > 0)
     <div class="mt-5 bg-white rounded-2xl border border-gray-100 shadow-sm">
-        <div class="px-6 py-4 border-b border-gray-100">
+        <div class="px-4 md:px-6 py-4 border-b border-gray-100">
             <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">F</span>
             <h3 class="text-sm font-semibold text-gray-800 mt-0.5">Dokumen Pendukung</h3>
         </div>
-        <div class="px-6 py-4">
+        <div class="px-4 md:px-6 py-4">
             <div class="space-y-3">
                 @foreach($permit->documents as $doc)
                 <div class="flex items-center gap-4 p-3 bg-gray-50 rounded-xl border border-gray-100">
@@ -243,7 +246,7 @@
     @endif
 
     @if($permit->approval_signatures && count($permit->approval_signatures) > 0)
-    <div class="mt-5 bg-white rounded-2xl border border-gray-100 shadow-sm px-6 py-5">
+    <div class="mt-5 bg-white rounded-2xl border border-gray-100 shadow-sm px-4 md:px-6 py-5">
         <h3 class="text-sm font-semibold text-gray-800 mb-4">Riwayat Persetujuan (Approval)</h3>
         <div class="flex flex-wrap gap-4">
             @foreach($permit->approval_signatures as $sig)
@@ -259,7 +262,7 @@
     @endif
 
     {{-- Timeline status --}}
-    <div class="mt-5 bg-white rounded-2xl border border-gray-100 shadow-sm px-6 py-5">
+    <div class="mt-5 bg-white rounded-2xl border border-gray-100 shadow-sm px-4 md:px-6 py-5">
         <h3 class="text-sm font-semibold text-gray-800 mb-4">Informasi Waktu</h3>
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
             <div>

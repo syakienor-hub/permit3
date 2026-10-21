@@ -4,7 +4,7 @@
     <div class="max-w-2xl mx-auto space-y-6">
 
         {{-- Page Header --}}
-        <div class="flex items-center justify-between">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <div>
                 <h1 class="text-2xl font-bold text-gray-900">{{ isset($division) ? 'Edit Divisi' : 'Tambah Divisi Baru' }}</h1>
                 <p class="text-sm text-gray-500 mt-1">{{ isset($division) ? 'Ubah nama divisi' : 'Tambahkan nama divisi ke dalam daftar' }}</p>

@@ -21,7 +21,7 @@
                     <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                 </div>
             </div>
-            <p class="text-4xl font-bold text-blue-500">{{ $counts['pending'] ?? 0 }}</p>
+            <p class="text-3xl sm:text-4xl font-bold text-blue-500">{{ $counts['pending'] ?? 0 }}</p>
             <p class="text-xs text-gray-400 mt-1">Menunggu persetujuan Anda</p>
         </a>
 
@@ -34,7 +34,7 @@
                     <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                 </div>
             </div>
-            <p class="text-4xl font-bold text-gray-700">{{ $counts['today'] ?? 0 }}</p>
+            <p class="text-3xl sm:text-4xl font-bold text-gray-700">{{ $counts['today'] ?? 0 }}</p>
             <p class="text-xs text-gray-400 mt-1">Antrean masuk hari ini</p>
         </a>
 
@@ -44,7 +44,7 @@
     <div class="bg-white rounded-2xl border border-gray-100 shadow-sm">
 
         {{-- Header section --}}
-        <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-4 md:px-6 py-4 border-b border-gray-100">
             <div>
                 <h3 class="text-base font-semibold text-gray-800">Permit Menunggu Approval ({{ $roleName }})</h3>
                 <p class="text-sm text-gray-400 mt-0.5">
@@ -56,12 +56,12 @@
                     @endif
                 </p>
             </div>
-            <div class="flex items-center gap-3">
+            <div class="flex flex-col sm:flex-row sm:items-center gap-2.5 sm:gap-3">
                 <a href="/admin/approvals" class="text-base font-semibold text-inka-navy hover:underline">
                     Lihat Semua
                 </a>
                 <a href="/admin/approvals"
-                   class="inline-flex items-center gap-2 bg-inka-navy text-white text-base font-semibold px-4 py-2 rounded-xl hover:opacity-90 transition-opacity">
+                   class="inline-flex items-center justify-center gap-2 bg-inka-navy text-white text-base font-semibold px-4 py-2 rounded-xl hover:opacity-90 transition-opacity">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                     </svg>
@@ -84,7 +84,7 @@
             </div>
         @else
             <div class="overflow-x-auto">
-                <table class="w-full text-left text-base">
+                <table class="w-full text-left text-base min-w-[880px]">
                     <thead>
                         <tr class="text-sm text-gray-400 uppercase tracking-wide border-b border-gray-100 bg-gray-50/60">
                             <th class="px-6 py-3 font-semibold">No. Permit</th>

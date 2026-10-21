@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ajukan Safety Permit — INKA Madiun</title>
+    <link rel="icon" type="image/png" href="{{ asset('assets/images/logok3.png') }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -17,28 +18,39 @@
             transition: border-color 0.15s, box-shadow 0.15s;
         }
         .form-input:focus { outline: none; border-color: #111d33; box-shadow: 0 0 0 3px rgba(17,29,51,0.08); }
+        /* HP saja: step tersembunyi tidak di-render (hemat memori/CPU). Laptop tidak berubah. */
+        @media (max-width: 767px) {
+            #step-0.hidden, #step-1.hidden, #step-2.hidden, #step-3.hidden,
+            #step-4.hidden, #step-5.hidden, #step-6.hidden {
+                content-visibility: hidden;
+                contain-intrinsic-size: 0 500px;
+            }
+            .form-input { transition: none; }
+            .form-input:focus { box-shadow: none; }
+            header { backdrop-filter: none; -webkit-backdrop-filter: none; }
+        }
     </style>
 </head>
 <body class="bg-slate-50 text-gray-900 min-h-screen">
 
     {{-- Header publik --}}
     <header class="bg-white border-b border-gray-100 sticky top-0 z-40">
-        <div class="max-w-5xl mx-auto px-6 h-16 flex items-center gap-3">
-            <a href="/" class="flex items-center gap-3 mr-auto">
-                <img src="{{ asset('assets/images/logoinka.svg') }}" alt="INKA" class="h-7 w-auto">
-                <div class="border-l border-gray-200 pl-3">
-                    <span class="text-sm font-bold">Safety Permit</span>
-                    <span class="block text-[10px] font-semibold text-gray-500 tracking-wide">INKA MADIUN</span>
+        <div class="max-w-5xl mx-auto px-4 md:px-6 h-16 flex items-center gap-2.5 sm:gap-3">
+            <a href="/" class="flex items-center gap-2.5 mr-auto min-w-0">
+                <img src="{{ asset('assets/images/logoinka.svg') }}" alt="INKA" class="h-6 sm:h-7 w-auto shrink-0">
+                <div class="border-l border-gray-200 pl-2.5 sm:pl-3 whitespace-nowrap">
+                    <span class="text-[13px] sm:text-sm font-bold">Safety Permit</span>
+                    <span class="block text-[9px] sm:text-[10px] font-semibold text-gray-500 tracking-wide">INKA MADIUN</span>
                 </div>
             </a>
-            <a href="/" class="text-sm font-semibold text-gray-500 hover:text-gray-800 transition-colors">← Beranda</a>
-            <a href="{{ route('login') }}" class="text-sm font-semibold text-white bg-inka-navy px-4 py-2 rounded-xl hover:opacity-90 transition-opacity">Login Petugas</a>
+            <a href="/" class="text-sm font-semibold text-gray-500 hover:text-gray-800 transition-colors whitespace-nowrap">← Beranda</a>
+            <a href="{{ route('login') }}" class="text-sm font-semibold text-white bg-inka-navy px-3 sm:px-4 py-2 rounded-xl hover:opacity-90 transition-opacity whitespace-nowrap">Login Petugas</a>
         </div>
     </header>
 
-    <main class="max-w-5xl mx-auto px-6 py-8">
+    <main class="max-w-5xl mx-auto px-4 md:px-6 py-6 md:py-8">
         <div class="mb-6">
-            <h1 class="text-2xl font-extrabold tracking-tight">Ajukan Safety Permit</h1>
+            <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight">Ajukan Safety Permit</h1>
             <p class="text-sm text-gray-500 mt-1">Tanpa login. Isi lengkap, langsung masuk antrian verifikasi <span class="font-semibold text-gray-700">Staff HSE</span>.</p>
         </div>
 
@@ -54,15 +66,15 @@
         @endif
 
         {{-- Step indicator --}}
-        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm px-6 py-4 mb-6 overflow-x-auto">
-            <div class="flex items-center justify-between min-w-[640px]" id="step-indicator">
+        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm px-4 md:px-6 py-4 mb-6 overflow-x-auto">
+            <div class="flex items-center justify-between gap-1 min-w-[620px]" id="step-indicator">
                 @php
                     $steps = [
                         0 => 'Site & Tipe',
-                        1 => 'Dokumen',
-                        2 => 'Klasifikasi & Info',
-                        3 => 'Bahaya & Pencegahan',
-                        4 => 'APD',
+                        1 => 'Klasifikasi & Info',
+                        2 => 'Bahaya & Pencegahan',
+                        3 => 'APD',
+                        4 => 'Dokumen',
                         5 => 'Validasi Kerja',
                         6 => 'Review & Kirim',
                     ];
@@ -99,11 +111,11 @@
             {{-- STEP 0 — SITE & TIPE --}}
             <div id="step-0" class="space-y-5">
                 <div class="bg-white rounded-2xl border border-gray-100 shadow-sm">
-                    <div class="px-6 py-4 border-b border-gray-100">
+                    <div class="px-4 md:px-6 py-4 border-b border-gray-100">
                         <h3 class="text-base font-semibold text-gray-800">Pilih Site <span class="text-red-500">*</span></h3>
                         <p class="text-sm text-gray-400 mt-0.5">Permit akan direview oleh Staff HSE site yang dipilih</p>
                     </div>
-                    <div class="px-6 py-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="px-4 md:px-6 py-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <button type="button" onclick="selectSite('Madiun')" id="btn-site-madiun"
                             class="site-btn p-6 rounded-2xl border-2 border-inka-navy bg-inka-navy/5 text-left transition-all">
                             <p class="text-lg font-bold text-gray-800">Madiun</p>
@@ -119,15 +131,15 @@
                 </div>
 
                 <div class="bg-white rounded-2xl border border-gray-100 shadow-sm">
-                    <div class="px-6 py-4 border-b border-gray-100">
+                    <div class="px-4 md:px-6 py-4 border-b border-gray-100">
                         <h3 class="text-base font-semibold text-gray-800">Pilih Tipe Permit</h3>
                         <p class="text-sm text-gray-400 mt-0.5">Internal untuk pekerjaan internal, Eksternal untuk pekerjaan oleh kontraktor</p>
                     </div>
-                    <div class="px-6 py-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="px-4 md:px-6 py-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <button type="button" onclick="selectTipe('Internal')" id="btn-internal"
                             class="tipe-btn p-6 rounded-2xl border-2 border-inka-navy bg-inka-navy/5 text-left transition-all">
                             <p class="text-lg font-bold text-gray-800">Internal</p>
-                            <p class="text-sm text-gray-400 mt-1">Pekerjaan internal perusahaan</p>
+                            <p class="text-sm text-gray-400 mt-1">Pekerjaan internal perusahaan (dokumen pendukung opsional)</p>
                         </button>
                         <button type="button" onclick="selectTipe('Eksternal')" id="btn-eksternal"
                             class="tipe-btn p-6 rounded-2xl border-2 border-gray-200 hover:border-inka-navy text-left transition-all">
@@ -139,14 +151,14 @@
                 </div>
             </div>
 
-            {{-- STEP 1 — DOKUMEN --}}
-            <div id="step-1" class="hidden space-y-5">
+            {{-- STEP 4 — DOKUMEN --}}
+            <div id="step-4" class="hidden space-y-5">
                 <div class="bg-white rounded-2xl border border-gray-100 shadow-sm">
-                    <div class="px-6 py-4 border-b border-gray-100">
+                    <div class="px-4 md:px-6 py-4 border-b border-gray-100">
                         <h3 class="text-base font-semibold text-gray-800 mt-0.5">Dokumen Pendukung</h3>
-                        <p class="text-sm text-gray-400 mt-0.5">Wajib untuk permit Eksternal (max 10MB per file)</p>
+                        <p class="text-sm text-gray-400 mt-0.5">Opsional untuk permit Internal, wajib untuk Eksternal (max 10MB per file)</p>
                     </div>
-                    <div class="px-6 py-5">
+                    <div class="px-4 md:px-6 py-5">
                         <div id="documents-list" class="space-y-4"></div>
                         <button type="button" onclick="addDocument()"
                             class="mt-4 inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-inka-navy border border-inka-navy rounded-xl hover:bg-inka-navy/5 transition-colors">
@@ -157,14 +169,14 @@
                 </div>
             </div>
 
-            {{-- STEP 2 — KLASIFIKASI + INFO --}}
-            <div id="step-2" class="space-y-5 hidden">
+            {{-- STEP 1 — KLASIFIKASI + INFO --}}
+            <div id="step-1" class="space-y-5 hidden">
                 <div class="bg-white rounded-2xl border border-gray-100 shadow-sm">
-                    <div class="px-6 py-4 border-b border-gray-100">
+                    <div class="px-4 md:px-6 py-4 border-b border-gray-100">
                         <h3 class="text-base font-semibold text-gray-800 mt-0.5">Klasifikasi Pekerjaan</h3>
                         <p class="text-sm text-gray-400 mt-0.5">Pilih satu atau lebih jenis pekerjaan berisiko tinggi</p>
                     </div>
-                    <div class="px-6 py-5 grid grid-cols-2 md:grid-cols-3 gap-3">
+                    <div class="px-4 md:px-6 py-5 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
                         @php
                             $dbKlasifikasi = \App\Models\Classification::all();
                             if ($dbKlasifikasi->isNotEmpty()) {
@@ -191,10 +203,10 @@
                 </div>
 
                 <div class="bg-white rounded-2xl border border-gray-100 shadow-sm">
-                    <div class="px-6 py-4 border-b border-gray-100">
+                    <div class="px-4 md:px-6 py-4 border-b border-gray-100">
                         <h3 class="text-base font-semibold text-gray-800 mt-0.5">Informasi Pekerjaan</h3>
                     </div>
-                    <div class="px-6 py-5 grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div class="px-4 md:px-6 py-5 grid grid-cols-1 md:grid-cols-2 gap-5">
                         <div class="md:col-span-2">
                             <label class="form-label">Divisi / Unit Pengaju <span class="text-red-500">*</span></label>
                             <input type="text" name="divisi_pengaju" class="form-input" value="{{ old('divisi_pengaju') }}" placeholder="Contoh: Divisi Teknik, Divisi Produksi, HSE" required>
@@ -229,9 +241,9 @@
                         </div>
                     </div>
 
-                    <div class="px-6 pb-5 border-t border-gray-100 pt-4">
+                    <div class="px-4 md:px-6 pb-5 border-t border-gray-100 pt-4">
                         <p class="text-sm font-semibold text-gray-600 mb-3">Daftar Pekerja</p>
-                        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
                             @php
                                 $pekerja = ['Engineer','Operator Alat Berat','Teknisi Listrik','Mekanik','Welder','Operator','Tukang Bangunan','Tukang Kayu','Helper'];
                             @endphp
@@ -246,13 +258,13 @@
                         </div>
                     </div>
 
-                    <div class="px-6 pb-5 border-t border-gray-100 pt-4">
+                    <div class="px-4 md:px-6 pb-5 border-t border-gray-100 pt-4">
                         <div class="flex items-center justify-between mb-2">
                             <p class="text-sm font-semibold text-gray-600">Peralatan Kerja & Material</p>
                             <button type="button" onclick="addPeralatan()" class="text-sm font-semibold text-inka-navy hover:underline">+ Tambah Baris</button>
                         </div>
                         <div id="peralatan-list" class="space-y-2">
-                            <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+                            <div class="grid grid-cols-2 lg:grid-cols-4 gap-2">
                                 <input type="text" name="peralatan_kerja[0][alat]" placeholder="Peralatan, mis. Gerinda" class="form-input text-base">
                                 <input type="text" name="peralatan_kerja[0][jumlah_alat]" placeholder="Jumlah, mis. 1" class="form-input text-base">
                                 <input type="text" name="peralatan_kerja[0][material]" placeholder="Material, mis. Baja" class="form-input text-base">
@@ -263,13 +275,13 @@
                 </div>
             </div>
 
-            {{-- STEP 3 — BAHAYA + PENCEGAHAN --}}
-            <div id="step-3" class="space-y-5 hidden">
+            {{-- STEP 2 — BAHAYA + PENCEGAHAN --}}
+            <div id="step-2" class="space-y-5 hidden">
                 <div class="bg-white rounded-2xl border border-gray-100 shadow-sm">
-                    <div class="px-6 py-4 border-b border-gray-100">
+                    <div class="px-4 md:px-6 py-4 border-b border-gray-100">
                         <h3 class="text-base font-semibold text-gray-800 mt-0.5">Bahaya Pekerjaan</h3>
                     </div>
-                    <div class="px-6 py-5 grid grid-cols-2 md:grid-cols-3 gap-3">
+                    <div class="px-4 md:px-6 py-5 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
                         @php
                             $bahaya = [
                                 'percikan_panas' => 'Percikan Panas',
@@ -314,10 +326,10 @@
                 </div>
 
                 <div class="bg-white rounded-2xl border border-gray-100 shadow-sm">
-                    <div class="px-6 py-4 border-b border-gray-100">
+                    <div class="px-4 md:px-6 py-4 border-b border-gray-100">
                         <h3 class="text-base font-semibold text-gray-800 mt-0.5">Tindakan Pencegahan Bahaya</h3>
                     </div>
-                    <div class="px-6 py-5 grid grid-cols-2 md:grid-cols-3 gap-3">
+                    <div class="px-4 md:px-6 py-5 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
                         @php
                             $pencegahan = [
                                 'proteksi_dari_jatuh' => 'Proteksi Dari Jatuh',
@@ -347,14 +359,14 @@
                 </div>
             </div>
 
-            {{-- STEP 4 — APD --}}
-            <div id="step-4" class="hidden">
+            {{-- STEP 3 — APD --}}
+            <div id="step-3" class="hidden">
                 <div class="bg-white rounded-2xl border border-gray-100 shadow-sm">
-                    <div class="px-6 py-4 border-b border-gray-100">
+                    <div class="px-4 md:px-6 py-4 border-b border-gray-100">
                         <h3 class="text-base font-semibold text-gray-800 mt-0.5">Alat Pelindung Diri (APD)</h3>
                         <p class="text-sm text-gray-400 mt-0.5">Pilih APD yang akan digunakan selama pekerjaan berlangsung</p>
                     </div>
-                    <div class="px-6 py-5 grid grid-cols-2 md:grid-cols-3 gap-3">
+                    <div class="px-4 md:px-6 py-5 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
                         @php
                             $apd = [
                                 'helm' => 'Helm Keselamatan',
@@ -388,11 +400,11 @@
             {{-- STEP 5 — TTD --}}
             <div id="step-5" class="hidden">
                 <div class="bg-white rounded-2xl border border-gray-100 shadow-sm">
-                    <div class="px-6 py-4 border-b border-gray-100">
+                    <div class="px-4 md:px-6 py-4 border-b border-gray-100">
                         <h3 class="text-base font-semibold text-gray-800 mt-0.5">Validasi Kerja</h3>
                         <p class="text-sm text-gray-400 mt-0.5">Tanda tangan pemohon, wajib diisi</p>
                     </div>
-                    <div class="px-6 py-5 space-y-4">
+                    <div class="px-4 md:px-6 py-5 space-y-4">
                         <div class="flex items-center justify-between mb-2">
                             <div>
                                 <p class="text-base font-semibold text-gray-700">Tanda Tangan Pemohon <span class="text-red-500">*</span></p>
@@ -420,19 +432,19 @@
             {{-- STEP 6 — REVIEW --}}
             <div id="step-6" class="hidden">
                 <div class="bg-white rounded-2xl border border-gray-100 shadow-sm">
-                    <div class="px-6 py-4 border-b border-gray-100">
+                    <div class="px-4 md:px-6 py-4 border-b border-gray-100">
                         <h3 class="text-base font-semibold text-gray-800">Review Pengajuan</h3>
                         <p class="text-sm text-gray-400 mt-0.5">Periksa kembali sebelum mengirim ke Staff HSE</p>
                     </div>
-                    <div class="px-6 py-5">
+                    <div class="px-4 md:px-6 py-5">
                         <div id="review-content" class="space-y-4 text-base text-gray-600">
                             <p class="text-sm text-gray-400 italic">Data review akan tampil setelah form sebelumnya diisi.</p>
                         </div>
                     </div>
                 </div>
-                <div class="mt-5 flex justify-end">
+                <div class="mt-5 flex flex-col sm:flex-row gap-3 sm:justify-end">
                     <button type="submit" id="btn-submit"
-                        class="px-6 py-3 rounded-xl bg-inka-navy text-white text-base font-semibold hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed">
+                        class="w-full sm:w-auto justify-center px-6 py-3 rounded-xl bg-inka-navy text-white text-base font-semibold hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed">
                         <span class="btn-text">Kirim ke Staff HSE</span>
                         <span class="btn-loading hidden">Mengirim...</span>
                     </button>
@@ -490,9 +502,6 @@
         function changeStep(direction) {
             let nextStep = currentStep + direction;
             if (nextStep < 0 || nextStep >= totalSteps) return;
-            if (direction > 0 && currentStep === 0 && selectedTipe === 'Internal') nextStep = 2;
-            if (direction < 0 && currentStep === 2 && selectedTipe === 'Internal') nextStep = 0;
-
             if (direction > 0) {
                 const stepEl = document.getElementById('step-' + currentStep);
                 const inputs = stepEl.querySelectorAll('input[required], select[required], textarea[required]');
@@ -506,7 +515,7 @@
                         return;
                     }
                 }
-                if (currentStep === 1 && selectedTipe === 'Eksternal') {
+                if (currentStep === 4 && selectedTipe === 'Eksternal') {
                     if (document.querySelectorAll('.doc-entry').length === 0) {
                         document.getElementById('doc-required-warning').classList.remove('hidden');
                         return;
@@ -558,7 +567,7 @@
             const telp = fd.get('telepon') || '—';
             const tgl1 = fd.get('tanggal_mulai') || '—';
             const tgl2 = fd.get('tanggal_selesai') || '—';
-            html += '<div class="grid grid-cols-2 gap-x-6 gap-y-3 text-base">'
+            html += '<div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3 text-base">'
                 + '<div><p class="text-sm text-gray-400">Divisi Pengaju</p><p class="font-medium text-gray-800">' + divisi + '</p></div>'
                 + '<div><p class="text-sm text-gray-400">Nama Pekerjaan</p><p class="font-medium text-gray-800">' + namaP + '</p></div>'
                 + '<div><p class="text-sm text-gray-400">Lokasi</p><p class="font-medium text-gray-800">' + lokasi + '</p></div>'
@@ -602,10 +611,13 @@
             function resizeCanvas() {
                 const rect = container.getBoundingClientRect();
                 if (rect.width === 0) return;
-                const dpr = window.devicePixelRatio || 1;
+                // HP saja: batasi DPR max 1.5. Laptop tetap DPR asli.
+                const isMobile = window.matchMedia('(max-width: 767px)').matches;
+                const rawDpr = window.devicePixelRatio || 1;
+                const dpr = isMobile ? Math.min(rawDpr, 1.5) : rawDpr;
                 canvas.width = rect.width * dpr;
                 canvas.height = rect.height * dpr;
-                ctx.scale(dpr, dpr);
+                ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
                 ctx.fillStyle = '#ffffff';
                 ctx.fillRect(0, 0, rect.width, rect.height);
                 ctx.strokeStyle = '#111d33';
@@ -630,7 +642,7 @@
                     document.getElementById('signature-error').classList.add('hidden');
                 }
             }
-            function stopDraw() { if (!drawing) return; drawing = false; ctx.beginPath(); hiddenInput.value = canvas.toDataURL('image/png'); }
+            function stopDraw() { if (!drawing) return; drawing = false; ctx.beginPath(); hiddenInput.value = window.matchMedia('(max-width: 767px)').matches ? canvas.toDataURL('image/jpeg', 0.7) : canvas.toDataURL('image/png'); }
             canvas.addEventListener('mousedown', startDraw);
             canvas.addEventListener('mousemove', draw);
             canvas.addEventListener('mouseup', stopDraw);
@@ -639,9 +651,18 @@
             canvas.addEventListener('touchmove', draw, { passive: false });
             canvas.addEventListener('touchend', stopDraw);
             window.clearSignature = function () {
-                const dpr = window.devicePixelRatio || 1;
+                ctx.setTransform(1, 0, 0, 1, 0, 0);
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
                 ctx.fillStyle = '#ffffff';
-                ctx.fillRect(0, 0, canvas.width / dpr, canvas.height / dpr);
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                const rect = container.getBoundingClientRect();
+                const rawDpr = window.devicePixelRatio || 1;
+                const dpr = window.matchMedia('(max-width: 767px)').matches ? Math.min(rawDpr, 1.5) : rawDpr;
+                ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+                ctx.strokeStyle = '#111d33';
+                ctx.lineWidth = 2;
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
                 hasDrawn = false; hiddenInput.value = '';
                 placeholder.classList.remove('hidden');
             };
@@ -652,7 +673,7 @@
         function addPeralatan() {
             const list = document.getElementById('peralatan-list');
             const row = document.createElement('div');
-            row.className = 'grid grid-cols-2 md:grid-cols-4 gap-2';
+            row.className = 'grid grid-cols-2 lg:grid-cols-4 gap-2';
             row.innerHTML = '<input type="text" name="peralatan_kerja[' + peralatanCount + '][alat]" placeholder="Peralatan" class="form-input text-base">'
                 + '<input type="text" name="peralatan_kerja[' + peralatanCount + '][jumlah_alat]" placeholder="Jumlah" class="form-input text-base">'
                 + '<input type="text" name="peralatan_kerja[' + peralatanCount + '][material]" placeholder="Material" class="form-input text-base">'

@@ -8,6 +8,8 @@ Route::get('/', function () {
     $permits = \App\Models\Permit::with(['user', 'classifications'])
         ->whereNotIn('status', ['Draft'])
         ->forSite(request('site'))
+        ->when(request()->filled('tipe') && in_array(request('tipe'), ['Internal', 'Eksternal'], true),
+            fn ($q) => $q->where('tipe', request('tipe')))
         ->orderByRaw('COALESCE(submitted_at, created_at) DESC')
         ->paginate(10)
         ->withQueryString()
@@ -21,7 +23,15 @@ Route::middleware(['throttle:10,1'])->group(function () {
     Route::get('/ajukan-permit', [\App\Http\Controllers\Public\PermitController::class, 'create']);
     Route::post('/ajukan-permit', [\App\Http\Controllers\Public\PermitController::class, 'store']);
 });
-Route::get('/ajukan-permit/sukses/{id}', [\App\Http\Controllers\Public\PermitController::class, 'success']);
+Route::get('/ajukan-permit/sukses/{permit}', [\App\Http\Controllers\Public\PermitController::class, 'success'])
+    ->middleware('signed')
+    ->name('public.permits.success');
+Route::get('/ajukan-permit/{permit}/batalkan', [\App\Http\Controllers\Public\CancellationController::class, 'show'])
+    ->middleware(['signed', 'throttle:10,1'])
+    ->name('public.permits.cancel.show');
+Route::post('/ajukan-permit/{permit}/batalkan', [\App\Http\Controllers\Public\CancellationController::class, 'cancel'])
+    ->middleware(['signed', 'throttle:10,1'])
+    ->name('public.permits.cancel');
 
 Route::get('/dashboard', function () {
     if (!Auth::check()) {
@@ -75,6 +85,9 @@ Route::middleware(['auth', 'prevent-back-history', 'role:staff,manager'])->group
     Route::put('/admin/approvals/{id}', [\App\Http\Controllers\Admin\ApprovalController::class, 'update']);
     Route::get('/admin/approvals/{permitId}/documents/{documentId}/download', [\App\Http\Controllers\Admin\ApprovalController::class, 'downloadDocument'])->name('admin.permits.documents.download');
     Route::get('/admin/history', [\App\Http\Controllers\Admin\HistoryController::class, 'index']);
+    Route::get('/admin/cancellations', [\App\Http\Controllers\Admin\CancellationController::class, 'index']);
+    Route::get('/admin/cancellations/{id}', [\App\Http\Controllers\Admin\CancellationController::class, 'show']);
+    Route::post('/admin/cancellations/{id}', [\App\Http\Controllers\Admin\CancellationController::class, 'cancel']);
     Route::get('/admin/permits/{id}/pdf', [\App\Http\Controllers\Admin\ApprovalController::class, 'downloadPdf']);
 });
 

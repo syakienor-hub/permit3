@@ -6,11 +6,11 @@
     {{-- Page Header --}}
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-            <h1 class="text-3xl font-bold text-gray-900">Dashboard Super Admin</h1>
+            <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">Dashboard Super Admin</h1>
             <p class="text-base text-gray-500 mt-1">Ringkasan statistik akun Divisi pada sistem</p>
         </div>
         <div>
-            <a href="{{ url('superadmin/users/create') }}" class="inline-flex items-center gap-2 bg-inka-navy text-white px-4 py-2.5 rounded-xl text-base font-semibold hover:bg-opacity-90 transition-colors shadow-sm focus:ring-2 focus:ring-offset-2 focus:ring-inka-navy">
+            <a href="{{ url('superadmin/users/create') }}" class="inline-flex items-center justify-center gap-2 bg-inka-navy text-white px-4 py-2.5 rounded-xl text-base font-semibold hover:bg-opacity-90 transition-colors shadow-sm focus:ring-2 focus:ring-offset-2 focus:ring-inka-navy w-full sm:w-auto">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
                 Tambah Akun Divisi
             </a>
@@ -44,7 +44,7 @@
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex items-center justify-between group hover:shadow-md transition-shadow">
             <div>
                 <p class="text-base font-medium text-gray-500 mb-1">Total Divisi</p>
-                <h3 class="text-4xl font-bold text-gray-900">{{ $counts['total'] }}</h3>
+                <h3 class="text-3xl sm:text-4xl font-bold text-gray-900">{{ $counts['total'] }}</h3>
             </div>
             <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
@@ -55,7 +55,7 @@
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex items-center justify-between group hover:shadow-md transition-shadow">
             <div>
                 <p class="text-base font-medium text-gray-500 mb-1">Akun Aktif</p>
-                <h3 class="text-4xl font-bold text-gray-900">{{ $counts['aktif'] }}</h3>
+                <h3 class="text-3xl sm:text-4xl font-bold text-gray-900">{{ $counts['aktif'] }}</h3>
             </div>
             <div class="w-12 h-12 bg-green-50 text-green-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
@@ -66,7 +66,7 @@
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex items-center justify-between group hover:shadow-md transition-shadow">
             <div>
                 <p class="text-base font-medium text-gray-500 mb-1">Akun Nonaktif</p>
-                <h3 class="text-4xl font-bold text-gray-900">{{ $counts['nonaktif'] }}</h3>
+                <h3 class="text-3xl sm:text-4xl font-bold text-gray-900">{{ $counts['nonaktif'] }}</h3>
             </div>
             <div class="w-12 h-12 bg-red-50 text-red-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
@@ -78,7 +78,7 @@
     {{-- Section: Akun Divisi Terbaru --}}
     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         
-        <div class="px-6 py-5 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
+        <div class="px-4 md:px-6 py-5 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-gray-50/50">
             <h2 class="text-xl font-bold text-gray-900">Akun Divisi Terbaru</h2>
             <a href="{{ url('superadmin/users') }}" class="text-base font-semibold text-inka-navy hover:underline">Lihat Semua</a>
         </div>
@@ -97,7 +97,7 @@
             </div>
         @else
             <div class="overflow-x-auto">
-                <table class="w-full text-left text-base text-gray-600">
+                <table class="w-full text-left text-base text-gray-600 min-w-[720px]">
                     <thead class="bg-gray-50/50 text-sm uppercase text-gray-500 border-b border-gray-100">
                         <tr>
                             <th class="px-6 py-4 font-semibold">Nama Divisi</th>

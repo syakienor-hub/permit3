@@ -17,13 +17,17 @@ return new class extends Migration
             ->where('role', 'senior-manager')
             ->delete();
 
-        // Alter enum: remove 'Review Senior Manager'
-        DB::statement("ALTER TABLE permits MODIFY status ENUM('Draft', 'Submitted', 'Review Staff', 'Review Manager', 'Revision', 'Active', 'Closed', 'Cancelled') DEFAULT 'Draft'");
+        // Alter enum: remove 'Review Senior Manager' (MySQL only, SQLite ignores enums)
+        if (DB::getDriverName() === 'mysql') {
+            DB::statement("ALTER TABLE permits MODIFY status ENUM('Draft', 'Submitted', 'Review Staff', 'Review Manager', 'Revision', 'Active', 'Closed', 'Cancelled') DEFAULT 'Draft'");
+        }
     }
 
     public function down(): void
     {
         // Re-add enum value (data loss expected)
-        DB::statement("ALTER TABLE permits MODIFY status ENUM('Draft', 'Submitted', 'Review Staff', 'Review Manager', 'Review Senior Manager', 'Revision', 'Active', 'Closed', 'Cancelled') DEFAULT 'Draft'");
+        if (DB::getDriverName() === 'mysql') {
+            DB::statement("ALTER TABLE permits MODIFY status ENUM('Draft', 'Submitted', 'Review Staff', 'Review Manager', 'Review Senior Manager', 'Revision', 'Active', 'Closed', 'Cancelled') DEFAULT 'Draft'");
+        }
     }
 };

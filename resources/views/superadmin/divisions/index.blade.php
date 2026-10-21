@@ -28,7 +28,7 @@
         {{-- Main Content --}}
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
             <div class="overflow-x-auto">
-                <table class="w-full text-left text-sm text-gray-600">
+                <table class="w-full text-left text-sm text-gray-600 min-w-[560px]">
                     <thead class="bg-gray-50/50 text-xs uppercase text-gray-500 border-b border-gray-100">
                         <tr>
                             <th class="px-6 py-4 font-semibold w-16">No</th>

@@ -9,6 +9,7 @@ use App\Models\PermitDocument;
 use App\Services\PermitMailNotifier;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\URL;
 
 class PermitController extends Controller
 {
@@ -38,6 +39,13 @@ class PermitController extends Controller
         if ($request->input('tipe') === 'Eksternal') {
             $request->validate([
                 'dokumen'             => 'required|array|min:1',
+                'dokumen.*.nama'      => 'required|string|max:255',
+                'dokumen.*.deskripsi' => 'nullable|string|max:500',
+                'dokumen.*.file'      => 'required|file|max:10240|mimes:pdf,doc,docx,xls,xlsx,jpg,jpeg,png,gif',
+            ]);
+        } elseif ($request->has('dokumen')) {
+            $request->validate([
+                'dokumen'             => 'array',
                 'dokumen.*.nama'      => 'required|string|max:255',
                 'dokumen.*.deskripsi' => 'nullable|string|max:500',
                 'dokumen.*.file'      => 'required|file|max:10240|mimes:pdf,doc,docx,xls,xlsx,jpg,jpeg,png,gif',
@@ -83,28 +91,26 @@ class PermitController extends Controller
                 $permit->classifications()->sync($cIds);
             }
 
-            if ($request->input('tipe') === 'Eksternal') {
-                $dokumenInput = $request->input('dokumen', []);
-                $dokumenFiles = $request->file('dokumen', []);
+            $dokumenInput = $request->input('dokumen', []);
+            $dokumenFiles = $request->file('dokumen', []);
 
-                foreach ($dokumenInput as $i => $doc) {
-                    if (!isset($dokumenFiles[$i]['file'])) {
-                        continue;
-                    }
-                    $file = $dokumenFiles[$i]['file'];
-                    $ext = $file->getClientOriginalExtension();
-                    $filename = time() . '-' . bin2hex(random_bytes(4)) . '.' . $ext;
-                    $path = $file->storeAs('permits/' . $permit->id, $filename);
-
-                    PermitDocument::create([
-                        'permit_id'    => $permit->id,
-                        'nama_dokumen' => $doc['nama'] ?? 'Dokumen',
-                        'deskripsi'    => $doc['deskripsi'] ?? null,
-                        'file_path'    => $path,
-                        'file_type'    => $ext,
-                        'file_size'    => $file->getSize(),
-                    ]);
+            foreach ($dokumenInput as $i => $doc) {
+                if (!isset($dokumenFiles[$i]['file'])) {
+                    continue;
                 }
+                $file = $dokumenFiles[$i]['file'];
+                $ext = $file->getClientOriginalExtension();
+                $filename = time() . '-' . bin2hex(random_bytes(4)) . '.' . $ext;
+                $path = $file->storeAs('permits/' . $permit->id, $filename);
+
+                PermitDocument::create([
+                    'permit_id'    => $permit->id,
+                    'nama_dokumen' => $doc['nama'] ?? 'Dokumen',
+                    'deskripsi'    => $doc['deskripsi'] ?? null,
+                    'file_path'    => $path,
+                    'file_type'    => $ext,
+                    'file_size'    => $file->getSize(),
+                ]);
             }
 
             return $permit;
@@ -112,20 +118,16 @@ class PermitController extends Controller
 
         PermitMailNotifier::notifyStaff($permit);
 
-        return redirect('/ajukan-permit/sukses/' . $permit->id)
-            ->with('no_permit', $permit->no_permit);
+        return redirect(URL::signedRoute('public.permits.success', ['permit' => $permit->id]));
     }
 
-    /** Halaman sukses setelah submit publik */
-    public function success($id)
+    /** Halaman sukses setelah submit publik (signed URL, dapat dibuka ulang) */
+    public function success(Permit $permit)
     {
-        $permit = Permit::findOrFail($id);
-
-        // Hanya tampilkan jika dari session yang benar (cegah tebak ID)
-        if (session('no_permit') !== $permit->no_permit) {
-            abort(404);
-        }
-
-        return view('public.permits.success', compact('permit'));
+        return view('public.permits.success', [
+            'permit' => $permit,
+            'cancelUrl' => URL::signedRoute('public.permits.cancel.show', ['permit' => $permit->id]),
+            'successUrl' => URL::signedRoute('public.permits.success', ['permit' => $permit->id]),
+        ]);
     }
 }

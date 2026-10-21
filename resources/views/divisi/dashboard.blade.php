@@ -12,7 +12,7 @@
     @endif
 
     {{-- ===== WIDGET RINGKASAN (4 KARTU KLIKABLE) ===== --}}
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
 
         {{-- Draft --}}
         <a href="/divisi/history?status=Draft"
@@ -25,7 +25,7 @@
                     </svg>
                 </div>
             </div>
-            <p class="text-4xl font-bold text-gray-700">{{ $counts['draft'] }}</p>
+            <p class="text-3xl sm:text-4xl font-bold text-gray-700">{{ $counts['draft'] }}</p>
             <p class="text-xs text-gray-400 mt-1">Belum diajukan</p>
         </a>
 
@@ -40,7 +40,7 @@
                     </svg>
                 </div>
             </div>
-            <p class="text-4xl font-bold text-yellow-500">{{ $counts['submitted'] }}</p>
+            <p class="text-3xl sm:text-4xl font-bold text-yellow-500">{{ $counts['submitted'] }}</p>
             <p class="text-xs text-gray-400 mt-1">Dalam proses review</p>
         </a>
 
@@ -55,7 +55,7 @@
                     </svg>
                 </div>
             </div>
-            <p class="text-4xl font-bold text-green-500">{{ $counts['active'] }}</p>
+            <p class="text-3xl sm:text-4xl font-bold text-green-500">{{ $counts['active'] }}</p>
             <p class="text-xs text-gray-400 mt-1">Permit berlaku</p>
         </a>
 
@@ -70,7 +70,7 @@
                     </svg>
                 </div>
             </div>
-            <p class="text-4xl font-bold text-slate-400">{{ $counts['closed'] }}</p>
+            <p class="text-3xl sm:text-4xl font-bold text-slate-400">{{ $counts['closed'] }}</p>
             <p class="text-xs text-gray-400 mt-1">Pekerjaan selesai</p>
         </a>
 
@@ -80,17 +80,17 @@
     <div class="bg-white rounded-2xl border border-gray-100 shadow-sm">
 
         {{-- Header section --}}
-        <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-4 md:px-6 py-4 border-b border-gray-100">
             <div>
                 <h3 class="text-base font-semibold text-gray-800">Permit Terbaru</h3>
                 <p class="text-sm text-gray-400 mt-0.5">5 pengajuan terakhir milik divisi Anda</p>
             </div>
-            <div class="flex items-center gap-5">
+            <div class="flex flex-col sm:flex-row sm:items-center gap-2.5 sm:gap-5">
                 <a href="/divisi/history" class="text-base font-semibold text-inka-navy hover:underline">
                     Lihat Semua
                 </a>
                 <a href="/divisi/permits/create"
-                   class="inline-flex items-center gap-2 bg-inka-navy text-white text-base font-semibold px-4 py-2 rounded-xl hover:opacity-90 transition-opacity">
+                   class="inline-flex items-center justify-center gap-2 bg-inka-navy text-white text-base font-semibold px-4 py-2 rounded-xl hover:opacity-90 transition-opacity">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                     </svg>
@@ -120,8 +120,9 @@
             </div>
 
         @else
-            <div class="overflow-x-auto">
-                <table class="w-full text-left text-base">
+            {{-- Desktop/laptop: tabel tetap --}}
+            <div class="overflow-x-auto hidden md:block">
+                <table class="w-full text-left text-base min-w-[880px]">
                     <thead>
                         <tr class="text-sm text-gray-400 uppercase tracking-wide border-b border-gray-100 bg-gray-50/60">
                             <th class="px-6 py-3 font-semibold">No. Permit</th>
@@ -184,6 +185,29 @@
                         @endforeach
                     </tbody>
                 </table>
+            </div>
+            {{-- HP saja: card vertikal, tanpa tabel lebar --}}
+            <div class="md:hidden divide-y divide-gray-50">
+                @foreach($permits as $permit)
+                @php
+                    $mBadge2 = $statusMap[$permit->status] ?? 'bg-gray-100 text-gray-600';
+                    $mCanEdit2 = in_array($permit->status, ['Draft', 'Revision']);
+                @endphp
+                <a href="/divisi/permits/{{ $permit->id }}" class="block px-4 py-4 active:bg-blue-50/50">
+                    <div class="flex items-center justify-between gap-2 mb-1.5">
+                        <span class="font-semibold text-inka-navy text-sm">{{ $permit->no_permit }}</span>
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold {{ $mBadge2 }} shrink-0">
+                            {{ str_starts_with($permit->status, 'Review') ? 'Menunggu ' . $permit->status : $permit->status }}
+                        </span>
+                    </div>
+                    <p class="text-sm text-gray-800 font-medium truncate">{{ $permit->nama_pekerjaan ?? $permit->kontraktor }}</p>
+                    <p class="text-xs text-gray-400 mt-0.5 truncate">{{ $permit->kontraktor }} &middot; {{ $permit->lokasi ?? '—' }}</p>
+                    <div class="flex items-center justify-between mt-2.5">
+                        <x-permit-tanggal :permit="$permit" />
+                        <span class="text-xs font-semibold text-inka-navy">{{ $mCanEdit2 ? 'Edit ›' : 'Lihat Detail ›' }}</span>
+                    </div>
+                </a>
+                @endforeach
             </div>
         @endif
     </div>

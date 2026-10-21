@@ -34,10 +34,17 @@ class PermitController extends Controller
             'tanda_tangan'     => $request->input('action') === 'submit' ? 'required|string' : 'nullable|string',
         ]);
 
-        // Validasi dokumen untuk tipe Eksternal
+        // Validasi dokumen: wajib untuk Eksternal, opsional untuk Internal
         if ($request->input('tipe') === 'Eksternal') {
             $request->validate([
                 'dokumen'               => 'required|array|min:1',
+                'dokumen.*.nama'        => 'required|string|max:255',
+                'dokumen.*.deskripsi'   => 'nullable|string|max:500',
+                'dokumen.*.file'        => 'required|file|max:10240|mimes:pdf,doc,docx,xls,xlsx,jpg,jpeg,png,gif',
+            ]);
+        } elseif ($request->has('dokumen')) {
+            $request->validate([
+                'dokumen'               => 'array',
                 'dokumen.*.nama'        => 'required|string|max:255',
                 'dokumen.*.deskripsi'   => 'nullable|string|max:500',
                 'dokumen.*.file'        => 'required|file|max:10240|mimes:pdf,doc,docx,xls,xlsx,jpg,jpeg,png,gif',
@@ -96,29 +103,27 @@ class PermitController extends Controller
                 $permit->classifications()->sync($cIds);
             }
 
-            // Simpan dokumen pendukung untuk tipe Eksternal
-            if ($request->input('tipe') === 'Eksternal') {
-                $dokumenInput = $request->input('dokumen', []);
-                $dokumenFiles = $request->file('dokumen', []);
+            // Simpan dokumen pendukung (Internal maupun Eksternal)
+            $dokumenInput = $request->input('dokumen', []);
+            $dokumenFiles = $request->file('dokumen', []);
 
-                foreach ($dokumenInput as $i => $doc) {
-                    if (!isset($dokumenFiles[$i]['file'])) {
-                        continue;
-                    }
-                    $file = $dokumenFiles[$i]['file'];
-                    $ext = $file->getClientOriginalExtension();
-                    $filename = time() . '-' . bin2hex(random_bytes(4)) . '.' . $ext;
-                    $path = $file->storeAs('permits/' . $permit->id, $filename);
-
-                    PermitDocument::create([
-                        'permit_id'    => $permit->id,
-                        'nama_dokumen' => $doc['nama'] ?? 'Dokumen',
-                        'deskripsi'    => $doc['deskripsi'] ?? null,
-                        'file_path'    => $path,
-                        'file_type'    => $ext,
-                        'file_size'    => $file->getSize(),
-                    ]);
+            foreach ($dokumenInput as $i => $doc) {
+                if (!isset($dokumenFiles[$i]['file'])) {
+                    continue;
                 }
+                $file = $dokumenFiles[$i]['file'];
+                $ext = $file->getClientOriginalExtension();
+                $filename = time() . '-' . bin2hex(random_bytes(4)) . '.' . $ext;
+                $path = $file->storeAs('permits/' . $permit->id, $filename);
+
+                PermitDocument::create([
+                    'permit_id'    => $permit->id,
+                    'nama_dokumen' => $doc['nama'] ?? 'Dokumen',
+                    'deskripsi'    => $doc['deskripsi'] ?? null,
+                    'file_path'    => $path,
+                    'file_type'    => $ext,
+                    'file_size'    => $file->getSize(),
+                ]);
             }
 
             return $permit;
@@ -169,17 +174,16 @@ class PermitController extends Controller
             'tanda_tangan'     => $request->input('action') === 'submit' ? 'required|string' : 'nullable|string',
         ]);
 
-        // Validasi dokumen untuk tipe Eksternal
-        if ($request->input('tipe') === 'Eksternal') {
-            $hasNewDocs = !empty($request->file('dokumen'));
+        // Validasi dokumen baru: wajib untuk Eksternal, opsional untuk Internal
+        $hasNewDocs = !empty($request->file('dokumen'));
 
-            if ($hasNewDocs) {
-                $request->validate([
-                    'dokumen.*.nama'      => 'required|string|max:255',
-                    'dokumen.*.deskripsi' => 'nullable|string|max:500',
-                    'dokumen.*.file'      => 'required|file|max:10240|mimes:pdf,doc,docx,xls,xlsx,jpg,jpeg,png,gif',
-                ]);
-            }
+        if ($hasNewDocs) {
+            $request->validate([
+                'dokumen'             => 'array',
+                'dokumen.*.nama'      => 'required|string|max:255',
+                'dokumen.*.deskripsi' => 'nullable|string|max:500',
+                'dokumen.*.file'      => 'required|file|max:10240|mimes:pdf,doc,docx,xls,xlsx,jpg,jpeg,png,gif',
+            ]);
         }
 
         // Idempotency check: prevent duplicate submissions
@@ -196,16 +200,7 @@ class PermitController extends Controller
 
         DB::transaction(function () use ($request, $permit, $status) {
             // Handle perubahan tipe
-            $oldTipe = $permit->tipe;
             $newTipe = $request->input('tipe');
-
-            // Jika tipe berubah dari Eksternal ke Internal, hapus semua dokumen
-            if ($oldTipe === 'Eksternal' && $newTipe === 'Internal') {
-                foreach ($permit->documents as $doc) {
-                    Storage::disk('local')->delete($doc->file_path);
-                }
-                $permit->documents()->delete();
-            }
 
             // Handle hapus dokumen individual
             if ($request->has('hapus_dokumen')) {
@@ -244,29 +239,27 @@ class PermitController extends Controller
             $cIds = Classification::whereIn('code', $klasifikasiSelected)->pluck('id');
             $permit->classifications()->sync($cIds);
 
-            // Simpan dokumen baru untuk tipe Eksternal
-            if ($newTipe === 'Eksternal') {
-                $dokumenInput = $request->input('dokumen', []);
-                $dokumenFiles = $request->file('dokumen', []);
+            // Simpan dokumen baru (Internal maupun Eksternal)
+            $dokumenInput = $request->input('dokumen', []);
+            $dokumenFiles = $request->file('dokumen', []);
 
-                foreach ($dokumenInput as $i => $doc) {
-                    if (!isset($dokumenFiles[$i]['file'])) {
-                        continue;
-                    }
-                    $file = $dokumenFiles[$i]['file'];
-                    $ext = $file->getClientOriginalExtension();
-                    $filename = time() . '-' . bin2hex(random_bytes(4)) . '.' . $ext;
-                    $path = $file->storeAs('permits/' . $permit->id, $filename);
-
-                    PermitDocument::create([
-                        'permit_id'    => $permit->id,
-                        'nama_dokumen' => $doc['nama'] ?? 'Dokumen',
-                        'deskripsi'    => $doc['deskripsi'] ?? null,
-                        'file_path'    => $path,
-                        'file_type'    => $ext,
-                        'file_size'    => $file->getSize(),
-                    ]);
+            foreach ($dokumenInput as $i => $doc) {
+                if (!isset($dokumenFiles[$i]['file'])) {
+                    continue;
                 }
+                $file = $dokumenFiles[$i]['file'];
+                $ext = $file->getClientOriginalExtension();
+                $filename = time() . '-' . bin2hex(random_bytes(4)) . '.' . $ext;
+                $path = $file->storeAs('permits/' . $permit->id, $filename);
+
+                PermitDocument::create([
+                    'permit_id'    => $permit->id,
+                    'nama_dokumen' => $doc['nama'] ?? 'Dokumen',
+                    'deskripsi'    => $doc['deskripsi'] ?? null,
+                    'file_path'    => $path,
+                    'file_type'    => $ext,
+                    'file_size'    => $file->getSize(),
+                ]);
             }
 
             $permit->forceFill([

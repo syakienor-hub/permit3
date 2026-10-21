@@ -2,15 +2,15 @@
     <x-slot name="title">Buat Permit Baru</x-slot>
 
     {{-- Step indicator --}}
-    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm px-6 py-4 mb-6">
-        <div class="flex items-center justify-between" id="step-indicator">
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm px-4 md:px-6 py-4 mb-6 overflow-x-auto">
+        <div class="flex items-center justify-between gap-1 min-w-[620px]" id="step-indicator">
             @php
                 $steps = [
                     0 => 'Site & Tipe',
-                    1 => 'Dokumen',
-                    2 => 'Klasifikasi & Info',
-                    3 => 'Bahaya & Pencegahan',
-                    4 => 'APD',
+                    1 => 'Klasifikasi & Info',
+                    2 => 'Bahaya & Pencegahan',
+                    3 => 'APD',
+                    4 => 'Dokumen',
                     5 => 'Validasi Kerja',
                     6 => 'Review & Submit',
                 ];
@@ -57,11 +57,11 @@
              ======================================================== --}}
         <div id="step-0" class="space-y-5">
             <div class="bg-white rounded-2xl border border-gray-100 shadow-sm">
-                <div class="px-6 py-4 border-b border-gray-100">
+                <div class="px-4 md:px-6 py-4 border-b border-gray-100">
                     <h3 class="text-base font-semibold text-gray-800">Pilih Site <span class="text-red-500">*</span></h3>
                     <p class="text-sm text-gray-400 mt-0.5">Permit akan direview oleh Staff HSE site yang dipilih</p>
                 </div>
-                <div class="px-6 py-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="px-4 md:px-6 py-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <button type="button" onclick="selectSite('Madiun')" id="btn-site-madiun"
                         class="site-btn group p-6 rounded-2xl border-2 border-inka-navy bg-inka-navy/5 text-left transition-all">
                         <p class="text-lg font-bold text-gray-800">Madiun</p>
@@ -77,11 +77,11 @@
             </div>
 
             <div class="bg-white rounded-2xl border border-gray-100 shadow-sm">
-                <div class="px-6 py-4 border-b border-gray-100">
+                <div class="px-4 md:px-6 py-4 border-b border-gray-100">
                     <h3 class="text-base font-semibold text-gray-800">Pilih Tipe Permit</h3>
                     <p class="text-sm text-gray-400 mt-0.5">Tentukan apakah permit ini untuk pekerjaan internal atau eksternal</p>
                 </div>
-                <div class="px-6 py-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="px-4 md:px-6 py-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <button type="button" onclick="selectTipe('Internal')" id="btn-internal"
                         class="tipe-btn group p-6 rounded-2xl border-2 border-inka-navy bg-inka-navy/5 text-left transition-all">
                         <div class="w-12 h-12 rounded-xl bg-inka-navy/10 flex items-center justify-center mb-3">
@@ -108,16 +108,15 @@
         </div>
 
         {{-- ========================================================
-             STEP 1 — DOKUMEN PENDUKUNG (Eksternal Only)
+             STEP 4 — DOKUMEN PENDUKUNG
              ======================================================== --}}
-        <div id="step-1" class="hidden space-y-5">
+        <div id="step-4" class="hidden space-y-5">
             <div class="bg-white rounded-2xl border border-gray-100 shadow-sm">
-                <div class="px-6 py-4 border-b border-gray-100">
-                    <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">D</span>
+                <div class="px-4 md:px-6 py-4 border-b border-gray-100">
                     <h3 class="text-base font-semibold text-gray-800 mt-0.5">Dokumen Pendukung</h3>
-                    <p class="text-sm text-gray-400 mt-0.5">Upload dokumen pendukung untuk permit eksternal (max 10MB per file)</p>
+                    <p class="text-sm text-gray-400 mt-0.5">Opsional untuk permit Internal, wajib untuk Eksternal (max 10MB per file)</p>
                 </div>
-                <div class="px-6 py-5">
+                <div class="px-4 md:px-6 py-5">
                     <div id="documents-list" class="space-y-4"></div>
                     <button type="button" onclick="addDocument()" id="btn-add-doc"
                         class="mt-4 inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-inka-navy border border-inka-navy rounded-xl hover:bg-inka-navy/5 transition-colors">
@@ -130,18 +129,18 @@
         </div>
 
         {{-- ========================================================
-             STEP 2 — A. KLASIFIKASI PEKERJAAN + B. INFORMASI PEKERJAAN
+             STEP 1 — A. KLASIFIKASI PEKERJAAN + B. INFORMASI PEKERJAAN
              ======================================================== --}}
-        <div id="step-2" class="space-y-5 hidden">
+        <div id="step-1" class="space-y-5 hidden">
 
             {{-- A. Klasifikasi Pekerjaan --}}
             <div class="bg-white rounded-2xl border border-gray-100 shadow-sm">
-                <div class="px-6 py-4 border-b border-gray-100">
+                <div class="px-4 md:px-6 py-4 border-b border-gray-100">
                     <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">A</span>
                     <h3 class="text-base font-semibold text-gray-800 mt-0.5">Klasifikasi Pekerjaan</h3>
                     <p class="text-sm text-gray-400 mt-0.5">Pilih satu atau lebih jenis pekerjaan berisiko tinggi</p>
                 </div>
-                <div class="px-6 py-5 grid grid-cols-2 md:grid-cols-3 gap-3">
+                <div class="px-4 md:px-6 py-5 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
                     @php
                         $dbKlasifikasi = \App\Models\Classification::all();
                         if ($dbKlasifikasi->isNotEmpty()) {
@@ -169,11 +168,11 @@
 
             {{-- B. Informasi Pekerjaan --}}
             <div class="bg-white rounded-2xl border border-gray-100 shadow-sm">
-                <div class="px-6 py-4 border-b border-gray-100">
+                <div class="px-4 md:px-6 py-4 border-b border-gray-100">
                     <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">B</span>
                     <h3 class="text-base font-semibold text-gray-800 mt-0.5">Informasi Pekerjaan</h3>
                 </div>
-                <div class="px-6 py-5 grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div class="px-4 md:px-6 py-5 grid grid-cols-1 md:grid-cols-2 gap-5">
                     <div class="md:col-span-2">
                         <label class="form-label">Pekerjaan <span class="text-red-500">*</span></label>
                         <input type="text" name="nama_pekerjaan" class="form-input" placeholder="Contoh: Perbaikan Atap Gudang B" required>
@@ -205,9 +204,9 @@
                 </div>
 
                 {{-- Daftar Pekerja --}}
-                <div class="px-6 pb-5 border-t border-gray-100 pt-4">
+                <div class="px-4 md:px-6 pb-5 border-t border-gray-100 pt-4">
                     <p class="text-sm font-semibold text-gray-600 mb-3">Daftar Pekerja</p>
-                    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
                         @php
                             $pekerja = ['Engineer','Operator Alat Berat','Teknisi Listrik','Mekanik','Welder','Operator','Tukang Bangunan','Tukang Kayu','Helper'];
                         @endphp
@@ -223,19 +222,19 @@
                 </div>
 
                 {{-- Peralatan Kerja --}}
-                <div class="px-6 pb-5 border-t border-gray-100 pt-4">
+                <div class="px-4 md:px-6 pb-5 border-t border-gray-100 pt-4">
                     <div class="flex items-center justify-between mb-2">
                         <p class="text-sm font-semibold text-gray-600">Peralatan Kerja & Material</p>
                         <button type="button" onclick="addPeralatan()" class="text-sm font-semibold text-inka-navy hover:underline">+ Tambah Baris</button>
                     </div>
-                    <div class="grid grid-cols-4 gap-2 mb-1.5">
+                    <div class="hidden sm:grid grid-cols-4 gap-2 mb-1.5">
                         <span class="text-xs font-semibold text-gray-400 uppercase tracking-wide px-1">Peralatan Kerja</span>
                         <span class="text-xs font-semibold text-gray-400 uppercase tracking-wide px-1">Jumlah</span>
                         <span class="text-xs font-semibold text-gray-400 uppercase tracking-wide px-1">Material</span>
                         <span class="text-xs font-semibold text-gray-400 uppercase tracking-wide px-1">Jumlah</span>
                     </div>
                     <div id="peralatan-list" class="space-y-2">
-                        <div class="peralatan-row grid grid-cols-4 gap-2 items-center">
+                        <div class="peralatan-row grid grid-cols-2 lg:grid-cols-4 gap-2 items-center">
                             <input type="text" name="peralatan_kerja[0][alat]" placeholder="e.g. Gerinda" class="form-input text-base">
                             <input type="text" name="peralatan_kerja[0][jumlah_alat]" placeholder="1" class="form-input text-base">
                             <input type="text" name="peralatan_kerja[0][material]" placeholder="e.g. Baja" class="form-input text-base">
@@ -247,17 +246,17 @@
         </div>
 
         {{-- ========================================================
-             STEP 3 — C. BAHAYA PEKERJAAN + D. TINDAKAN PENCEGAHAN
+             STEP 2 — C. BAHAYA PEKERJAAN + D. TINDAKAN PENCEGAHAN
              ======================================================== --}}
-        <div id="step-3" class="space-y-5 hidden">
+        <div id="step-2" class="space-y-5 hidden">
 
             {{-- C. Bahaya Pekerjaan --}}
             <div class="bg-white rounded-2xl border border-gray-100 shadow-sm">
-                <div class="px-6 py-4 border-b border-gray-100">
+                <div class="px-4 md:px-6 py-4 border-b border-gray-100">
                     <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">C</span>
                     <h3 class="text-base font-semibold text-gray-800 mt-0.5">Bahaya Pekerjaan</h3>
                 </div>
-                <div class="px-6 py-5 grid grid-cols-2 md:grid-cols-3 gap-3">
+                <div class="px-4 md:px-6 py-5 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
                     @php
                         $bahaya = [
                             'percikan_panas'       => 'Percikan Panas',
@@ -303,11 +302,11 @@
 
             {{-- D. Tindakan Pencegahan --}}
             <div class="bg-white rounded-2xl border border-gray-100 shadow-sm">
-                <div class="px-6 py-4 border-b border-gray-100">
+                <div class="px-4 md:px-6 py-4 border-b border-gray-100">
                     <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">D</span>
                     <h3 class="text-base font-semibold text-gray-800 mt-0.5">Tindakan Pencegahan Bahaya</h3>
                 </div>
-                <div class="px-6 py-5 grid grid-cols-2 md:grid-cols-3 gap-3">
+                <div class="px-4 md:px-6 py-5 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
                     @php
                         $pencegahan = [
                             'proteksi_dari_jatuh'   => 'Proteksi Dari Jatuh',
@@ -338,16 +337,16 @@
         </div>
 
         {{-- ========================================================
-             STEP 4 — E. ALAT PELINDUNG DIRI (APD)
+             STEP 3 — E. ALAT PELINDUNG DIRI (APD)
              ======================================================== --}}
-        <div id="step-4" class="hidden">
+        <div id="step-3" class="hidden">
             <div class="bg-white rounded-2xl border border-gray-100 shadow-sm">
-                <div class="px-6 py-4 border-b border-gray-100">
+                <div class="px-4 md:px-6 py-4 border-b border-gray-100">
                     <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">E</span>
                     <h3 class="text-base font-semibold text-gray-800 mt-0.5">Alat Pelindung Diri (APD)</h3>
                     <p class="text-sm text-gray-400 mt-0.5">Pilih APD yang akan digunakan selama pekerjaan berlangsung</p>
                 </div>
-                <div class="px-6 py-5 grid grid-cols-2 md:grid-cols-3 gap-3">
+                <div class="px-4 md:px-6 py-5 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
                     @php
                         $apd = [
                             'helm'               => 'Helm Keselamatan',
@@ -383,12 +382,12 @@
              ======================================================== --}}
         <div id="step-5" class="hidden">
             <div class="bg-white rounded-2xl border border-gray-100 shadow-sm">
-                <div class="px-6 py-4 border-b border-gray-100">
+                <div class="px-4 md:px-6 py-4 border-b border-gray-100">
                     <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">F</span>
                     <h3 class="text-base font-semibold text-gray-800 mt-0.5">Validasi Kerja</h3>
                     <p class="text-sm text-gray-400 mt-0.5">Izin diberikan sesuai pengajuan dan kondisi di atas</p>
                 </div>
-                <div class="px-6 py-5 space-y-4">
+                <div class="px-4 md:px-6 py-5 space-y-4">
                     <div class="pt-2">
                         <div class="flex items-center justify-between mb-2">
                             <div>
@@ -425,11 +424,11 @@
              ======================================================== --}}
         <div id="step-6" class="hidden">
             <div class="bg-white rounded-2xl border border-gray-100 shadow-sm">
-                <div class="px-6 py-4 border-b border-gray-100">
+                <div class="px-4 md:px-6 py-4 border-b border-gray-100">
                     <h3 class="text-base font-semibold text-gray-800">Review Pengajuan</h3>
                     <p class="text-sm text-gray-400 mt-0.5">Periksa kembali seluruh data sebelum menyimpan atau mengajukan permit</p>
                 </div>
-                <div class="px-6 py-5">
+                <div class="px-4 md:px-6 py-5">
                     <div id="review-content" class="space-y-4 text-base text-gray-600">
                         <p class="text-sm text-gray-400 italic">Data review akan ditampilkan di sini setelah Anda mengisi form sebelumnya.</p>
                     </div>
@@ -482,6 +481,17 @@
         .form-input:focus { outline: none; border-color: #111d33; box-shadow: 0 0 0 3px rgba(17,29,51,0.08); }
         .form-input.error { border-color: #fca5a5; }
         .form-input.error:focus { border-color: #ef4444; box-shadow: 0 0 0 3px rgba(239,68,68,0.15); }
+        /* HP saja: step yang disembunyikan tidak di-render browser (hemat memori/CPU).
+           Laptop/desktop tidak terpengaruh. */
+        @media (max-width: 767px) {
+            #step-0.hidden, #step-1.hidden, #step-2.hidden, #step-3.hidden,
+            #step-4.hidden, #step-5.hidden, #step-6.hidden {
+                content-visibility: hidden;
+                contain-intrinsic-size: 0 500px;
+            }
+            .form-input { transition: none; }
+            .form-input:focus { box-shadow: none; }
+        }
     </style>
 
     <script>
@@ -522,14 +532,6 @@
             let nextStep = currentStep + direction;
             if (nextStep < 0 || nextStep >= totalSteps) return;
 
-            // Skip step 1 (documents) if Internal
-            if (direction > 0 && currentStep === 0 && selectedTipe === 'Internal') {
-                nextStep = 2;
-            }
-            if (direction < 0 && currentStep === 2 && selectedTipe === 'Internal') {
-                nextStep = 0;
-            }
-
             // Validation before moving forward
             if (direction > 0) {
                 const stepEl = document.getElementById('step-' + currentStep);
@@ -562,8 +564,8 @@
                     return;
                 }
 
-                // Validate document count for Eksternal when leaving step 1
-                if (currentStep === 1 && selectedTipe === 'Eksternal') {
+                // Validate document count for Eksternal when leaving step 4
+                if (currentStep === 4 && selectedTipe === 'Eksternal') {
                     const docs = document.querySelectorAll('.doc-entry');
                     if (docs.length === 0) {
                         document.getElementById('doc-required-warning').classList.remove('hidden');
@@ -647,7 +649,7 @@
             const tgl1   = fd.get('tanggal_mulai') || '—';
             const tgl2   = fd.get('tanggal_selesai') || '—';
 
-            html += `<div class="grid grid-cols-2 gap-x-6 gap-y-3 text-base">
+            html += `<div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3 text-base">
                 <div><p class="text-sm text-gray-400">Nama Pekerjaan</p><p class="font-medium text-gray-800">${namaP}</p></div>
                 <div><p class="text-sm text-gray-400">Lokasi</p><p class="font-medium text-gray-800">${lokasi}</p></div>
                 <div><p class="text-sm text-gray-400">Kontraktor</p><p class="font-medium text-gray-800">${kontra}</p></div>
@@ -724,10 +726,14 @@
                 const rect = container.getBoundingClientRect();
                 if (rect.width === 0) return;
 
-                const dpr = window.devicePixelRatio || 1;
+                // HP saja: batasi DPR max 1.5 agar canvas tidak 3x lipat (hemat RAM + base64 kecil).
+                // Laptop/desktop tetap pakai DPR asli agar tajam.
+                const isMobile = window.matchMedia('(max-width: 767px)').matches;
+                const rawDpr = window.devicePixelRatio || 1;
+                const dpr = isMobile ? Math.min(rawDpr, 1.5) : rawDpr;
                 canvas.width  = rect.width  * dpr;
                 canvas.height = rect.height * dpr;
-                ctx.scale(dpr, dpr);
+                ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
                 // Set white background
                 ctx.fillStyle = '#ffffff';
@@ -783,7 +789,13 @@
                 if (!drawing) return;
                 drawing = false;
                 ctx.beginPath();
-                hiddenInput.value = canvas.toDataURL('image/png');
+                // HP saja: JPEG kualitas 0.7 (~3-5x lebih kecil dari PNG, upload jauh lebih cepat).
+                // Laptop/desktop tetap PNG agar kualitas maksimal.
+                if (window.matchMedia('(max-width: 767px)').matches) {
+                    hiddenInput.value = canvas.toDataURL('image/jpeg', 0.7);
+                } else {
+                    hiddenInput.value = canvas.toDataURL('image/png');
+                }
             }
 
             canvas.addEventListener('mousedown',  startDraw);
@@ -795,9 +807,17 @@
             canvas.addEventListener('touchend',   stopDraw);
 
             window.clearSignature = function () {
-                const dpr = window.devicePixelRatio || 1;
+                ctx.setTransform(1, 0, 0, 1, 0, 0);
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
                 ctx.fillStyle = '#ffffff';
-                ctx.fillRect(0, 0, canvas.width / dpr, canvas.height / dpr);
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                const rawDpr = window.devicePixelRatio || 1;
+                const dpr = window.matchMedia('(max-width: 767px)').matches ? Math.min(rawDpr, 1.5) : rawDpr;
+                ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+                ctx.strokeStyle = '#111d33';
+                ctx.lineWidth = 2;
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
                 hasDrawn = false;
                 hiddenInput.value = '';
                 placeholder.classList.remove('hidden');
@@ -813,7 +833,7 @@
         function addPeralatan() {
             const list = document.getElementById('peralatan-list');
             const row = document.createElement('div');
-            row.className = 'peralatan-row grid grid-cols-4 gap-2 items-center';
+            row.className = 'peralatan-row grid grid-cols-2 lg:grid-cols-4 gap-2 items-center';
             row.innerHTML = `
                 <input type="text" name="peralatan_kerja[${peralatanCount}][alat]" placeholder="mis. Gerinda" class="form-input text-base">
                 <input type="text" name="peralatan_kerja[${peralatanCount}][jumlah_alat]" placeholder="1" class="form-input text-base">
