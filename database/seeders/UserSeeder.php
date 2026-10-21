@@ -51,7 +51,7 @@ class UserSeeder extends Seeder
                 'password' => Hash::make('password'),
             ],
             [
-                'name' => 'Manager HSE',
+                'name' => 'Dimas Ali Akbar',
                 'username' => 'manager_hse',
                 'email' => 'arsyadaauni.work@gmail.com',
                 'role' => 'manager',
