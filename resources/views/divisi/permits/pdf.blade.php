@@ -287,8 +287,8 @@
         <tr>
             <td width="60%" style="border-right: none; padding-right: 0;">
                 <div>Izin diberikan sesuai pengajuan dan kondisi di atas :</div>
-                <div style="margin-top: 3px;">Mulai Tgl &nbsp;: {{ $permit->tanggal_mulai ? \Carbon\Carbon::parse($permit->tanggal_mulai)->format('d/m/Y') : '......................' }} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Jam : {{ $permit->tanggal_mulai ? \Carbon\Carbon::parse($permit->tanggal_mulai)->format('H:i') : '......................' }}</div>
-                <div style="margin-top: 3px;">Selesai Tgl : {{ $permit->tanggal_selesai ? \Carbon\Carbon::parse($permit->tanggal_selesai)->format('d/m/Y') : '......................' }} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Jam : {{ $permit->tanggal_selesai ? \Carbon\Carbon::parse($permit->tanggal_selesai)->format('H:i') : '......................' }}</div>
+                <div style="margin-top: 3px;">Mulai Tgl &nbsp;: {{ $permit->tanggal_mulai ? \Carbon\Carbon::parse($permit->tanggal_mulai)->format('d/m/Y') : '......................' }}</div>
+                <div style="margin-top: 3px;">Selesai Tgl : {{ $permit->tanggal_selesai ? \Carbon\Carbon::parse($permit->tanggal_selesai)->format('d/m/Y') : '......................' }}</div>
             </td>
             <td width="40%" style="padding: 0; border: none;">
                 <table style="border: none; width: 100%; border-left: 1px solid #000; border-right: 1px solid #000; border-top: 1px solid #000;">
@@ -347,7 +347,7 @@
             <td width="60%" style="border-right: none; padding-right: 0;">
                 <div>Izin kerja dibatalkan</div>
                 <div style="margin-top: 6px;">Alasan &nbsp;: {{ $permit->cancellation_reason ?: '..................................' }}</div>
-                <div style="margin-top: 6px;">Tanggal &nbsp;: {{ $permit->cancelled_at ? \Carbon\Carbon::parse($permit->cancelled_at)->format('d/m/Y') : '..................................' }} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Jam : {{ $permit->cancelled_at ? \Carbon\Carbon::parse($permit->cancelled_at)->format('H:i') : '......................' }}</div>
+                <div style="margin-top: 6px;">Tanggal &nbsp;: {{ $permit->cancelled_at ? \Carbon\Carbon::parse($permit->cancelled_at)->format('d/m/Y') : '..................................' }}</div>
             </td>
             <td width="40%" style="padding: 0; border: none;">
                 <table style="border: none; width: 100%; border-left: 1px solid #000; border-right: 1px solid #000; border-top: 1px solid #000;">
