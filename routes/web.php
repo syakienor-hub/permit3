@@ -34,6 +34,20 @@ Route::post('/cek-permit', [\App\Http\Controllers\Public\PermitStatusController:
     ->middleware('throttle:10,1')
     ->name('public.permits.status');
 
+// ===== HSE PLAN PUBLIK (tanpa login) =====
+Route::get('/ajukan-hse-plan', [\App\Http\Controllers\Public\HsePlanController::class, 'create'])
+    ->middleware('throttle:10,1');
+Route::post('/ajukan-hse-plan', [\App\Http\Controllers\Public\HsePlanController::class, 'store'])
+    ->middleware('throttle:10,1');
+Route::get('/ajukan-hse-plan/sukses/{hsePlan}', [\App\Http\Controllers\Public\HsePlanController::class, 'success'])
+    ->middleware('signed')
+    ->name('public.hse-plans.success');
+Route::get('/cek-hse-plan', [\App\Http\Controllers\Public\HsePlanController::class, 'statusForm'])
+    ->name('public.hse-plans.status.form');
+Route::post('/cek-hse-plan', [\App\Http\Controllers\Public\HsePlanController::class, 'statusShow'])
+    ->middleware('throttle:10,1')
+    ->name('public.hse-plans.status');
+
 // ===== PENGAJUAN PUBLIK (tanpa login) =====
 Route::middleware(['throttle:10,1'])->group(function () {
     Route::get('/ajukan-permit', [\App\Http\Controllers\Public\PermitController::class, 'create']);
@@ -91,6 +105,16 @@ Route::middleware(['auth', 'prevent-back-history', 'role:divisi'])->group(functi
     Route::get('/divisi/permits/{id}/edit', [\App\Http\Controllers\Divisi\PermitController::class, 'edit']);
     Route::put('/divisi/permits/{id}', [\App\Http\Controllers\Divisi\PermitController::class, 'update']);
     Route::get('/divisi/permits/{permitId}/documents/{documentId}/download', [\App\Http\Controllers\Divisi\PermitController::class, 'downloadDocument'])->name('permits.documents.download');
+});
+
+// ===== HSE PLAN (role:manager) =====
+Route::middleware(['auth', 'prevent-back-history', 'role:manager'])->group(function () {
+    Route::get('/admin/hse-plans', [\App\Http\Controllers\Admin\HsePlanApprovalController::class, 'index']);
+    Route::get('/admin/hse-plans/{id}', [\App\Http\Controllers\Admin\HsePlanApprovalController::class, 'show']);
+    Route::post('/admin/hse-plans/{id}/approve', [\App\Http\Controllers\Admin\HsePlanApprovalController::class, 'approve']);
+    Route::post('/admin/hse-plans/{id}/reject', [\App\Http\Controllers\Admin\HsePlanApprovalController::class, 'reject']);
+    Route::get('/admin/hse-plans/{hsePlanId}/documents/{documentId}/download', [\App\Http\Controllers\Admin\HsePlanApprovalController::class, 'downloadDocument'])
+        ->name('admin.hse-plans.documents.download');
 });
 
 // ===== ADMIN (role:staff, manager) =====
