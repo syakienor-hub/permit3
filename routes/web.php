@@ -10,6 +10,15 @@ Route::get('/', function () {
         ->forSite(request('site'))
         ->when(request()->filled('tipe') && in_array(request('tipe'), ['Internal', 'Eksternal'], true),
             fn ($q) => $q->where('tipe', request('tipe')))
+        ->when(request()->filled('search'), function ($q) {
+            $term = '%' . trim((string) request('search')) . '%';
+
+            $q->where(fn ($sub) => $sub
+                ->where('no_permit', 'like', $term)
+                ->orWhere('nama_pekerjaan', 'like', $term)
+                ->orWhere('kontraktor', 'like', $term)
+                ->orWhere('lokasi', 'like', $term));
+        })
         ->orderByRaw('COALESCE(submitted_at, created_at) DESC')
         ->paginate(10)
         ->withQueryString()

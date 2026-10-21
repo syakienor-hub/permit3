@@ -455,7 +455,7 @@
         </div>
 
         <!-- Table Card -->
-        <div class="bg-white rounded-2xl border border-[var(--border)] shadow-sm overflow-hidden reveal">
+        <div class="table-card reveal">
             <div class="px-4 md:px-6 py-4 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-gray-50/50">
                 <div class="flex items-center gap-3">
                     <div class="w-9 h-9 rounded-xl bg-blue-50 text-inka-navy border border-blue-100 flex items-center justify-center font-bold">
@@ -484,35 +484,52 @@
                     <option value="Internal" {{ request('tipe') === 'Internal' ? 'selected' : '' }}>Internal</option>
                     <option value="Eksternal" {{ request('tipe') === 'Eksternal' ? 'selected' : '' }}>Eksternal</option>
                 </select>
-                @if(request('site') || request('tipe'))
+                @if(request('site') || request('tipe') || request('search'))
                 <a href="{{ url('/') }}#monitoring" class="text-xs text-gray-400 hover:text-gray-600">Reset</a>
                 @endif
+                <div class="ml-auto flex items-center gap-2 w-full sm:w-auto">
+                    <div class="relative flex-1 sm:flex-none">
+                        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11a6 6 0 11-12 0 6 6 0 0112 0z"/>
+                        </svg>
+                        <input type="text" name="search" value="{{ request('search') }}" maxlength="100"
+                               placeholder="Cari no. permit, pekerjaan, kontraktor..."
+                               class="w-full sm:w-64 text-xs border border-gray-200 rounded-lg pl-8 pr-3 py-1.5 text-gray-700 placeholder-gray-400 focus:outline-none focus:border-inka-navy">
+                    </div>
+                    <button type="submit" class="text-xs font-semibold bg-inka-navy text-white px-3 py-1.5 rounded-lg hover:opacity-90 transition-opacity">Cari</button>
+                </div>
             </form>
 
             @if($permits->isEmpty())
                 <div class="py-16 text-center text-gray-400">
                     <svg class="w-12 h-12 mx-auto text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                    <p class="text-sm font-semibold text-gray-600">Belum ada permit kerja yang terdaftar.</p>
+                    <p class="text-sm font-semibold text-gray-600">
+                        @if(request('search'))
+                            Tidak ada permit yang cocok dengan pencarian "{{ request('search') }}".
+                        @else
+                            Belum ada permit kerja yang terdaftar.
+                        @endif
+                    </p>
                 </div>
             @else
                 {{-- Desktop/laptop: tabel tetap --}}
                 <div class="overflow-x-auto -mx-4 md:mx-0 px-4 md:px-0 hidden md:block">
-                    <table class="w-full text-left text-sm min-w-[900px]">
+                    <table class="data-table min-w-[1000px]">
                         <thead>
-                            <tr class="text-xs text-gray-400 uppercase tracking-wide border-b border-gray-100 bg-gray-50/70">
-                                <th class="px-5 py-3.5 font-semibold">No. Permit</th>
-                                <th class="px-5 py-3.5 font-semibold">Site</th>
-                                <th class="px-5 py-3.5 font-semibold">Tipe</th>
-                                <th class="px-5 py-3.5 font-semibold">Klasifikasi Pekerjaan</th>
-                                <th class="px-5 py-3.5 font-semibold">Divisi</th>
-                                <th class="px-5 py-3.5 font-semibold">Kontraktor</th>
-                                <th class="px-5 py-3.5 font-semibold">Lokasi</th>
-                                <th class="px-5 py-3.5 font-semibold">Tanggal Permit</th>
-                                <th class="px-5 py-3.5 font-semibold">Status</th>
-                                <th class="px-5 py-3.5 font-semibold text-left">Aksi</th>
+                            <tr>
+                                <th>No. Permit</th>
+                                <th>Site</th>
+                                <th>Tipe</th>
+                                <th>Klasifikasi Pekerjaan</th>
+                                <th>Divisi</th>
+                                <th>Kontraktor</th>
+                                <th>Lokasi</th>
+                                <th>Tanggal Permit</th>
+                                <th>Status</th>
+                                <th class="text-right">Aksi</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-gray-100">
+                        <tbody>
                             @foreach($permits as $permit)
                             @php
                                 $klasArr = [];
@@ -547,16 +564,16 @@
                                 }
 
                                 $statusMap = [
-                                    'Draft'                    => 'bg-gray-100 text-gray-600',
-                                    'Submitted'                => 'bg-blue-100 text-blue-700',
-                                    'Review Staff'             => 'bg-orange-100 text-orange-700',
-                                    'Review Manager'           => 'bg-orange-100 text-orange-700',
-                                    'Revision'                 => 'bg-red-100 text-red-700',
-                                    'Active'                   => 'bg-green-100 text-green-700',
-                                    'Closed'                   => 'bg-slate-100 text-slate-600',
-                                    'Cancelled'                => 'bg-red-600 text-white',
+                                    'Draft'                    => 'bg-gray-100 text-gray-600 border-gray-200',
+                                    'Submitted'                => 'bg-blue-50 text-blue-700 border-blue-200/70',
+                                    'Review Staff'             => 'bg-orange-50 text-orange-700 border-orange-200/70',
+                                    'Review Manager'           => 'bg-orange-50 text-orange-700 border-orange-200/70',
+                                    'Revision'                 => 'bg-red-50 text-red-700 border-red-200/70',
+                                    'Active'                   => 'bg-green-50 text-green-700 border-green-200/70',
+                                    'Closed'                   => 'bg-slate-50 text-slate-700 border-slate-200',
+                                    'Cancelled'                => 'bg-red-600 text-white border-red-600',
                                 ];
-                                $statusBadge = $statusMap[$permit->status] ?? 'bg-gray-100 text-gray-600';
+                                $statusBadge = $statusMap[$permit->status] ?? 'bg-gray-100 text-gray-600 border-gray-200';
 
                                 $modalPayload = [
                                     'no_permit' => $permit->no_permit,
@@ -573,35 +590,35 @@
                                     'klasifikasi' => $klasArr,
                                 ];
                             @endphp
-                            <tr class="hover:bg-blue-50/20 transition-colors">
-                                <td class="px-5 py-3.5 whitespace-nowrap font-bold text-inka-navy">
+                            <tr class="transition-colors">
+                                <td class="whitespace-nowrap font-semibold text-inka-navy">
                                     {{ $permit->no_permit }}
                                 </td>
-                                <td class="px-5 py-3.5 whitespace-nowrap">
+                                <td class="whitespace-nowrap">
                                     <x-permit-site-badge :site="$permit->site" />
                                 </td>
-                                <td class="px-5 py-3.5 whitespace-nowrap">
+                                <td class="whitespace-nowrap">
                                     <x-permit-tipe-badge :tipe="$permit->tipe" />
                                 </td>
-                                <td class="px-5 py-3.5">
+                                <td>
                                     <x-permit-klasifikasi-badges :permit="$permit" />
                                 </td>
-                                <td class="px-5 py-3.5 font-medium text-gray-800 whitespace-nowrap">
+                                <td class="font-medium text-gray-800 whitespace-nowrap">
                                     {{ optional($permit->user)->name ?? $permit->divisi_pengaju ?? '—' }}
                                 </td>
-                                <td class="px-5 py-3.5 text-gray-600 text-xs">
+                                <td class="text-gray-600">
                                     {{ $permit->kontraktor }}
                                 </td>
-                                <td class="px-5 py-3.5 text-gray-600 text-xs">
+                                <td class="text-gray-600">
                                     {{ $permit->lokasi ?? '—' }}
                                 </td>
-                                <td class="px-5 py-3.5 whitespace-nowrap">
+                                <td class="whitespace-nowrap">
                                     <x-permit-tanggal :permit="$permit" />
                                 </td>
-                                <td class="px-5 py-3.5 whitespace-nowrap">
-                                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-semibold {{ $statusBadge }}">{{ $permit->status }}</span>
+                                <td class="whitespace-nowrap">
+                                    <x-permit-status-badge :status="$permit->status" />
                                 </td>
-                                <td class="px-5 py-3.5 text-left whitespace-nowrap">
+                                <td class="text-right whitespace-nowrap">
                                     <button type="button"
                                             @click="openModal({{ json_encode($modalPayload) }})"
                                             class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-inka-navy text-white hover:opacity-90 transition-all shadow-sm">
@@ -630,13 +647,13 @@
                         $mMulai = $permit->tanggal_mulai ? $permit->tanggal_mulai->format('d/m/Y') : null;
                         $mSelesai = $permit->tanggal_selesai ? $permit->tanggal_selesai->format('d/m/Y') : null;
                         $mTgl = ($mMulai && $mSelesai) ? (($mMulai === $mSelesai) ? $mMulai : "$mMulai – $mSelesai") : ($mMulai ?? $mSelesai ?? ($permit->submitted_at ? $permit->submitted_at->format('d/m/Y') : '—'));
-                        $mStatusMap = ['Draft'=>'bg-gray-100 text-gray-600','Submitted'=>'bg-blue-100 text-blue-700','Review Staff'=>'bg-orange-100 text-orange-700','Review Manager'=>'bg-orange-100 text-orange-700','Revision'=>'bg-red-100 text-red-700','Active'=>'bg-green-100 text-green-700','Closed'=>'bg-slate-100 text-slate-600','Cancelled'=>'bg-red-600 text-white'];
+                        $mStatusMap = ['Draft'=>'bg-gray-100 text-gray-600 border-gray-200','Submitted'=>'bg-blue-50 text-blue-700 border-blue-200/70','Review Staff'=>'bg-orange-50 text-orange-700 border-orange-200/70','Review Manager'=>'bg-orange-50 text-orange-700 border-orange-200/70','Revision'=>'bg-red-50 text-red-700 border-red-200/70','Active'=>'bg-green-50 text-green-700 border-green-200/70','Closed'=>'bg-slate-50 text-slate-700 border-slate-200','Cancelled'=>'bg-red-600 text-white border-red-600'];
                         $mPayload = ['no_permit'=>$permit->no_permit,'site'=>$permit->site ?? 'Madiun','tipe'=>$permit->tipe,'nama_pekerjaan'=>$permit->nama_pekerjaan,'divisi'=>optional($permit->user)->name ?? $permit->divisi_pengaju ?? '—','kontraktor'=>$permit->kontraktor,'lokasi'=>$permit->lokasi ?? '—','tanggal_permit'=>$mTgl,'penanggung_jawab'=>$permit->penanggung_jawab ?? '—','status'=>$permit->status,'status_badge'=>$mStatusMap[$permit->status] ?? 'bg-gray-100 text-gray-600','klasifikasi'=>$mKlas];
                     @endphp
                     <button type="button" @click="openModal({{ json_encode($mPayload) }})" class="block w-full text-left px-4 py-4 active:bg-blue-50/50">
                         <div class="flex items-center justify-between gap-2 mb-1">
                             <span class="font-bold text-inka-navy text-sm">{{ $permit->no_permit }}</span>
-                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold {{ $mStatusMap[$permit->status] ?? 'bg-gray-100 text-gray-600' }}">{{ $permit->status }}</span>
+                            <x-permit-status-badge :status="$permit->status" class="shrink-0" />
                         </div>
                         <p class="text-sm text-gray-800 font-medium leading-snug">{{ $permit->nama_pekerjaan }}</p>
                         <p class="text-xs text-gray-400 mt-0.5 truncate">{{ $permit->kontraktor }} &middot; {{ $permit->lokasi ?? '—' }} &middot; {{ $mTgl }}</p>
@@ -687,12 +704,12 @@
             <div class="px-4 sm:px-6 py-4 border-b border-gray-100 bg-gray-50/90 flex items-center justify-between gap-2">
                 <div class="flex items-center gap-2.5 flex-wrap">
                     <span class="font-bold text-gray-900 text-lg" x-text="activePermit.no_permit"></span>
-                    <span class="px-2 py-0.5 rounded-full text-xs font-semibold"
-                          :class="activePermit.site === 'Banyuwangi' ? 'bg-emerald-100 text-emerald-700' : 'bg-indigo-100 text-indigo-700'"
+                    <span class="badge"
+                          :class="activePermit.site === 'Banyuwangi' ? 'bg-emerald-50 text-emerald-700 border-emerald-200/70' : 'bg-indigo-50 text-indigo-700 border-indigo-200/70'"
                           x-text="activePermit.site || 'Madiun'"></span>
-                    <span class="px-2 py-0.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-700" x-text="activePermit.tipe"></span>
-                    <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold"
-                          :class="activePermit.status_badge || 'bg-gray-100 text-gray-600'"
+                    <span class="badge bg-blue-50 text-blue-700 border-blue-200/70" x-text="activePermit.tipe"></span>
+                    <span class="badge"
+                          :class="activePermit.status_badge || 'bg-gray-100 text-gray-600 border-gray-200'"
                           x-text="activePermit.status"></span>
                 </div>
                 <button @click="closeModal()" class="w-8 h-8 rounded-lg hover:bg-gray-200/60 text-gray-400 hover:text-gray-700 flex items-center justify-center transition-colors">
@@ -707,7 +724,7 @@
                     <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Klasifikasi Pekerjaan</p>
                     <div class="flex flex-wrap gap-1.5">
                         <template x-for="k in activePermit.klasifikasi" :key="k">
-                            <span class="px-2.5 py-1 rounded-md text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200/70" x-text="k"></span>
+                            <span class="badge bg-blue-50 text-blue-700 border-blue-200/70" x-text="k"></span>
                         </template>
                         <template x-if="!activePermit.klasifikasi || activePermit.klasifikasi.length === 0">
                             <span class="text-sm text-gray-400 italic">Tidak ada klasifikasi pekerjaan</span>
