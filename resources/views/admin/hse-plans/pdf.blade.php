@@ -11,8 +11,8 @@
         .page:last-child { page-break-after: auto; }
         .header { width: 100%; border: 1px solid #000; margin-bottom: 10px; }
         .header td { border: 1px solid #000; vertical-align: middle; }
-        .header-logo { width: 25%; padding: 5px 8px; text-align: center; }
-        .header-title { width: 45%; text-align: center; font-size: 19px; font-weight: bold; letter-spacing: 0.5px; }
+        .header-logo { width: 40%; padding: 5px 8px; text-align: center; }
+        .header-title { width: 30%; text-align: center; font-size: 19px; font-weight: bold; letter-spacing: 0.5px; }
         .header-meta { width: 30%; padding: 5px 7px; font-size: 9.5px; }
         .header-meta table { width: 100%; }
         .header-meta td { border: none; padding: 1px 0; vertical-align: top; }
@@ -93,6 +93,7 @@
     <div class="page">
         <table class="header">
             <tr>
+                <td class="header-title">HSE PLAN</td>
                 <td class="header-logo">
                     @if(file_exists($logoPath))
                         <img src="data:image/svg+xml;base64,{{ base64_encode(file_get_contents($logoPath)) }}" class="logo" alt="Logo INKA">
@@ -100,7 +101,6 @@
                         <strong style="font-size: 18px;">INKA</strong>
                     @endif
                 </td>
-                <td class="header-title">HSE PLAN</td>
                 <td class="header-meta">
                     <table>
                         <tr><td style="width: 20%;">No</td><td>: {{ $hsePlan->no_hse_plan }}</td></tr>
@@ -232,6 +232,7 @@
     <div class="page">
         <table class="header">
             <tr>
+                <td class="header-title">HSE PLAN</td>
                 <td class="header-logo">
                     @if(file_exists($logoPath))
                         <img src="data:image/svg+xml;base64,{{ base64_encode(file_get_contents($logoPath)) }}" class="logo" alt="Logo INKA">
@@ -239,7 +240,6 @@
                         <strong style="font-size: 18px;">INKA</strong>
                     @endif
                 </td>
-                <td class="header-title">HSE PLAN</td>
                 <td class="header-meta">
                     <table>
                         <tr><td style="width: 20%;">No</td><td>: {{ $hsePlan->no_hse_plan }}</td></tr>
