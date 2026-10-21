@@ -109,6 +109,18 @@ class HsePlanTest extends TestCase
             ->assertSee('Setujui HSE Plan');
     }
 
+    public function test_manager_can_download_hse_plan_pdf(): void
+    {
+        $manager = User::factory()->create(['role' => 'manager']);
+        $hsePlan = $this->makeHsePlan();
+
+        $this->actingAs($manager)
+            ->get('/admin/hse-plans/' . $hsePlan->id . '/pdf')
+            ->assertOk()
+            ->assertHeader('content-type', 'application/pdf')
+            ->assertDownload('HSE-Plan-' . str_replace('/', '-', $hsePlan->no_hse_plan) . '.pdf');
+    }
+
     public function test_manager_can_approve_hse_plan(): void
     {
         $manager = User::factory()->create(['role' => 'manager']);

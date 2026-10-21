@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\HsePlan;
 use App\Models\HsePlanDocument;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -53,6 +54,17 @@ class HsePlanApprovalController extends Controller
         $hsePlan = HsePlan::with(['documents', 'reviewer'])->findOrFail($id);
 
         return view('admin.hse-plans.show', compact('hsePlan'));
+    }
+
+    public function downloadPdf($id)
+    {
+        $hsePlan = HsePlan::with('reviewer')->findOrFail($id);
+
+        $pdf = Pdf::loadView('admin.hse-plans.pdf', compact('hsePlan'))
+            ->setPaper('A4', 'portrait')
+            ->setOptions(['defaultFont' => 'sans-serif']);
+
+        return $pdf->download('HSE-Plan-' . str_replace('/', '-', $hsePlan->no_hse_plan) . '.pdf');
     }
 
     public function approve(Request $request, $id)

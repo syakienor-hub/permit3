@@ -111,6 +111,7 @@ Route::middleware(['auth', 'prevent-back-history', 'role:divisi'])->group(functi
 Route::middleware(['auth', 'prevent-back-history', 'role:manager'])->group(function () {
     Route::get('/admin/hse-plans', [\App\Http\Controllers\Admin\HsePlanApprovalController::class, 'index']);
     Route::get('/admin/hse-plans/{id}', [\App\Http\Controllers\Admin\HsePlanApprovalController::class, 'show']);
+    Route::get('/admin/hse-plans/{id}/pdf', [\App\Http\Controllers\Admin\HsePlanApprovalController::class, 'downloadPdf']);
     Route::post('/admin/hse-plans/{id}/approve', [\App\Http\Controllers\Admin\HsePlanApprovalController::class, 'approve']);
     Route::post('/admin/hse-plans/{id}/reject', [\App\Http\Controllers\Admin\HsePlanApprovalController::class, 'reject']);
     Route::get('/admin/hse-plans/{hsePlanId}/documents/{documentId}/download', [\App\Http\Controllers\Admin\HsePlanApprovalController::class, 'downloadDocument'])
