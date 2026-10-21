@@ -25,6 +25,8 @@ class HsePlan extends Model
         'lama_pekerjaan',
         'tanggal_mulai',
         'tanggal_selesai',
+        'jam_mulai',
+        'jam_selesai',
         'personil',
         'apd',
         'apd_lainnya',

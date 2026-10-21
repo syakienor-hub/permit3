@@ -79,9 +79,15 @@
                     <div><p class="text-gray-400">Divisi / Unit Pengaju</p><p class="font-semibold text-gray-700">{{ $hsePlan->divisi_pengaju }}</p></div>
                     <div><p class="text-gray-400">Pimpinan Proyek</p><p class="font-semibold text-gray-700">{{ $hsePlan->nama_pimpinan_proyek }}</p></div>
                     <div><p class="text-gray-400">Telepon</p><p class="font-semibold text-gray-700">{{ $hsePlan->telepon }}</p></div>
-                    <div><p class="text-gray-400">Lama Pekerjaan</p><p class="font-semibold text-gray-700">{{ $hsePlan->lama_pekerjaan }}</p></div>
-                    <div><p class="text-gray-400">Tanggal Mulai</p><p class="font-semibold text-gray-700">{{ $hsePlan->tanggal_mulai?->format('d/m/Y') ?? '-' }}</p></div>
-                    <div><p class="text-gray-400">Tanggal Selesai</p><p class="font-semibold text-gray-700">{{ $hsePlan->tanggal_selesai?->format('d/m/Y') ?? '-' }}</p></div>
+                    <div class="sm:col-span-2">
+                        <p class="text-gray-400">Lama Pekerjaan</p>
+                        <p class="font-semibold text-gray-700">
+                            Tanggal: {{ $hsePlan->tanggal_mulai?->format('d/m/Y') ?? '-' }} s/d {{ $hsePlan->tanggal_selesai?->format('d/m/Y') ?? '-' }}
+                        </p>
+                        <p class="font-semibold text-gray-700">
+                            Jam: {{ $hsePlan->jam_mulai ?: '-' }} s/d {{ $hsePlan->jam_selesai ?: '-' }}
+                        </p>
+                    </div>
                     <div class="sm:col-span-2"><p class="text-gray-400">Deskripsi Pekerjaan</p><p class="font-semibold text-gray-700 whitespace-pre-line">{{ $hsePlan->deskripsi_pekerjaan }}</p></div>
                     <div><p class="text-gray-400">Diajukan</p><p class="font-semibold text-gray-700">{{ ($hsePlan->submitted_at ?? $hsePlan->created_at)?->format('d/m/Y H:i') }}</p></div>
                 </div>

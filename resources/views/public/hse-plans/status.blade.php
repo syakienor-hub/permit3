@@ -42,7 +42,7 @@
                 <label class="block text-sm font-semibold text-gray-700 mb-2">Nomor HSE Plan <span class="text-red-500">*</span></label>
                 <input type="text" name="no_hse_plan" required maxlength="50"
                     value="{{ old('no_hse_plan', $hsePlan->no_hse_plan ?? '') }}"
-                    placeholder="Contoh: HSE-2026-1A2B3C4D"
+                    placeholder="Contoh: 001/SHEPLAN/SHE/2026"
                     class="w-full border-gray-300 rounded-xl focus:border-inka-navy focus:ring-inka-navy text-sm font-mono uppercase">
             </div>
             <div>
@@ -90,8 +90,8 @@
                         <div><span class="text-gray-400">Site:</span> <span class="font-semibold text-gray-700">{{ $hsePlan->site }}</span></div>
                         <div><span class="text-gray-400">Kontraktor:</span> <span class="font-semibold text-gray-700">{{ $hsePlan->nama_kontraktor }}</span></div>
                         <div><span class="text-gray-400">Divisi:</span> <span class="font-semibold text-gray-700">{{ $hsePlan->divisi_pengaju }}</span></div>
-                        <div><span class="text-gray-400">Mulai:</span> <span class="font-semibold text-gray-700">{{ $hsePlan->tanggal_mulai?->format('d/m/Y') ?? '-' }}</span></div>
-                        <div><span class="text-gray-400">Selesai:</span> <span class="font-semibold text-gray-700">{{ $hsePlan->tanggal_selesai?->format('d/m/Y') ?? '-' }}</span></div>
+                        <div><span class="text-gray-400">Mulai:</span> <span class="font-semibold text-gray-700">{{ $hsePlan->tanggal_mulai?->format('d/m/Y') ?? '-' }} {{ $hsePlan->jam_mulai ?: '' }}</span></div>
+                        <div><span class="text-gray-400">Selesai:</span> <span class="font-semibold text-gray-700">{{ $hsePlan->tanggal_selesai?->format('d/m/Y') ?? '-' }} {{ $hsePlan->jam_selesai ?: '' }}</span></div>
                     </div>
                 </div>
             </div>

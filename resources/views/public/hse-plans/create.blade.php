@@ -43,6 +43,56 @@
             'baju_pelindung' => 'Baju Pelindung',
             'safety_harness' => 'Safety Harness',
         ];
+        $pernyataan = [
+            [
+                'field' => 'bahan_b3',
+                'label' => 'Apakah pekerjaan menggunakan bahan-bahan B3?',
+                'note' => 'Jika Ya, wajib melampirkan MSDS.',
+                'file' => 'msds_file',
+                'file_id' => 'msds-field',
+                'file_label' => 'MSDS Bahan B3',
+            ],
+            [
+                'field' => 'limbah_b3',
+                'label' => 'Apakah pekerjaan menghasilkan limbah B3?',
+                'note' => 'Jika Ya, wajib melampirkan rencana pengelolaan limbah B3.',
+                'file' => 'limbah_b3_file',
+                'file_id' => 'limbah-field',
+                'file_label' => 'Rencana Pengelolaan Limbah B3',
+            ],
+            [
+                'field' => 'prosedur_kerja',
+                'label' => 'Memiliki prosedur / instruksi kerja yang terkait?',
+                'note' => 'Jika Ya, wajib melampirkan prosedur / instruksi kerja.',
+                'file' => 'prosedur_kerja_file',
+                'file_id' => 'prosedur-field',
+                'file_label' => 'Prosedur / Instruksi Kerja',
+            ],
+            [
+                'field' => 'rencana_inspeksi',
+                'label' => 'Memiliki rencana pemantauan / inspeksi selama proses pekerjaan berlangsung?',
+                'note' => 'Jika Ya, wajib melampirkan rencana pemantauan / inspeksi.',
+                'file' => 'inspeksi_file',
+                'file_id' => 'inspeksi-field',
+                'file_label' => 'Rencana Pemantauan / Inspeksi',
+            ],
+            [
+                'field' => 'tanggap_darurat',
+                'label' => 'Menyediakan fasilitas peralatan tanggap darurat seperti APAR dan lain sebagainya?',
+                'note' => null,
+                'file' => null,
+                'file_id' => null,
+                'file_label' => null,
+            ],
+            [
+                'field' => 'struktur_organisasi',
+                'label' => 'Memiliki struktur organisasi proyek?',
+                'note' => 'Jika Ya, wajib melampirkan struktur organisasi proyek.',
+                'file' => 'struktur_file',
+                'file_id' => 'struktur-field',
+                'file_label' => 'Struktur Organisasi Proyek',
+            ],
+        ];
     @endphp
 
     <header class="bg-white border-b border-gray-100 sticky top-0 z-40">
@@ -78,11 +128,58 @@
         <form action="/ajukan-hse-plan" method="POST" enctype="multipart/form-data" id="hse-plan-form" class="space-y-5">
             @csrf
 
-            {{-- DATA PENGAJUAN --}}
+            {{-- DATA PENGAJUAN (sesuai Form K3LH IV-01.053) --}}
             <section class="bg-white rounded-2xl border border-gray-100 shadow-sm">
                 <div class="px-4 md:px-6 py-4 border-b border-gray-100">
                     <h2 class="text-base font-semibold text-gray-800">Data Pengajuan</h2>
-                    <p class="text-sm text-gray-400 mt-0.5">Informasi umum proyek dan kontraktor pelaksana</p>
+                    <p class="text-sm text-gray-400 mt-0.5">Sesuai Form K3LH IV-01.053 — SHE Plan</p>
+                </div>
+                <div class="px-4 md:px-6 py-5 grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div>
+                        <label class="form-label">1. Nomor PO</label>
+                        <input type="text" name="no_po" class="form-input" value="{{ old('no_po') }}" placeholder="Nomor purchase order">
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="form-label">2. Deskripsi Pekerjaan <span class="text-red-500">*</span></label>
+                        <textarea name="deskripsi_pekerjaan" rows="3" class="form-input" placeholder="Uraikan lingkup dan tahapan pekerjaan" required>{{ old('deskripsi_pekerjaan') }}</textarea>
+                    </div>
+                    <div class="md:col-span-2">
+                        <p class="form-label mb-2">3. Lama Pekerjaan <span class="text-red-500">*</span></p>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-500 mb-1">a. Tanggal Mulai</label>
+                                <input type="date" name="tanggal_mulai" class="form-input" value="{{ old('tanggal_mulai') }}" required>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-500 mb-1">Tanggal Selesai</label>
+                                <input type="date" name="tanggal_selesai" class="form-input" value="{{ old('tanggal_selesai') }}" required>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-500 mb-1">b. Jam Mulai</label>
+                                <input type="time" name="jam_mulai" class="form-input" value="{{ old('jam_mulai') }}" required>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-500 mb-1">Jam Selesai</label>
+                                <input type="time" name="jam_selesai" class="form-input" value="{{ old('jam_selesai') }}" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="form-label">4. Nama Kontraktor <span class="text-red-500">*</span></label>
+                        <input type="text" name="nama_kontraktor" class="form-input" value="{{ old('nama_kontraktor') }}" placeholder="Nama perusahaan pelaksana" required>
+                    </div>
+                    <div>
+                        <label class="form-label">5. Nama Pimpinan Proyek <span class="text-red-500">*</span></label>
+                        <input type="text" name="nama_pimpinan_proyek" class="form-input" value="{{ old('nama_pimpinan_proyek') }}" placeholder="Penanggung jawab proyek" required>
+                    </div>
+                </div>
+            </section>
+
+            {{-- INFORMASI TAMBAHAN --}}
+            <section class="bg-white rounded-2xl border border-gray-100 shadow-sm">
+                <div class="px-4 md:px-6 py-4 border-b border-gray-100">
+                    <h2 class="text-base font-semibold text-gray-800">Informasi Pengajuan</h2>
+                    <p class="text-sm text-gray-400 mt-0.5">Dipakai untuk penempatan review dan pengecekan status</p>
                 </div>
                 <div class="px-4 md:px-6 py-5 grid grid-cols-1 md:grid-cols-2 gap-5">
                     <div>
@@ -104,36 +201,8 @@
                         <input type="text" name="divisi_pengaju" class="form-input" value="{{ old('divisi_pengaju') }}" placeholder="Contoh: Divisi Teknik" required>
                     </div>
                     <div>
-                        <label class="form-label">Nomor PO</label>
-                        <input type="text" name="no_po" class="form-input" value="{{ old('no_po') }}" placeholder="Nomor purchase order (jika ada)">
-                    </div>
-                    <div>
-                        <label class="form-label">Nama Kontraktor <span class="text-red-500">*</span></label>
-                        <input type="text" name="nama_kontraktor" class="form-input" value="{{ old('nama_kontraktor') }}" placeholder="Nama perusahaan pelaksana" required>
-                    </div>
-                    <div>
-                        <label class="form-label">Nama Pimpinan Proyek <span class="text-red-500">*</span></label>
-                        <input type="text" name="nama_pimpinan_proyek" class="form-input" value="{{ old('nama_pimpinan_proyek') }}" placeholder="Penanggung jawab proyek" required>
-                    </div>
-                    <div>
                         <label class="form-label">Nomor Telepon <span class="text-red-500">*</span></label>
                         <input type="text" name="telepon" class="form-input" value="{{ old('telepon') }}" placeholder="Nomor untuk cek status" required>
-                    </div>
-                    <div>
-                        <label class="form-label">Lama Pekerjaan <span class="text-red-500">*</span></label>
-                        <input type="text" name="lama_pekerjaan" class="form-input" value="{{ old('lama_pekerjaan') }}" placeholder="Contoh: 14 hari kerja" required>
-                    </div>
-                    <div>
-                        <label class="form-label">Tanggal Mulai</label>
-                        <input type="date" name="tanggal_mulai" class="form-input" value="{{ old('tanggal_mulai') }}">
-                    </div>
-                    <div>
-                        <label class="form-label">Tanggal Selesai</label>
-                        <input type="date" name="tanggal_selesai" class="form-input" value="{{ old('tanggal_selesai') }}">
-                    </div>
-                    <div class="md:col-span-2">
-                        <label class="form-label">Deskripsi Pekerjaan <span class="text-red-500">*</span></label>
-                        <textarea name="deskripsi_pekerjaan" rows="3" class="form-input" placeholder="Uraikan lingkup dan tahapan pekerjaan" required>{{ old('deskripsi_pekerjaan') }}</textarea>
                     </div>
                 </div>
             </section>
@@ -142,7 +211,7 @@
             <section class="bg-white rounded-2xl border border-gray-100 shadow-sm">
                 <div class="px-4 md:px-6 py-4 border-b border-gray-100 flex items-center justify-between gap-3">
                     <div>
-                        <h2 class="text-base font-semibold text-gray-800">Nama &amp; Tugas Personil</h2>
+                        <h2 class="text-base font-semibold text-gray-800">6. Nama &amp; Tugas Setiap Personil</h2>
                         <p class="text-sm text-gray-400 mt-0.5">Lampirkan sertifikat keahlian setiap personil pada bagian dokumen</p>
                     </div>
                     <button type="button" onclick="addPersonil()" class="text-sm font-semibold text-inka-navy hover:underline whitespace-nowrap">+ Tambah</button>
@@ -163,7 +232,7 @@
             {{-- APD --}}
             <section class="bg-white rounded-2xl border border-gray-100 shadow-sm">
                 <div class="px-4 md:px-6 py-4 border-b border-gray-100">
-                    <h2 class="text-base font-semibold text-gray-800">Jenis APD yang Digunakan</h2>
+                    <h2 class="text-base font-semibold text-gray-800">7. Jenis APD yang Digunakan</h2>
                     <p class="text-sm text-gray-400 mt-0.5">Pilih minimal satu APD</p>
                 </div>
                 <div class="px-4 md:px-6 py-5 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
@@ -185,7 +254,7 @@
             <section class="bg-white rounded-2xl border border-gray-100 shadow-sm">
                 <div class="px-4 md:px-6 py-4 border-b border-gray-100 flex items-center justify-between gap-3">
                     <div>
-                        <h2 class="text-base font-semibold text-gray-800">Daftar Peralatan Kerja</h2>
+                        <h2 class="text-base font-semibold text-gray-800">8. Daftar Peralatan Kerja</h2>
                         <p class="text-sm text-gray-400 mt-0.5">Lampirkan sertifikat peralatan yang dipersyaratkan</p>
                     </div>
                     <button type="button" onclick="addPeralatan()" class="text-sm font-semibold text-inka-navy hover:underline whitespace-nowrap">+ Tambah</button>
@@ -206,7 +275,7 @@
             {{-- DOKUMEN & PERNYATAAN --}}
             <section class="bg-white rounded-2xl border border-gray-100 shadow-sm">
                 <div class="px-4 md:px-6 py-4 border-b border-gray-100">
-                    <h2 class="text-base font-semibold text-gray-800">Dokumen Pendukung &amp; Pernyataan</h2>
+                    <h2 class="text-base font-semibold text-gray-800">9. Job Safety Analysis &amp; Dokumen Pendukung</h2>
                     <p class="text-sm text-gray-400 mt-0.5">Format PDF, DOC, XLS, atau gambar. Maksimal 10MB per file.</p>
                 </div>
                 <div class="px-4 md:px-6 py-5 space-y-5">
@@ -225,86 +294,72 @@
                         </div>
                     </div>
 
-                    <div class="space-y-4 border-t border-gray-100 pt-4">
-                        <div class="flex items-start gap-3">
-                            <input type="checkbox" name="bahan_b3" id="bahan_b3" value="1" @checked(old('bahan_b3')) onchange="toggleFile('msds-field', this.checked)" class="mt-1 w-4 h-4 rounded text-inka-navy border-gray-300 focus:ring-inka-navy">
-                            <div class="flex-1">
-                                <label for="bahan_b3" class="text-sm font-semibold text-gray-700 cursor-pointer">Pekerjaan menggunakan bahan B3</label>
-                                <p class="text-xs text-gray-400">Wajib melampirkan MSDS.</p>
-                                <div id="msds-field" class="{{ old('bahan_b3') ? '' : 'hidden' }} mt-2">
-                                    <input type="file" name="msds_file" class="form-input" accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png">
+                    <div class="space-y-5 border-t border-gray-100 pt-4">
+                        @foreach($pernyataan as $item)
+                            @php
+                                $hasAnswer = old($item['field']) !== null;
+                                $isYes = filter_var(old($item['field'], false), FILTER_VALIDATE_BOOLEAN);
+                                $number = 10 + $loop->index;
+                            @endphp
+                            <div>
+                                <p class="text-sm font-semibold text-gray-700">{{ $number }}. {{ $item['label'] }} <span class="text-red-500">*</span></p>
+                                <div class="mt-2 flex items-center gap-5">
+                                    <label class="inline-flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
+                                        <input type="radio" name="{{ $item['field'] }}" value="1" @checked($hasAnswer && $isYes) @if($item['file']) onchange="toggleFile('{{ $item['file_id'] }}', true)" @endif required
+                                            class="w-4 h-4 text-inka-navy border-gray-300 focus:ring-inka-navy">
+                                        Ya
+                                    </label>
+                                    <label class="inline-flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
+                                        <input type="radio" name="{{ $item['field'] }}" value="0" @checked($hasAnswer && ! $isYes) @if($item['file']) onchange="toggleFile('{{ $item['file_id'] }}', false)" @endif
+                                            class="w-4 h-4 text-inka-navy border-gray-300 focus:ring-inka-navy">
+                                        Tidak
+                                    </label>
                                 </div>
+                                @if($item['note'])
+                                    <p class="text-xs text-gray-400 mt-1.5">{{ $item['note'] }}</p>
+                                @endif
+                                @if($item['file'])
+                                    <div id="{{ $item['file_id'] }}" class="{{ $isYes ? '' : 'hidden' }} mt-2">
+                                        <label class="block text-xs font-semibold text-gray-500 mb-1">{{ $item['file_label'] }}</label>
+                                        <input type="file" name="{{ $item['file'] }}" class="form-input" accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png">
+                                    </div>
+                                @endif
                             </div>
-                        </div>
-
-                        <div class="flex items-start gap-3">
-                            <input type="checkbox" name="limbah_b3" id="limbah_b3" value="1" @checked(old('limbah_b3')) onchange="toggleFile('limbah-field', this.checked)" class="mt-1 w-4 h-4 rounded text-inka-navy border-gray-300 focus:ring-inka-navy">
-                            <div class="flex-1">
-                                <label for="limbah_b3" class="text-sm font-semibold text-gray-700 cursor-pointer">Pekerjaan menghasilkan limbah B3</label>
-                                <p class="text-xs text-gray-400">Wajib melampirkan rencana pengelolaan limbah B3.</p>
-                                <div id="limbah-field" class="{{ old('limbah_b3') ? '' : 'hidden' }} mt-2">
-                                    <input type="file" name="limbah_b3_file" class="form-input" accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png">
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="flex items-start gap-3">
-                            <input type="checkbox" name="prosedur_kerja" id="prosedur_kerja" value="1" @checked(old('prosedur_kerja')) onchange="toggleFile('prosedur-field', this.checked)" class="mt-1 w-4 h-4 rounded text-inka-navy border-gray-300 focus:ring-inka-navy">
-                            <div class="flex-1">
-                                <label for="prosedur_kerja" class="text-sm font-semibold text-gray-700 cursor-pointer">Memiliki prosedur / instruksi kerja</label>
-                                <p class="text-xs text-gray-400">Wajib melampirkan prosedur atau instruksi kerja.</p>
-                                <div id="prosedur-field" class="{{ old('prosedur_kerja') ? '' : 'hidden' }} mt-2">
-                                    <input type="file" name="prosedur_kerja_file" class="form-input" accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png">
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="flex items-start gap-3">
-                            <input type="checkbox" name="rencana_inspeksi" id="rencana_inspeksi" value="1" @checked(old('rencana_inspeksi')) onchange="toggleFile('inspeksi-field', this.checked)" class="mt-1 w-4 h-4 rounded text-inka-navy border-gray-300 focus:ring-inka-navy">
-                            <div class="flex-1">
-                                <label for="rencana_inspeksi" class="text-sm font-semibold text-gray-700 cursor-pointer">Memiliki rencana pemantauan / inspeksi</label>
-                                <p class="text-xs text-gray-400">Wajib melampirkan rencana pemantauan atau inspeksi.</p>
-                                <div id="inspeksi-field" class="{{ old('rencana_inspeksi') ? '' : 'hidden' }} mt-2">
-                                    <input type="file" name="inspeksi_file" class="form-input" accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png">
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="flex items-start gap-3">
-                            <input type="checkbox" name="tanggap_darurat" id="tanggap_darurat" value="1" @checked(old('tanggap_darurat')) class="mt-1 w-4 h-4 rounded text-inka-navy border-gray-300 focus:ring-inka-navy">
-                            <label for="tanggap_darurat" class="text-sm font-semibold text-gray-700 cursor-pointer">Menyediakan fasilitas tanggap darurat (APAR, dll.)</label>
-                        </div>
-
-                        <div class="flex items-start gap-3">
-                            <input type="checkbox" name="struktur_organisasi" id="struktur_organisasi" value="1" @checked(old('struktur_organisasi')) onchange="toggleFile('struktur-field', this.checked)" class="mt-1 w-4 h-4 rounded text-inka-navy border-gray-300 focus:ring-inka-navy">
-                            <div class="flex-1">
-                                <label for="struktur_organisasi" class="text-sm font-semibold text-gray-700 cursor-pointer">Memiliki struktur organisasi proyek</label>
-                                <p class="text-xs text-gray-400">Wajib melampirkan struktur organisasi proyek.</p>
-                                <div id="struktur-field" class="{{ old('struktur_organisasi') ? '' : 'hidden' }} mt-2">
-                                    <input type="file" name="struktur_file" class="form-input" accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png">
-                                </div>
-                            </div>
-                        </div>
+                        @endforeach
                     </div>
                 </div>
             </section>
 
-            {{-- TANDA TANGAN --}}
+            {{-- PENGESAHAN / TANDA TANGAN --}}
             <section class="bg-white rounded-2xl border border-gray-100 shadow-sm">
                 <div class="px-4 md:px-6 py-4 border-b border-gray-100 flex items-center justify-between gap-3">
                     <div>
-                        <h2 class="text-base font-semibold text-gray-800">Tanda Tangan Kontraktor <span class="text-red-500">*</span></h2>
-                        <p class="text-sm text-gray-400 mt-0.5">Digambar oleh pimpinan proyek / perwakilan kontraktor.</p>
+                        <h2 class="text-base font-semibold text-gray-800">Pengesahan</h2>
+                        <p class="text-sm text-gray-400 mt-0.5">Dibuat oleh Kontraktor dan disetujui oleh Manager SHE.</p>
                     </div>
                     <button type="button" onclick="clearSignature()" class="text-sm font-semibold text-gray-400 hover:text-red-500 border border-gray-200 hover:border-red-300 px-3 py-1.5 rounded-lg transition-colors">Hapus</button>
                 </div>
                 <div class="px-4 md:px-6 py-5">
-                    <div id="signature-container" class="relative border-2 border-dashed border-gray-300 rounded-xl overflow-hidden bg-white hover:border-inka-navy/40 transition-colors cursor-crosshair w-full max-w-[300px] aspect-square mx-auto">
-                        <canvas id="signature-canvas" class="block w-full h-full" style="touch-action: none;"></canvas>
-                        <span id="signature-placeholder" class="absolute inset-0 flex items-center justify-center text-sm text-gray-300 pointer-events-none select-none">Tanda tangan di sini</span>
+                    <p class="text-sm text-gray-600 mb-5">Madiun, ................................</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <p class="text-sm font-semibold text-gray-700">Dibuat oleh,<br>Kontraktor</p>
+                            <div id="signature-container" class="relative mt-3 border-2 border-dashed border-gray-300 rounded-xl overflow-hidden bg-white hover:border-inka-navy/40 transition-colors cursor-crosshair w-full aspect-[2/1]">
+                                <canvas id="signature-canvas" class="block w-full h-full" style="touch-action: none;"></canvas>
+                                <span id="signature-placeholder" class="absolute inset-0 flex items-center justify-center text-sm text-gray-300 pointer-events-none select-none">Tanda tangan di sini</span>
+                            </div>
+                            <input type="hidden" name="tanda_tangan" id="tanda-tangan-input">
+                            <p id="signature-error" class="text-sm text-red-500 mt-1.5 hidden">Tanda tangan wajib diisi sebelum mengirim.</p>
+                            <p class="mt-2 text-sm font-semibold text-gray-700">({{ old('nama_pimpinan_proyek') ?: 'Pimpinan Proyek' }})</p>
+                        </div>
+                        <div>
+                            <p class="text-sm font-semibold text-gray-700">Disetujui oleh,<br>Manager SHE</p>
+                            <div class="mt-3 w-full aspect-[2/1] rounded-xl border border-dashed border-gray-200 bg-gray-50 flex items-center justify-center px-4 text-center">
+                                <p class="text-xs text-gray-400">Diisi oleh Manager SHE setelah HSE Plan direview.</p>
+                            </div>
+                            <p class="mt-2 text-sm font-semibold text-gray-400">(..............................)</p>
+                        </div>
                     </div>
-                    <input type="hidden" name="tanda_tangan" id="tanda-tangan-input">
-                    <p id="signature-error" class="text-sm text-red-500 mt-1.5 hidden text-center">Tanda tangan wajib diisi sebelum mengirim.</p>
                 </div>
             </section>
 
@@ -348,7 +403,9 @@
         }
 
         function toggleFile(id, show) {
-            document.getElementById(id).classList.toggle('hidden', !show);
+            const element = document.getElementById(id);
+            if (!element) return;
+            element.classList.toggle('hidden', !show);
         }
 
         (function () {

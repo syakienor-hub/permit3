@@ -30,9 +30,10 @@ class HsePlanController extends Controller
             'nama_pimpinan_proyek' => 'required|string|max:255',
             'telepon' => 'required|string|max:50',
             'deskripsi_pekerjaan' => 'required|string|max:2000',
-            'lama_pekerjaan' => 'required|string|max:100',
-            'tanggal_mulai' => 'nullable|date',
-            'tanggal_selesai' => 'nullable|date|after_or_equal:tanggal_mulai',
+            'tanggal_mulai' => 'required|date',
+            'tanggal_selesai' => 'required|date|after_or_equal:tanggal_mulai',
+            'jam_mulai' => 'required|date_format:H:i',
+            'jam_selesai' => 'required|date_format:H:i',
             'personil' => 'required|array|min:1',
             'personil.*.nama' => 'required|string|max:255',
             'personil.*.tugas' => 'required|string|max:255',
@@ -42,12 +43,12 @@ class HsePlanController extends Controller
             'peralatan' => 'required|array|min:1',
             'peralatan.*.nama' => 'required|string|max:255',
             'peralatan.*.jumlah' => 'required|string|max:50',
-            'bahan_b3' => 'nullable|boolean',
-            'limbah_b3' => 'nullable|boolean',
-            'prosedur_kerja' => 'nullable|boolean',
-            'rencana_inspeksi' => 'nullable|boolean',
-            'tanggap_darurat' => 'nullable|boolean',
-            'struktur_organisasi' => 'nullable|boolean',
+            'bahan_b3' => 'required|boolean',
+            'limbah_b3' => 'required|boolean',
+            'prosedur_kerja' => 'required|boolean',
+            'rencana_inspeksi' => 'required|boolean',
+            'tanggap_darurat' => 'required|boolean',
+            'struktur_organisasi' => 'required|boolean',
             'tanda_tangan' => 'required|string',
             'jsa_file' => 'required|' . self::FILE_RULES,
             'sertifikat_personil' => 'required|array|min:1',
@@ -62,8 +63,11 @@ class HsePlanController extends Controller
         ]);
 
         $hsePlan = DB::transaction(function () use ($request) {
+            $year = date('Y');
+            $sequence = HsePlan::where('no_hse_plan', 'like', '%/SHEPLAN/SHE/' . $year)->count() + 1;
+
             $hsePlan = HsePlan::create([
-                'no_hse_plan' => 'HSE-' . date('Y') . '-' . strtoupper(substr(bin2hex(random_bytes(4)), 0, 8)),
+                'no_hse_plan' => sprintf('%03d/SHEPLAN/SHE/%d', $sequence, $year),
                 'no_po' => $request->no_po,
                 'site' => $request->site,
                 'tipe' => $request->tipe,
@@ -72,9 +76,12 @@ class HsePlanController extends Controller
                 'nama_pimpinan_proyek' => $request->nama_pimpinan_proyek,
                 'telepon' => $request->telepon,
                 'deskripsi_pekerjaan' => $request->deskripsi_pekerjaan,
-                'lama_pekerjaan' => $request->lama_pekerjaan,
+                'lama_pekerjaan' => $request->tanggal_mulai . ' s/d ' . $request->tanggal_selesai
+                    . ' (' . $request->jam_mulai . ' - ' . $request->jam_selesai . ')',
                 'tanggal_mulai' => $request->tanggal_mulai,
                 'tanggal_selesai' => $request->tanggal_selesai,
+                'jam_mulai' => $request->jam_mulai,
+                'jam_selesai' => $request->jam_selesai,
                 'personil' => $this->cleanPersonil($request->input('personil', [])),
                 'apd' => array_values((array) $request->input('apd', [])),
                 'apd_lainnya' => $request->apd_lainnya,

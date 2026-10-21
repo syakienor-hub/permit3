@@ -166,6 +166,8 @@ class HsePlanTest extends TestCase
             'lama_pekerjaan' => '5 hari kerja',
             'tanggal_mulai' => now()->toDateString(),
             'tanggal_selesai' => now()->addDays(5)->toDateString(),
+            'jam_mulai' => '08:00',
+            'jam_selesai' => '17:00',
             'personil' => [
                 ['nama' => 'Andi', 'tugas' => 'Teknisi'],
             ],
@@ -173,6 +175,12 @@ class HsePlanTest extends TestCase
             'peralatan' => [
                 ['nama' => 'Gerinda', 'jumlah' => '2'],
             ],
+            'bahan_b3' => '0',
+            'limbah_b3' => '0',
+            'prosedur_kerja' => '0',
+            'rencana_inspeksi' => '0',
+            'tanggap_darurat' => '0',
+            'struktur_organisasi' => '0',
             'tanda_tangan' => 'data:image/png;base64,abc',
             'jsa_file' => UploadedFile::fake()->create('jsa.pdf', 100, 'application/pdf'),
             'sertifikat_personil' => [
@@ -197,6 +205,10 @@ class HsePlanTest extends TestCase
             'telepon' => '08123456789',
             'deskripsi_pekerjaan' => 'Pekerjaan perbaikan atap gudang.',
             'lama_pekerjaan' => '5 hari kerja',
+            'tanggal_mulai' => now()->toDateString(),
+            'tanggal_selesai' => now()->addDays(5)->toDateString(),
+            'jam_mulai' => '08:00',
+            'jam_selesai' => '17:00',
             'personil' => [['nama' => 'Andi', 'tugas' => 'Teknisi']],
             'apd' => ['helm', 'sepatu'],
             'peralatan' => [['nama' => 'Gerinda', 'jumlah' => '2']],
