@@ -52,6 +52,7 @@ class Permit extends Model
         'cancelled_at'          => 'datetime',
         'cancellation_signatures' => 'array',
         'approval_signatures'   => 'array',
+        'edit_history'          => 'array',
         'tipe'                  => 'string',
     ];
 

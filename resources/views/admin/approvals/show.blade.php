@@ -36,6 +36,13 @@
                 Batalkan Permit
             </a>
             @endif
+            @if($canEdit)
+            <a href="/admin/approvals/{{ $permit->id }}/edit"
+               class="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-semibold text-inka-navy bg-inka-navy/5 border border-inka-navy/20 rounded-xl hover:bg-inka-navy/10 transition-colors">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                Koreksi Detail
+            </a>
+            @endif
             <a href="/admin/permits/{{ $permit->id }}/pdf" target="_blank"
                class="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-semibold text-red-600 bg-red-50 border border-red-200 rounded-xl hover:bg-red-100 transition-colors">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
@@ -276,6 +283,37 @@
                 <img src="{{ $sig['signature'] }}" alt="TTD" class="h-16 mx-auto mb-1">
                 <p class="text-xs font-semibold text-gray-800">{{ $sig['name'] }}</p>
                 <p class="text-[10px] text-gray-400 mt-1">{{ \Carbon\Carbon::parse($sig['date'])->format('d/m/Y H:i') }}</p>
+            </div>
+            @endforeach
+        </div>
+    </div>
+    @endif
+
+    {{-- Riwayat koreksi detail oleh Staff HSE --}}
+    @if($permit->edit_history && count($permit->edit_history) > 0)
+    <div class="mt-5 bg-white rounded-2xl border border-gray-100 shadow-sm px-4 md:px-6 py-5">
+        <div class="flex items-center gap-2 mb-4">
+            <svg class="w-5 h-5 text-inka-navy" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <h3 class="text-sm font-semibold text-gray-800">Riwayat Perubahan Detail</h3>
+        </div>
+        <div class="space-y-4">
+            @foreach(array_reverse($permit->edit_history) as $entry)
+            <div class="border border-gray-100 rounded-xl p-3 bg-gray-50">
+                <div class="flex flex-wrap items-center gap-2 mb-2">
+                    <span class="text-xs font-bold text-gray-700">{{ $entry['by'] ?? '—' }}</span>
+                    <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">{{ $entry['role'] ?? 'Staff HSE' }}</span>
+                    <span class="text-[10px] text-gray-400">{{ isset($entry['at']) ? \Illuminate\Support\Carbon::parse($entry['at'])->format('d/m/Y H:i') : '—' }}</span>
+                </div>
+                <ul class="space-y-1">
+                    @foreach($entry['changes'] ?? [] as $change)
+                    <li class="text-xs text-gray-600">
+                        <span class="font-semibold text-gray-700">{{ $change['label'] ?? '' }}:</span>
+                        <span class="text-red-500 line-through">{{ ($change['from'] ?? '') !== '' ? $change['from'] : '—' }}</span>
+                        <span class="text-gray-400">→</span>
+                        <span class="text-green-600 font-medium">{{ ($change['to'] ?? '') !== '' ? $change['to'] : '—' }}</span>
+                    </li>
+                    @endforeach
+                </ul>
             </div>
             @endforeach
         </div>

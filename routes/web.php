@@ -82,6 +82,8 @@ Route::middleware(['auth', 'prevent-back-history', 'role:staff,manager'])->group
     Route::get('/admin/dashboard', [\App\Http\Controllers\Admin\DashboardController::class, 'index']);
     Route::get('/admin/approvals', [\App\Http\Controllers\Admin\ApprovalController::class, 'index']);
     Route::get('/admin/approvals/{id}', [\App\Http\Controllers\Admin\ApprovalController::class, 'show']);
+    Route::get('/admin/approvals/{id}/edit', [\App\Http\Controllers\Admin\ApprovalController::class, 'edit']);
+    Route::put('/admin/approvals/{id}/edit', [\App\Http\Controllers\Admin\ApprovalController::class, 'updateDetail']);
     Route::put('/admin/approvals/{id}', [\App\Http\Controllers\Admin\ApprovalController::class, 'update']);
     Route::get('/admin/approvals/{permitId}/documents/{documentId}/download', [\App\Http\Controllers\Admin\ApprovalController::class, 'downloadDocument'])->name('admin.permits.documents.download');
     Route::get('/admin/history', [\App\Http\Controllers\Admin\HistoryController::class, 'index']);
