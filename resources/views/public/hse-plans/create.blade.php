@@ -111,7 +111,7 @@
     <main class="max-w-5xl mx-auto px-4 md:px-6 py-6 md:py-8">
         <div class="mb-6">
             <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight">Ajukan HSE Plan</h1>
-            <p class="text-sm text-gray-500 mt-1">Tanpa login. Isi rencana keselamatan kerja, lalu kirim untuk persetujuan <span class="font-semibold text-gray-700">Manager SHE</span>.</p>
+            <p class="text-sm text-gray-500 mt-1">Tanpa login. Isi rencana keselamatan kerja, lalu kirim untuk persetujuan <span class="font-semibold text-gray-700">Manager HSE</span>.</p>
         </div>
 
         @if($errors->any())
@@ -132,7 +132,7 @@
             <section class="bg-white rounded-2xl border border-gray-100 shadow-sm">
                 <div class="px-4 md:px-6 py-4 border-b border-gray-100">
                     <h2 class="text-base font-semibold text-gray-800">Data Pengajuan</h2>
-                    <p class="text-sm text-gray-400 mt-0.5">Sesuai Form K3LH IV-01.053 — SHE Plan</p>
+                    <p class="text-sm text-gray-400 mt-0.5">Sesuai Form K3LH IV-01.053 — HSE Plan</p>
                 </div>
                 <div class="px-4 md:px-6 py-5 grid grid-cols-1 md:grid-cols-2 gap-5">
                     <div>
@@ -335,7 +335,7 @@
                 <div class="px-4 md:px-6 py-4 border-b border-gray-100 flex items-center justify-between gap-3">
                     <div>
                         <h2 class="text-base font-semibold text-gray-800">Pengesahan</h2>
-                        <p class="text-sm text-gray-400 mt-0.5">Dibuat oleh Kontraktor dan disetujui oleh Manager SHE.</p>
+                        <p class="text-sm text-gray-400 mt-0.5">Dibuat oleh Kontraktor dan disetujui oleh Manager HSE.</p>
                     </div>
                     <button type="button" onclick="clearSignature()" class="text-sm font-semibold text-gray-400 hover:text-red-500 border border-gray-200 hover:border-red-300 px-3 py-1.5 rounded-lg transition-colors">Hapus</button>
                 </div>
@@ -353,9 +353,9 @@
                             <p class="mt-2 text-sm font-semibold text-gray-700">({{ old('nama_pimpinan_proyek') ?: 'Pimpinan Proyek' }})</p>
                         </div>
                         <div>
-                            <p class="text-sm font-semibold text-gray-700">Disetujui oleh,<br>Manager SHE</p>
+                            <p class="text-sm font-semibold text-gray-700">Disetujui oleh,<br>Manager HSE</p>
                             <div class="mt-3 w-full aspect-[2/1] rounded-xl border border-dashed border-gray-200 bg-gray-50 flex items-center justify-center px-4 text-center">
-                                <p class="text-xs text-gray-400">Diisi oleh Manager SHE setelah HSE Plan direview.</p>
+                                <p class="text-xs text-gray-400">Diisi oleh Manager HSE setelah HSE Plan direview.</p>
                             </div>
                             <p class="mt-2 text-sm font-semibold text-gray-400">(..............................)</p>
                         </div>

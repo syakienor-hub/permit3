@@ -12,7 +12,7 @@
 <body class="bg-slate-50 min-h-screen flex items-center justify-center px-4 py-8">
     @php
         $statusMap = [
-            'Review Manager' => ['label' => 'Menunggu Persetujuan Manager SHE', 'class' => 'bg-orange-100 text-orange-700'],
+            'Review Manager' => ['label' => 'Menunggu Persetujuan Manager HSE', 'class' => 'bg-orange-100 text-orange-700'],
             'Approved' => ['label' => 'Disetujui', 'class' => 'bg-green-100 text-green-700'],
             'Rejected' => ['label' => 'Ditolak', 'class' => 'bg-red-600 text-white'],
         ];
@@ -42,7 +42,7 @@
                 <label class="block text-sm font-semibold text-gray-700 mb-2">Nomor HSE Plan <span class="text-red-500">*</span></label>
                 <input type="text" name="no_hse_plan" required maxlength="50"
                     value="{{ old('no_hse_plan', $hsePlan->no_hse_plan ?? '') }}"
-                    placeholder="Contoh: 001/SHEPLAN/SHE/2026"
+                    placeholder="Contoh: 001/HSEPLAN/HSE/2026"
                     class="w-full border-gray-300 rounded-xl focus:border-inka-navy focus:ring-inka-navy text-sm font-mono uppercase">
             </div>
             <div>

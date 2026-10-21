@@ -17,7 +17,7 @@
             </svg>
         </div>
         <h1 class="text-xl sm:text-2xl font-extrabold text-gray-800">HSE Plan Berhasil Dikirim</h1>
-        <p class="text-sm text-gray-500 mt-1">Pengajuan Anda sudah masuk ke antrean persetujuan Manager SHE.</p>
+        <p class="text-sm text-gray-500 mt-1">Pengajuan Anda sudah masuk ke antrean persetujuan Manager HSE.</p>
 
         <div class="mt-6 rounded-xl border border-gray-100 bg-gray-50/60 px-4 py-4 text-left">
             <p class="text-xs text-gray-400">Nomor HSE Plan</p>

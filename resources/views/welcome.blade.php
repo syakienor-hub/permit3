@@ -902,7 +902,7 @@
             <span>&copy; 2026 Safety Permit INKA Madiun. Seluruh hak cipta dilindungi.</span>
             <div class="flex items-center gap-3">
                 <img src="{{ asset('assets/images/logok3.png') }}" alt="Logo K3" class="h-8 w-auto opacity-70">
-                <span>SHE PT. INKA (Persero) Madiun</span>
+                <span>HSE PT. INKA (Persero) Madiun</span>
             </div>
         </div>
     </div>

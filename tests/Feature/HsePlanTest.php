@@ -32,6 +32,7 @@ class HsePlanTest extends TestCase
         $hsePlan = HsePlan::firstOrFail();
 
         $this->assertSame('PT Contoh Kontraktor', $hsePlan->nama_kontraktor);
+        $this->assertMatchesRegularExpression('#^\d{3}/HSEPLAN/HSE/\d{4}$#', $hsePlan->no_hse_plan);
         $this->assertSame(HsePlan::STATUS_REVIEW, $hsePlan->status);
         $this->assertNotNull($hsePlan->submitted_at);
         $this->assertCount(1, $hsePlan->personil);
@@ -76,7 +77,7 @@ class HsePlanTest extends TestCase
         ])
             ->assertOk()
             ->assertSee($hsePlan->no_hse_plan)
-            ->assertSee('Menunggu Persetujuan Manager SHE');
+            ->assertSee('Menunggu Persetujuan Manager HSE');
     }
 
     public function test_wrong_phone_does_not_reveal_hse_plan(): void

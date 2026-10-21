@@ -10,7 +10,7 @@
         $statusLabel = match($hsePlan->status) {
             \App\Models\HsePlan::STATUS_APPROVED => 'Disetujui',
             \App\Models\HsePlan::STATUS_REJECTED => 'Ditolak',
-            default => 'Menunggu Persetujuan Manager SHE',
+            default => 'Menunggu Persetujuan Manager HSE',
         };
         $apdLabels = [
             'helm' => 'Helm Keselamatan',
@@ -209,7 +209,7 @@
             @if($hsePlan->status === \App\Models\HsePlan::STATUS_REVIEW)
                 <section class="bg-white rounded-2xl border border-gray-100 shadow-sm">
                     <div class="px-4 md:px-6 py-4 border-b border-gray-100">
-                        <h2 class="text-base font-semibold text-gray-800">Keputusan Manager SHE</h2>
+                        <h2 class="text-base font-semibold text-gray-800">Keputusan Manager HSE</h2>
                         <p class="text-sm text-gray-400 mt-0.5">Setujui dengan tanda tangan, atau tolak dengan alasan.</p>
                     </div>
                     <div class="px-4 md:px-6 py-4 space-y-5">
@@ -243,12 +243,12 @@
                     </div>
                     <div class="px-4 md:px-6 py-4 text-sm space-y-2">
                         <p class="text-gray-400">Diproses oleh</p>
-                        <p class="font-semibold text-gray-700">{{ optional($hsePlan->reviewer)->name ?? 'Manager SHE' }}</p>
+                        <p class="font-semibold text-gray-700">{{ optional($hsePlan->reviewer)->name ?? 'Manager HSE' }}</p>
                         <p class="text-gray-400">Pada</p>
                         <p class="font-semibold text-gray-700">{{ $hsePlan->reviewed_at?->format('d/m/Y H:i') ?? '-' }}</p>
                         @if($hsePlan->manager_signature)
-                            <p class="text-gray-400 pt-2">Tanda tangan Manager SHE</p>
-                            <img src="{{ $hsePlan->manager_signature }}" alt="Tanda tangan Manager SHE" class="w-full max-w-[260px] border border-gray-100 rounded-xl bg-white">
+                            <p class="text-gray-400 pt-2">Tanda tangan Manager HSE</p>
+                            <img src="{{ $hsePlan->manager_signature }}" alt="Tanda tangan Manager HSE" class="w-full max-w-[260px] border border-gray-100 rounded-xl bg-white">
                         @endif
                     </div>
                 </section>

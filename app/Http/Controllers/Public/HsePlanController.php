@@ -64,10 +64,10 @@ class HsePlanController extends Controller
 
         $hsePlan = DB::transaction(function () use ($request) {
             $year = date('Y');
-            $sequence = HsePlan::where('no_hse_plan', 'like', '%/SHEPLAN/SHE/' . $year)->count() + 1;
+            $sequence = HsePlan::where('no_hse_plan', 'like', '%/HSEPLAN/HSE/' . $year)->count() + 1;
 
             $hsePlan = HsePlan::create([
-                'no_hse_plan' => sprintf('%03d/SHEPLAN/SHE/%d', $sequence, $year),
+                'no_hse_plan' => sprintf('%03d/HSEPLAN/HSE/%d', $sequence, $year),
                 'no_po' => $request->no_po,
                 'site' => $request->site,
                 'tipe' => $request->tipe,
