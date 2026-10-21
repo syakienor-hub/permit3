@@ -18,6 +18,13 @@ Route::get('/', function () {
     return view('welcome', compact('permits'));
 });
 
+// ===== CEK STATUS PERMIT PUBLIK (tanpa login) =====
+Route::get('/cek-permit', [\App\Http\Controllers\Public\PermitStatusController::class, 'create'])
+    ->name('public.permits.status.form');
+Route::post('/cek-permit', [\App\Http\Controllers\Public\PermitStatusController::class, 'show'])
+    ->middleware('throttle:10,1')
+    ->name('public.permits.status');
+
 // ===== PENGAJUAN PUBLIK (tanpa login) =====
 Route::middleware(['throttle:10,1'])->group(function () {
     Route::get('/ajukan-permit', [\App\Http\Controllers\Public\PermitController::class, 'create']);

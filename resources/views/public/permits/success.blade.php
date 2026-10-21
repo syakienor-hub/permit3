@@ -46,7 +46,7 @@
                 Divisi <span class="font-semibold text-gray-700">{{ $permit->divisi_pengaju }}</span> —
                 status <span class="font-semibold text-orange-600">{{ $permit->status }}</span>.
             </p>
-            <p class="text-xs text-gray-400 mt-3">Simpan tautan halaman ini agar Anda dapat memantau status atau membatalkan permit.</p>
+            <p class="text-xs text-gray-400 mt-3">Simpan tautan halaman ini agar Anda dapat membuka detail permit. Anda juga dapat memeriksa status kapan saja di <a href="/cek-permit" class="font-semibold text-inka-navy hover:underline">Cek Status Permit</a> menggunakan nomor permit dan nomor telepon yang Anda isi.</p>
         @endif
 
         <div class="mt-6 flex flex-col sm:flex-row gap-2.5 sm:gap-3 justify-center">

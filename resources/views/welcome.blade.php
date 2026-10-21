@@ -278,6 +278,7 @@
                 Monitoring Permit
             </a>
             <a href="#alur" class="hover:text-[var(--navy-950)] transition-colors">Alur Pengajuan</a>
+            <a href="/cek-permit" class="hover:text-[var(--navy-950)] transition-colors">Cek Status</a>
             <a href="#tentang" class="hover:text-[var(--navy-950)] transition-colors">Tentang Kami</a>
         </div>
         <div class="hidden sm:flex items-center gap-2.5 shrink-0">
@@ -300,6 +301,7 @@
                 Monitoring Permit
             </a>
             <a href="#alur" @click="mobileOpen = false" class="py-3 border-b border-gray-100">Alur Pengajuan</a>
+            <a href="/cek-permit" @click="mobileOpen = false" class="py-3 border-b border-gray-100">Cek Status Permit</a>
             <a href="#tentang" @click="mobileOpen = false" class="py-3 border-b border-gray-100">Tentang Kami</a>
         </nav>
         <div class="flex flex-col gap-2.5 mt-3 sm:hidden">
@@ -506,6 +508,7 @@
                                 <th class="px-5 py-3.5 font-semibold">Kontraktor</th>
                                 <th class="px-5 py-3.5 font-semibold">Lokasi</th>
                                 <th class="px-5 py-3.5 font-semibold">Tanggal Permit</th>
+                                <th class="px-5 py-3.5 font-semibold">Status</th>
                                 <th class="px-5 py-3.5 font-semibold text-left">Aksi</th>
                             </tr>
                         </thead>
@@ -594,6 +597,9 @@
                                 </td>
                                 <td class="px-5 py-3.5 whitespace-nowrap">
                                     <x-permit-tanggal :permit="$permit" />
+                                </td>
+                                <td class="px-5 py-3.5 whitespace-nowrap">
+                                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-semibold {{ $statusBadge }}">{{ $permit->status }}</span>
                                 </td>
                                 <td class="px-5 py-3.5 text-left whitespace-nowrap">
                                     <button type="button"
