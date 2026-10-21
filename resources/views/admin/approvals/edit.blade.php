@@ -128,7 +128,7 @@
     </div>
     @endif
 
-    <form action="/admin/approvals/{{ $permit->id }}/edit" method="POST" id="detail-form">
+    <form action="/admin/approvals/{{ $permit->id }}/edit" method="POST" id="detail-form" enctype="multipart/form-data">
         @csrf
         @method('PUT')
 
@@ -315,6 +315,54 @@
                     </div>
                 </div>
             </div>
+            {{-- F. Dokumen Pendukung --}}
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm">
+                <div class="px-4 md:px-6 py-4 border-b border-gray-100">
+                    <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">F</span>
+                    <h3 class="text-base font-semibold text-gray-800 mt-0.5">Dokumen Pendukung</h3>
+                    <p class="text-sm text-gray-400 mt-0.5">Tambahkan dokumen yang belum diunggah pengaju (max 10MB per file)</p>
+                </div>
+                <div class="px-4 md:px-6 py-5">
+                    @if($permit->documents && $permit->documents->count())
+                        <div class="space-y-3 mb-4">
+                            @foreach($permit->documents as $doc)
+                            <div class="flex items-center justify-between gap-3 p-3 bg-gray-50 rounded-xl border border-gray-100">
+                                <div class="flex items-center gap-3 min-w-0">
+                                    <div class="w-10 h-10 rounded-lg bg-blue-50 border border-blue-200 flex items-center justify-center shrink-0">
+                                        <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                    </div>
+                                    <div class="min-w-0">
+                                        <p class="text-sm font-semibold text-gray-700 truncate">{{ $doc->nama_dokumen }}</p>
+                                        @if($doc->deskripsi)
+                                            <p class="text-xs text-gray-500 truncate">{{ $doc->deskripsi }}</p>
+                                        @endif
+                                        <p class="text-[10px] text-gray-400">{{ strtoupper($doc->file_type) }} &middot; {{ round($doc->file_size / 1024) }} KB</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-3 shrink-0">
+                                    <a href="{{ route('admin.permits.documents.download', [$permit->id, $doc->id]) }}"
+                                       class="text-xs font-semibold text-blue-600 hover:underline">Unduh</a>
+                                    <label class="flex items-center gap-2 cursor-pointer">
+                                        <input type="checkbox" name="hapus_dokumen[]" value="{{ $doc->id }}" class="rounded text-red-500 border-gray-300">
+                                        <span class="text-xs text-red-500">Hapus</span>
+                                    </label>
+                                </div>
+                            </div>
+                            @endforeach
+                        </div>
+                    @else
+                        <p class="text-sm text-gray-400 italic mb-4">Belum ada dokumen pendukung.</p>
+                    @endif
+
+                    <div id="documents-list" class="space-y-4"></div>
+
+                    <button type="button" onclick="addDocument()" id="btn-add-doc"
+                        class="mt-2 inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-inka-navy border border-inka-navy rounded-xl hover:bg-inka-navy/5 transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                        Tambah Dokumen
+                    </button>
+                </div>
+            </div>
         </div>
 
         <div class="mt-6 flex flex-col sm:flex-row gap-3 justify-end">
@@ -381,6 +429,38 @@
                 '<input type="text" name="peralatan_kerja[' + idx + '][material]" placeholder="e.g. Baja" class="form-input text-base">' +
                 '<input type="text" name="peralatan_kerja[' + idx + '][jumlah_material]" placeholder="5 kg" class="form-input text-base">';
             document.getElementById('peralatan-list').appendChild(row);
+        }
+
+        let docCount = 0;
+
+        function addDocument() {
+            const idx = docCount++;
+            const html =
+                '<div class="p-4 border border-gray-100 rounded-xl space-y-3" id="doc-' + idx + '">' +
+                    '<div class="flex items-center justify-between">' +
+                        '<p class="text-sm font-semibold text-gray-600">Dokumen Baru ' + (idx + 1) + '</p>' +
+                        '<button type="button" onclick="removeDocument(' + idx + ')" class="text-sm text-red-500 hover:underline">Hapus</button>' +
+                    '</div>' +
+                    '<div>' +
+                        '<label class="form-label">Nama Dokumen <span class="text-red-500">*</span></label>' +
+                        '<input type="text" name="dokumen[' + idx + '][nama]" class="form-input" placeholder="Contoh: HIRADC" required>' +
+                    '</div>' +
+                    '<div>' +
+                        '<label class="form-label">Deskripsi</label>' +
+                        '<textarea name="dokumen[' + idx + '][deskripsi]" class="form-input" rows="2" placeholder="Deskripsi singkat dokumen..."></textarea>' +
+                    '</div>' +
+                    '<div>' +
+                        '<label class="form-label">File <span class="text-red-500">*</span></label>' +
+                        '<input type="file" name="dokumen[' + idx + '][file]" class="form-input" required>' +
+                        '<p class="text-xs text-gray-400 mt-1">Maks 10MB. Format: PDF, gambar, Office.</p>' +
+                    '</div>' +
+                '</div>';
+            document.getElementById('documents-list').insertAdjacentHTML('beforeend', html);
+        }
+
+        function removeDocument(idx) {
+            const el = document.getElementById('doc-' + idx);
+            if (el) el.remove();
         }
 
         document.getElementById('detail-form').addEventListener('submit', function () {

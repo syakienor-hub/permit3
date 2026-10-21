@@ -121,7 +121,7 @@ class ApprovalController extends Controller
 
     private function findEditablePermit($id): Permit
     {
-        $permit = Permit::findOrFail($id);
+        $permit = Permit::with('documents')->findOrFail($id);
 
         if (! $this->canEditDetail($permit)) {
             abort(403, 'Detail permit hanya dapat diedit oleh Staff HSE site terkait sebelum approval ke Manager.');
@@ -156,6 +156,16 @@ class ApprovalController extends Controller
             'apd_lainnya'        => 'nullable|string|max:255',
         ]);
 
+        // Dokumen pendukung boleh ditambahkan / dihapus saat koreksi.
+        if (! empty((array) $request->input('dokumen', []))) {
+            $request->validate([
+                'dokumen'             => 'array',
+                'dokumen.*.nama'      => 'required|string|max:255',
+                'dokumen.*.deskripsi' => 'nullable|string|max:500',
+                'dokumen.*.file'      => 'required|file|max:10240|mimes:pdf,doc,docx,xls,xlsx,jpg,jpeg,png,gif',
+            ]);
+        }
+
         $before = $this->detailSnapshot($permit);
 
         $peralatan = array_values(array_filter((array) $request->input('peralatan_kerja', []), function ($row) {
@@ -183,6 +193,8 @@ class ApprovalController extends Controller
 
         $after = $this->detailSnapshot($permit);
 
+        $documentNotes = $this->syncDocuments($request, $permit);
+
         $changes = [];
         foreach (self::EDITABLE_DETAIL_FIELDS as $field => $label) {
             if (($before[$field] ?? '') !== ($after[$field] ?? '')) {
@@ -192,6 +204,14 @@ class ApprovalController extends Controller
                     'to'    => $after[$field] ?? '',
                 ];
             }
+        }
+
+        foreach ($documentNotes as $note) {
+            $changes[] = [
+                'label' => 'Dokumen Pendukung',
+                'from'  => '',
+                'to'    => $note,
+            ];
         }
 
         if (! empty($changes)) {
@@ -207,9 +227,56 @@ class ApprovalController extends Controller
 
         $message = empty($changes)
             ? 'Tidak ada perubahan pada detail permit.'
-            : 'Detail permit berhasil diperbarui (' . count($changes) . ' field) dan tercatat di riwayat.';
+            : 'Detail permit berhasil diperbarui (' . count($changes) . ' perubahan) dan tercatat di riwayat.';
 
         return redirect('/admin/approvals/' . $permit->id)->with('success', $message);
+    }
+
+    /**
+     * Simpan / hapus dokumen pendukung saat koreksi detail.
+     *
+     * @return array<int, string> Catatan perubahan dokumen untuk riwayat.
+     */
+    private function syncDocuments(Request $request, Permit $permit): array
+    {
+        $notes = [];
+
+        $hapus = (array) $request->input('hapus_dokumen', []);
+        foreach ($hapus as $docId) {
+            $doc = PermitDocument::where('permit_id', $permit->id)->find($docId);
+            if ($doc) {
+                Storage::disk('local')->delete($doc->file_path);
+                $notes[] = 'Hapus: ' . $doc->nama_dokumen;
+                $doc->delete();
+            }
+        }
+
+        $dokumenInput = (array) $request->input('dokumen', []);
+        $dokumenFiles = $request->file('dokumen', []);
+
+        foreach ($dokumenInput as $i => $doc) {
+            if (! isset($dokumenFiles[$i]['file'])) {
+                continue;
+            }
+
+            $file = $dokumenFiles[$i]['file'];
+            $ext = $file->getClientOriginalExtension();
+            $filename = time() . '-' . bin2hex(random_bytes(4)) . '.' . $ext;
+            $path = $file->storeAs('permits/' . $permit->id, $filename);
+
+            PermitDocument::create([
+                'permit_id'    => $permit->id,
+                'nama_dokumen' => $doc['nama'] ?? 'Dokumen',
+                'deskripsi'    => $doc['deskripsi'] ?? null,
+                'file_path'    => $path,
+                'file_type'    => $ext,
+                'file_size'    => $file->getSize(),
+            ]);
+
+            $notes[] = 'Tambah: ' . ($doc['nama'] ?? 'Dokumen');
+        }
+
+        return $notes;
     }
 
     /** Snapshot nilai tampilan tiap field detail, dipakai untuk diff riwayat. */

@@ -3,8 +3,11 @@
 namespace Tests\Feature;
 
 use App\Models\Permit;
+use App\Models\PermitDocument;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class PermitDetailEditTest extends TestCase
@@ -142,6 +145,91 @@ class PermitDetailEditTest extends TestCase
 
         $permit->refresh();
         $this->assertSame('Pekerjaan Pengelasan', $permit->nama_pekerjaan);
+    }
+
+    public function test_staff_can_add_missing_supporting_document(): void
+    {
+        Storage::fake('local');
+
+        $staff = $this->makeStaff('Madiun');
+        $permit = $this->makePermit(['status' => 'Review Staff']);
+
+        $this->actingAs($staff)->put("/admin/approvals/{$permit->id}/edit", [
+            'nama_pekerjaan' => $permit->nama_pekerjaan,
+            'kontraktor' => $permit->kontraktor,
+            'lokasi' => $permit->lokasi,
+            'dokumen' => [
+                [
+                    'nama' => 'HIRADC',
+                    'deskripsi' => 'Dokumen yang tertinggal',
+                    'file' => UploadedFile::fake()->create('hiradc.pdf', 100, 'application/pdf'),
+                ],
+            ],
+        ])->assertRedirect("/admin/approvals/{$permit->id}");
+
+        $permit->refresh();
+
+        $this->assertCount(1, $permit->documents);
+        $doc = $permit->documents->first();
+        $this->assertSame('HIRADC', $doc->nama_dokumen);
+        Storage::disk('local')->assertExists($doc->file_path);
+
+        $this->assertCount(1, $permit->edit_history);
+        $change = $permit->edit_history[0]['changes'][0];
+        $this->assertSame('Dokumen Pendukung', $change['label']);
+        $this->assertSame('Tambah: HIRADC', $change['to']);
+    }
+
+    public function test_staff_can_remove_supporting_document(): void
+    {
+        Storage::fake('local');
+
+        $staff = $this->makeStaff('Madiun');
+        $permit = $this->makePermit(['status' => 'Review Staff']);
+
+        Storage::disk('local')->put('permits/' . $permit->id . '/lama.pdf', 'isi');
+        $doc = PermitDocument::create([
+            'permit_id' => $permit->id,
+            'nama_dokumen' => 'Salah Upload',
+            'file_path' => 'permits/' . $permit->id . '/lama.pdf',
+            'file_type' => 'pdf',
+            'file_size' => 3,
+        ]);
+
+        $this->actingAs($staff)->put("/admin/approvals/{$permit->id}/edit", [
+            'nama_pekerjaan' => $permit->nama_pekerjaan,
+            'kontraktor' => $permit->kontraktor,
+            'lokasi' => $permit->lokasi,
+            'hapus_dokumen' => [$doc->id],
+        ])->assertRedirect("/admin/approvals/{$permit->id}");
+
+        $permit->refresh();
+
+        $this->assertCount(0, $permit->documents);
+        Storage::disk('local')->assertMissing('permits/' . $permit->id . '/lama.pdf');
+
+        $this->assertSame('Hapus: Salah Upload', $permit->edit_history[0]['changes'][0]['to']);
+    }
+
+    public function test_added_document_requires_a_file(): void
+    {
+        Storage::fake('local');
+
+        $staff = $this->makeStaff('Madiun');
+        $permit = $this->makePermit(['status' => 'Review Staff']);
+
+        $this->actingAs($staff)->put("/admin/approvals/{$permit->id}/edit", [
+            'nama_pekerjaan' => $permit->nama_pekerjaan,
+            'kontraktor' => $permit->kontraktor,
+            'lokasi' => $permit->lokasi,
+            'dokumen' => [
+                ['nama' => 'HIRADC', 'deskripsi' => '', 'file' => null],
+            ],
+        ])->assertSessionHasErrors('dokumen.0.file');
+
+        $permit->refresh();
+
+        $this->assertCount(0, $permit->documents);
     }
 
     private function makeStaff(string $site): User
