@@ -91,9 +91,7 @@
 
         .eyebrow {
             display: inline-flex; align-items: center; gap: 7px;
-            background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.35);
             color: #fff; font-size: 12px; font-weight: 600;
-            padding: 6px 14px; border-radius: 20px;
             letter-spacing: .02em;
         }
 
@@ -328,15 +326,16 @@
 <!-- ================= HERO ================= -->
 <section class="hero">
     <div class="max-w-[660px] mx-auto px-4 md:px-6 hero-inner">
-        <div class="flex flex-wrap items-center justify-center gap-2 sm:gap-3 mb-5 hero-animate">
-            <div class="eyebrow" id="hero-eyebrow"><span class="dot"></span> SISTEM ONLINE · MONITORING REALTIME</div>
-            <div id="hero-realtime" class="inline-flex items-center gap-2 whitespace-nowrap rounded-full border border-white/25 bg-white/10 px-3.5 py-1.5 text-[11px] sm:text-xs font-medium text-white/90 backdrop-blur-md">
+        <div class="inline-flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5 rounded-full border border-white/25 bg-white/10 px-4 py-2 mb-5 hero-animate backdrop-blur-md">
+            <span class="eyebrow" id="hero-eyebrow"><span class="dot"></span> SISTEM ONLINE · MONITORING REALTIME</span>
+            <span class="hidden sm:block h-4 w-px bg-white/25"></span>
+            <span id="hero-realtime" class="inline-flex items-center gap-2 whitespace-nowrap text-[11px] sm:text-xs font-medium text-white/90">
                 <svg class="w-3.5 h-3.5 text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                 <span id="hero-realtime-date">Memuat tanggal…</span>
                 <span class="text-white/40">•</span>
                 <span id="hero-realtime-time" class="tabular-nums font-semibold text-white">--:--:--</span>
                 <span class="text-[10px] font-semibold text-white/60">WIB</span>
-            </div>
+            </span>
         </div>
         <h1 class="text-[30px] sm:text-[38px] md:text-[50px] leading-[1.2] font-extrabold tracking-[-.01em] mb-4 hero-animate" id="hero-title">
             SIMONIKA  <span class="text-[var(--amber-500)]"> </span>
