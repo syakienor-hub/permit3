@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Safety Permit INKA Madiun</title>
+    <title>Login - Safety Permit PT INKA (Persero)</title>
     <link rel="icon" type="image/png" href="{{ asset('assets/images/logok3.png') }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -114,7 +114,7 @@
 
     {{-- Footer --}}
     <footer class="py-6 text-center text-xs text-gray-400">
-        <p>&copy; {{ date('Y') }} PT INKA (Persero) Madiun. All rights reserved.</p>
+        <p>&copy; {{ date('Y') }} PT INKA (Persero). All rights reserved.</p>
     </footer>
 
     {{-- Interactivity Script --}}

@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Safety Permit INKA Madiun — Sistem Monitoring K3 Kontraktor</title>
+    <title>Safety Permit PT INKA (Persero) — Sistem Monitoring K3 Kontraktor</title>
 
     <link rel="icon" type="image/png" href="{{ asset('assets/images/logok3.png') }}">
 
@@ -340,7 +340,7 @@
             SIMONIKA  <span class="text-[var(--amber-500)]"> </span>
         </h1>
         <p class="text-sm sm:text-[15.5px] text-white/100 mb-6 md:mb-8 hero-animate px-1" id="hero-sub">
-        Sistem Informasi Monitoring dan Izin Kerja INKA Madiun        </p>
+        Sistem Informasi Monitoring dan Izin Kerja PT INKA (Persero)        </p>
         <div class="flex flex-col sm:flex-row gap-3 justify-center items-stretch sm:items-center sm:flex-wrap hero-animate px-2 sm:px-0" id="hero-actions">
             <a href="/ajukan-permit" class="btn btn-outline-light btn-lg w-full sm:w-auto">
                 Ajukan Safety Permit
@@ -469,7 +469,7 @@
                 Monitoring Izin Kerja (Safety Permit)
             </h2>
             <p class="text-[14.5px] text-[var(--ink-600)]">
-                Pantau daftar izin kerja risiko tinggi di lingkungan PT INKA (Persero) Madiun secara transparan dan mudah.
+                Pantau daftar izin kerja risiko tinggi di lingkungan PT INKA (Persero) secara transparan dan mudah.
             </p>
         </div>
 
@@ -859,8 +859,8 @@
         <div class="reveal-left">
             <div class="sec-tag">Tentang Kami</div>
             <h2 class="text-[22px] sm:text-[26px] font-extrabold tracking-[-.01em] mb-[14px] text-[var(--navy-950)]">Dibangun untuk Tim HSE yang Ingin Bekerja Lebih Cepat dan Aman</h2>
-            <p class="text-sm text-[var(--ink-600)] mb-3.5 leading-relaxed">Safety Permit INKA Madiun adalah sistem monitoring keselamatan kerja kontraktor yang menggantikan proses manual berbasis kertas dengan alur digital yang lebih rapi dan mudah diaudit.</p>
-            <p class="text-sm text-[var(--ink-600)] mb-3.5 leading-relaxed">Kami percaya keselamatan kerja seharusnya tidak menghambat kecepatan operasional. Karena itu Safety Permit INKA Madiun dirancang agar divisi bisa mengelola data kontraktor dan mengajukan izin kerja dengan cepat, sementara tim HSE tetap punya kendali penuh atas setiap persetujuan.</p>
+            <p class="text-sm text-[var(--ink-600)] mb-3.5 leading-relaxed">Safety Permit PT INKA (Persero) adalah sistem monitoring keselamatan kerja kontraktor yang menggantikan proses manual berbasis kertas dengan alur digital yang lebih rapi dan mudah diaudit.</p>
+            <p class="text-sm text-[var(--ink-600)] mb-3.5 leading-relaxed">Kami percaya keselamatan kerja seharusnya tidak menghambat kecepatan operasional. Karena itu Safety Permit PT INKA (Persero) dirancang agar divisi bisa mengelola data kontraktor dan mengajukan izin kerja dengan cepat, sementara tim HSE tetap punya kendali penuh atas setiap persetujuan.</p>
             <a href="#" class="btn btn-solid" style="margin-top:8px;">Pelajari Lebih Lanjut</a>
         </div>
         <div class="about-visual reveal-right">
@@ -883,7 +883,7 @@
                     <img src="{{ asset('assets/images/logoinka.svg') }}" alt="INKA" class="h-7 w-auto brightness-0 invert opacity-80">
                     <div class="border-l border-white/20 pl-3">
                         <span class="text-sm font-bold">Safety Permit</span>
-                        <span class="block text-[10px] font-semibold text-[var(--steel-300)] tracking-wide">INKA MADIUN</span>
+                        <span class="block text-[10px] font-semibold text-[var(--steel-300)] tracking-wide">PT INKA (Persero)</span>
                     </div>
                 </div>
                 <p class="text-[12.5px] text-[var(--steel-300)] max-w-[280px] mt-3">Platform digital untuk monitoring kontraktor dan izin kerja risiko tinggi dalam satu sistem terpadu.</p>
@@ -909,10 +909,10 @@
             </div>
         </div>
         <div class="border-t border-white/12 pt-5 flex justify-between items-center flex-wrap gap-2.5 text-xs text-[var(--steel-300)]">
-            <span>&copy; 2026 Safety Permit INKA Madiun. Seluruh hak cipta dilindungi.</span>
+            <span>&copy; 2026 Safety Permit PT INKA (Persero). Seluruh hak cipta dilindungi.</span>
             <div class="flex items-center gap-3">
                 <img src="{{ asset('assets/images/logok3.png') }}" alt="Logo K3" class="h-8 w-auto opacity-70">
-                <span>HSE PT. INKA (Persero) Madiun</span>
+                <span>HSE PT INKA (Persero)</span>
             </div>
         </div>
     </div>

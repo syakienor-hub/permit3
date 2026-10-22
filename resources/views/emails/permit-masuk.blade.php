@@ -12,7 +12,7 @@
             <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;background:#ffffff;border-radius:12px;overflow:hidden;">
                 <tr>
                     <td style="background:#0f2a4a;padding:20px 28px;color:#ffffff;">
-                        <p style="margin:0;font-size:12px;letter-spacing:1px;font-weight:bold;">SAFETY PERMIT &bull; PT INKA MADIUN</p>
+                        <p style="margin:0;font-size:12px;letter-spacing:1px;font-weight:bold;">SAFETY PERMIT &bull; PT INKA (Persero)</p>
                         <h1 style="margin:8px 0 0;font-size:20px;line-height:1.3;">
                             @if($targetRole === 'manager')
                                 Permit baru masuk — perlu review Manager HSE
@@ -88,7 +88,7 @@
                 </tr>
                 <tr>
                     <td style="padding:16px 28px;background:#f8fafc;color:#94a3b8;font-size:11px;text-align:center;">
-                        Email otomatis dari Sistem Safety Permit PT INKA Madiun. Mohon tidak membalas email ini.
+                        Email otomatis dari Sistem Safety Permit PT INKA (Persero). Mohon tidak membalas email ini.
                     </td>
                 </tr>
             </table>

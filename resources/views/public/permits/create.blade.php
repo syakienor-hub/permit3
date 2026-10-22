@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ajukan Safety Permit — INKA Madiun</title>
+    <title>Ajukan Safety Permit — PT INKA (Persero)</title>
     <link rel="icon" type="image/png" href="{{ asset('assets/images/logok3.png') }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -40,7 +40,7 @@
                 <img src="{{ asset('assets/images/logoinka.svg') }}" alt="INKA" class="h-6 sm:h-7 w-auto shrink-0">
                 <div class="border-l border-gray-200 pl-2.5 sm:pl-3 whitespace-nowrap">
                     <span class="text-[13px] sm:text-sm font-bold">Safety Permit</span>
-                    <span class="block text-[9px] sm:text-[10px] font-semibold text-gray-500 tracking-wide">INKA MADIUN</span>
+                    <span class="block text-[9px] sm:text-[10px] font-semibold text-gray-500 tracking-wide">PT INKA (Persero)</span>
                 </div>
             </a>
             <a href="/" class="text-sm font-semibold text-gray-500 hover:text-gray-800 transition-colors whitespace-nowrap">← Beranda</a>

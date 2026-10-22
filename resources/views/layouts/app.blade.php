@@ -5,7 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>{{ isset($title) ? $title . ' — ' : '' }}Safety Permit INKA Madiun</title>
+        <title>{{ isset($title) ? $title . ' — ' : '' }}Safety Permit PT INKA (Persero)</title>
 
         <link rel="icon" type="image/png" href="{{ asset('assets/images/logok3.png') }}">
 
@@ -56,7 +56,7 @@
                 <img src="{{ asset('assets/images/logoinka.svg') }}" alt="Logo PT INKA" class="h-8 w-auto brightness-0 invert">
                 <div class="leading-tight pl-1 border-l border-white/20">
                     <p class="text-[11px] font-bold tracking-wider text-white">SAFETY PERMIT</p>
-                    <p class="text-[9px] text-gray-400 tracking-wide">PT INKA Madiun</p>
+                    <p class="text-[9px] text-gray-400 tracking-wide">PT INKA (Persero)</p>
                 </div>
             </div>
 
