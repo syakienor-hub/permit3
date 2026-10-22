@@ -167,9 +167,15 @@
                     </button>
                     <h2 class="text-base font-semibold text-gray-800 truncate">{{ $title ?? 'Dashboard' }}</h2>
                 </div>
-                
-                {{-- Notification Bell --}}
-                @if(in_array($role, ['staff', 'manager']))
+                <div class="flex items-center gap-2 sm:gap-4">
+                    {{-- Jam & tanggal realtime --}}
+                    <div class="flex flex-col items-end leading-tight text-right" title="Waktu Indonesia Barat (WIB)">
+                        <span id="realtime-time" class="text-sm font-bold text-gray-800 tabular-nums">--:--:--</span>
+                        <span id="realtime-date" class="hidden sm:block text-[10px] font-medium text-gray-400">Memuat tanggal…</span>
+                    </div>
+
+                    {{-- Notification Bell --}}
+                    @if(in_array($role, ['staff', 'manager']))
                 <div class="relative" x-data="{ open: false }">
                     <button @click="open = !open" @click.away="open = false" class="relative p-2 text-gray-400 hover:text-inka-navy transition-colors rounded-full hover:bg-gray-50 focus:outline-none">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
@@ -210,8 +216,9 @@
                             @endif
                         </div>
                     </div>
+                    </div>
+                    @endif
                 </div>
-                @endif
             </header>
 
             {{-- Content --}}
@@ -282,6 +289,32 @@
                 padding-left: 26px;
             }
         </style>
+
+        <script>
+            (function () {
+                const timeEl = document.getElementById('realtime-time');
+                const dateEl = document.getElementById('realtime-date');
+                if (!timeEl) return;
+
+                const timeFmt = new Intl.DateTimeFormat('id-ID', {
+                    timeZone: 'Asia/Jakarta',
+                    hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
+                });
+                const dateFmt = new Intl.DateTimeFormat('id-ID', {
+                    timeZone: 'Asia/Jakarta',
+                    weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+                });
+
+                function render() {
+                    const now = new Date();
+                    timeEl.textContent = timeFmt.format(now).replace(/\./g, ':');
+                    if (dateEl) dateEl.textContent = dateFmt.format(now);
+                }
+
+                render();
+                setInterval(render, 1000);
+            })();
+        </script>
 
     </body>
 </html>
