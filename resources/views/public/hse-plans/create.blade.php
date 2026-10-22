@@ -26,22 +26,6 @@
             padding-right: 38px;
             cursor: pointer;
         }
-        input[type="file"].form-input { padding: 7px 10px; cursor: pointer; }
-        input[type="file"].form-input::file-selector-button {
-            margin-right: 12px; padding: 7px 16px;
-            border: 1px solid #e5e7eb; border-radius: 9999px;
-            background: #f3f4f6; color: #374151;
-            font-size: 0.85rem; font-weight: 600; font-family: inherit;
-            cursor: pointer; transition: background-color 0.15s, border-color 0.15s;
-        }
-        input[type="file"].form-input::file-selector-button:hover { background: #e5e7eb; border-color: #d1d5db; }
-        input[type="file"].form-input::-webkit-file-upload-button {
-            margin-right: 12px; padding: 7px 16px;
-            border: 1px solid #e5e7eb; border-radius: 9999px;
-            background: #f3f4f6; color: #374151;
-            font-size: 0.85rem; font-weight: 600; font-family: inherit;
-            cursor: pointer;
-        }
         .form-input:focus { outline: none; border-color: #111d33; box-shadow: 0 0 0 3px rgba(17,29,51,0.08); }
         .form-input:disabled { background: #f9fafb; color: #9ca3af; }
     </style>

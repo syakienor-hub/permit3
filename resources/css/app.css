@@ -41,4 +41,31 @@
     .badge {
         @apply inline-flex items-center gap-1 whitespace-nowrap rounded-full border px-2.5 py-1 text-[11px] font-semibold;
     }
+
+    /* Tombol "Choose File" seragam dengan kelengkungan input di seluruh aplikasi. */
+    input[type="file"].form-input {
+        padding: 7px 10px;
+        cursor: pointer;
+    }
+
+    input[type="file"].form-input::file-selector-button,
+    input[type="file"].form-input::-webkit-file-upload-button {
+        margin-right: 12px;
+        padding: 7px 14px;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        background: #f3f4f6;
+        color: #374151;
+        font-size: 0.85rem;
+        font-weight: 600;
+        font-family: inherit;
+        cursor: pointer;
+        transition: background-color 0.15s, border-color 0.15s;
+    }
+
+    input[type="file"].form-input::file-selector-button:hover,
+    input[type="file"].form-input::-webkit-file-upload-button:hover {
+        background: #e5e7eb;
+        border-color: #d1d5db;
+    }
 }
