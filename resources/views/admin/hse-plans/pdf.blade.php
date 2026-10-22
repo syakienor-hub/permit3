@@ -295,7 +295,7 @@
             </table>
             <p class="answer-note">Jika &ldquo;Ya&rdquo; maka wajib melampirkan struktur organisasi proyek</p>
 
-            <p style="margin-top: 70px;">Madiun, {{ $tanggal?->format('d/m/Y') ?? '....................' }}</p>
+            <p style="margin-top: 70px;">{{ $hsePlan->site ?: 'Madiun' }}, {{ $tanggal?->format('d/m/Y') ?? '....................' }}</p>
 
             <table class="signature-table">
                 <tr>

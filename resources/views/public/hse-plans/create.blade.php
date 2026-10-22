@@ -199,7 +199,7 @@
                 <div class="px-4 md:px-6 py-5 grid grid-cols-1 md:grid-cols-2 gap-5">
                     <div>
                         <label class="form-label">Site <span class="text-red-500">*</span></label>
-                        <select name="site" class="form-input" required>
+                        <select name="site" id="site-select" class="form-input" required>
                             <option value="Madiun" @selected(old('site', 'Madiun') === 'Madiun')>Madiun</option>
                             <option value="Banyuwangi" @selected(old('site') === 'Banyuwangi')>Banyuwangi</option>
                         </select>
@@ -355,7 +355,7 @@
                     <button type="button" onclick="clearSignature()" class="text-sm font-semibold text-gray-400 hover:text-red-500 border border-gray-200 hover:border-red-300 px-3 py-1.5 rounded-lg transition-colors">Hapus</button>
                 </div>
                 <div class="px-4 md:px-6 py-5">
-                    <p class="text-sm text-gray-600 mb-5">Madiun, ................................</p>
+                    <p class="text-sm text-gray-600 mb-5"><span id="pengesahan-kota">{{ old('site') === 'Banyuwangi' ? 'Banyuwangi' : 'Madiun' }}</span>, ................................</p>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <p class="text-sm font-semibold text-gray-700">Dibuat oleh,<br>Kontraktor</p>
@@ -388,6 +388,17 @@
     <script>
         let personilCount = {{ count($personilRows) }};
         let peralatanCount = {{ count($peralatanRows) }};
+
+        (function () {
+            const siteSelect = document.getElementById('site-select');
+            const kota = document.getElementById('pengesahan-kota');
+            if (!siteSelect || !kota) return;
+            const syncKota = () => {
+                kota.textContent = siteSelect.value === 'Banyuwangi' ? 'Banyuwangi' : 'Madiun';
+            };
+            siteSelect.addEventListener('change', syncKota);
+            syncKota();
+        })();
 
         function addPersonil() {
             const list = document.getElementById('personil-list');
