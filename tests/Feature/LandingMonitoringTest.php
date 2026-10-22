@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Contractor;
 use App\Models\Permit;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -68,6 +69,67 @@ class LandingMonitoringTest extends TestCase
         $draft = $this->makePermit('WP-2026-CCC33333', 'Pekerjaan Draft', 'PT Gamma', 'Madiun', 'Draft');
 
         $this->get('/')->assertOk()->assertDontSee($draft->no_permit);
+    }
+
+    public function test_contractor_monitoring_table_lists_contractors_and_statuses(): void
+    {
+        $waiting = $this->makeContractor('PT Alpha Konstruksi', 'Madiun', Contractor::STATUS_WAITING);
+        $final = $this->makeContractor('CV Beta Teknik', 'Banyuwangi', Contractor::STATUS_FINAL);
+
+        $this->get('/')
+            ->assertOk()
+            ->assertSee('Monitoring Data Kontraktor')
+            ->assertSee($waiting->vendor)
+            ->assertSee($final->vendor)
+            ->assertSee(Contractor::STATUS_WAITING)
+            ->assertSee(Contractor::STATUS_FINAL);
+    }
+
+    public function test_contractor_monitoring_can_be_filtered_by_site_status_and_search(): void
+    {
+        $alpha = $this->makeContractor('PT Alpha Konstruksi', 'Madiun', Contractor::STATUS_WAITING);
+        $beta = $this->makeContractor('CV Beta Teknik', 'Banyuwangi', Contractor::STATUS_FINAL);
+
+        $this->get('/?k_site=Banyuwangi')
+            ->assertOk()
+            ->assertSee($beta->vendor)
+            ->assertDontSee($alpha->vendor);
+
+        $this->get('/?k_status=HSE Plan Final')
+            ->assertOk()
+            ->assertSee($beta->vendor)
+            ->assertDontSee($alpha->vendor);
+
+        $this->get('/?k_search=Beta')
+            ->assertOk()
+            ->assertSee($beta->vendor)
+            ->assertDontSee($alpha->vendor);
+    }
+
+    public function test_contractor_search_keeps_value_and_shows_empty_state(): void
+    {
+        $this->get('/?k_search=tidak-ada-kontraktor-ini')
+            ->assertOk()
+            ->assertSee('value="tidak-ada-kontraktor-ini"', false)
+            ->assertSee('Tidak ada kontraktor yang cocok dengan pencarian');
+    }
+
+    private function makeContractor(string $vendor, string $site, string $status): Contractor
+    {
+        return Contractor::create([
+            'token' => substr(hash('sha256', $vendor), 0, 40),
+            'vendor' => $vendor,
+            'pic' => 'Budi Santoso',
+            'jenis_pekerjaan' => 'panas',
+            'telepon' => '08123456789',
+            'nama_pekerjaan' => 'Pekerjaan pengelasan struktur',
+            'tanggal_mulai' => now()->addDay(),
+            'tanggal_selesai' => now()->addDays(3),
+            'jumlah_pekerja' => '4',
+            'lokasi' => 'Workshop',
+            'site' => $site,
+            'status' => $status,
+        ]);
     }
 
     private function makePermit(

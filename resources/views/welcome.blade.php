@@ -280,6 +280,11 @@
                 <span x-show="activeNav === 'monitoring'" class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                 Monitoring Permit
             </a>
+            <a href="#monitoring-kontraktor" @click="activeNav = 'monitoring-kontraktor'" class="hover:text-[var(--navy-950)] transition-colors flex items-center gap-1.5"
+                :class="activeNav === 'monitoring-kontraktor' ? 'text-inka-navy font-bold' : ''">
+                <span x-show="activeNav === 'monitoring-kontraktor'" class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                Monitoring Kontraktor
+            </a>
             <a href="/data-kontraktor" class="hover:text-[var(--navy-950)] transition-colors">Data Kontraktor</a>
             <a href="#alur" @click="activeNav = 'alur'" class="hover:text-[var(--navy-950)] transition-colors"
                 :class="activeNav === 'alur' ? 'text-inka-navy font-bold' : ''">Alur Pengajuan</a>
@@ -305,6 +310,11 @@
                 :class="activeNav === 'monitoring' ? 'text-inka-navy font-bold' : ''">
                 <span x-show="activeNav === 'monitoring'" class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                 Monitoring Permit
+            </a>
+            <a href="#monitoring-kontraktor" @click="activeNav = 'monitoring-kontraktor'; mobileOpen = false" class="flex items-center gap-2 py-3 border-b border-gray-100"
+                :class="activeNav === 'monitoring-kontraktor' ? 'text-inka-navy font-bold' : ''">
+                <span x-show="activeNav === 'monitoring-kontraktor'" class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                Monitoring Kontraktor
             </a>
             <a href="/data-kontraktor" @click="mobileOpen = false" class="py-3 border-b border-gray-100">Ajukan Data Kontraktor</a>
             <a href="#alur" @click="activeNav = 'alur'; mobileOpen = false" class="py-3 border-b border-gray-100"
@@ -806,6 +816,365 @@
     </div>
 </section>
 
+<!-- ================= MONITORING KONTRAKTOR ================= -->
+<section class="py-12 md:py-20 px-4 md:px-6 bg-white border-y border-[var(--border)]" id="monitoring-kontraktor" x-data="{
+    isContractorModalOpen: false,
+    activeContractor: {
+        vendor: '',
+        pic: '',
+        jenis: '',
+        nama_pekerjaan: '',
+        site: '',
+        lokasi: '',
+        periode: '',
+        jumlah: '',
+        status: '',
+        status_badge: '',
+        dokumen: 0
+    },
+    openContractorModal(data) {
+        this.activeContractor = data;
+        this.isContractorModalOpen = true;
+        document.body.style.overflow = 'hidden';
+    },
+    closeContractorModal() {
+        this.isContractorModalOpen = false;
+        document.body.style.overflow = '';
+    }
+}">
+    <div class="max-w-[1140px] mx-auto">
+        <div class="max-w-[640px] mx-auto text-center mb-10 reveal">
+            <div class="sec-tag inline-flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                Monitoring Kontraktor
+            </div>
+            <h2 class="text-[22px] sm:text-[28px] font-extrabold tracking-[-.01em] mb-3 text-[var(--navy-950)]">
+                Monitoring Data Kontraktor
+            </h2>
+            <p class="text-[14.5px] text-[var(--ink-600)]">
+                Pantau status HSE Plan dan kesiapan dokumen kontraktor sebelum pekerjaan dimulai di lingkungan PT INKA (Persero).
+            </p>
+        </div>
+
+        <div class="table-card reveal">
+            <div class="px-4 md:px-6 py-4 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-gray-50/50">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-100 flex items-center justify-center font-bold">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m6-5.13a4 4 0 11-8 0 4 4 0 018 0zm6 3a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-bold text-gray-900">Daftar Kontraktor Terkini</h3>
+                        <p class="text-xs text-gray-500">Menampilkan 10 kontraktor terbaru beserta status HSE Plan</p>
+                    </div>
+                </div>
+                <div class="text-xs font-semibold text-gray-500 bg-white px-3 py-1.5 rounded-lg border border-gray-200">
+                    Total: <span class="text-inka-navy font-bold">{{ $contractors->total() }}</span> Kontraktor Terdaftar
+                </div>
+            </div>
+
+            <form method="GET" action="{{ url('/') }}#monitoring-kontraktor" class="px-4 md:px-6 py-3 border-b border-gray-100 bg-white flex flex-wrap items-center gap-x-3 gap-y-2">
+                @foreach(['site', 'tipe', 'search'] as $permitFilter)
+                    @if(request()->filled($permitFilter))
+                        <input type="hidden" name="{{ $permitFilter }}" value="{{ request($permitFilter) }}">
+                    @endif
+                @endforeach
+                <label class="text-xs font-semibold text-gray-500">Filter site:</label>
+                <select name="k_site" onchange="this.form.submit()" class="text-xs font-semibold border border-gray-200 rounded-lg px-3 py-1.5 text-gray-700 focus:outline-none focus:border-inka-navy">
+                    <option value="">Semua Site</option>
+                    @foreach(\App\Models\HsePlan::SITES as $s)
+                        <option value="{{ $s }}" {{ request('k_site') === $s ? 'selected' : '' }}>{{ $s }}</option>
+                    @endforeach
+                </select>
+                <label class="text-xs font-semibold text-gray-500">Status HSE Plan:</label>
+                <select name="k_status" onchange="this.form.submit()" class="text-xs font-semibold border border-gray-200 rounded-lg px-3 py-1.5 text-gray-700 focus:outline-none focus:border-inka-navy">
+                    <option value="">Semua Status</option>
+                    @foreach($contractorStatuses as $status)
+                        <option value="{{ $status }}" {{ request('k_status') === $status ? 'selected' : '' }}>{{ $status }}</option>
+                    @endforeach
+                </select>
+                @if(request('k_site') || request('k_status') || request('k_search'))
+                    <a href="{{ url('/') }}#monitoring-kontraktor" class="text-xs text-gray-400 hover:text-gray-600">Reset</a>
+                @endif
+                <div class="ml-auto flex items-center gap-2 w-full sm:w-auto">
+                    <div class="relative flex-1 sm:flex-none">
+                        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11a6 6 0 11-12 0 6 6 0 0112 0z"/>
+                        </svg>
+                        <input type="text" name="k_search" value="{{ request('k_search') }}" maxlength="100"
+                               placeholder="Cari kontraktor, PIC, pekerjaan..."
+                               class="w-full sm:w-64 text-xs border border-gray-200 rounded-lg pl-8 pr-3 py-1.5 text-gray-700 placeholder-gray-400 focus:outline-none focus:border-inka-navy">
+                    </div>
+                    <button type="submit" class="text-xs font-semibold bg-inka-navy text-white px-3 py-1.5 rounded-lg hover:opacity-90 transition-opacity">Cari</button>
+                </div>
+            </form>
+
+            @if($contractors->isEmpty())
+                <div class="py-16 text-center text-gray-400">
+                    <svg class="w-12 h-12 mx-auto text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m6-5.13a4 4 0 11-8 0 4 4 0 018 0zm6 3a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    <p class="text-sm font-semibold text-gray-600">
+                        @if(request('k_search'))
+                            Tidak ada kontraktor yang cocok dengan pencarian "{{ request('k_search') }}".
+                        @else
+                            Belum ada data kontraktor yang terdaftar.
+                        @endif
+                    </p>
+                </div>
+            @else
+                {{-- Desktop/laptop --}}
+                <div class="overflow-x-auto -mx-4 md:mx-0 px-4 md:px-0 hidden md:block">
+                    <table class="data-table min-w-[1100px]">
+                        <thead>
+                            <tr>
+                                <th>Kontraktor</th>
+                                <th>PIC</th>
+                                <th>Jenis Pekerjaan</th>
+                                <th>Nama Pekerjaan</th>
+                                <th>Site</th>
+                                <th>Lokasi</th>
+                                <th>Periode</th>
+                                <th>Pekerja</th>
+                                <th>Status HSE Plan</th>
+                                <th class="text-right">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($contractors as $contractor)
+                            @php
+                                $jenisLabel = $classifications[$contractor->jenis_pekerjaan]
+                                    ?? ucwords(str_replace('_', ' ', $contractor->jenis_pekerjaan));
+
+                                $mulai = $contractor->tanggal_mulai ? $contractor->tanggal_mulai->format('d/m/Y') : null;
+                                $selesai = $contractor->tanggal_selesai ? $contractor->tanggal_selesai->format('d/m/Y') : null;
+
+                                if ($mulai && $selesai) {
+                                    $periode = ($mulai === $selesai) ? $mulai : "$mulai – $selesai";
+                                } else {
+                                    $periode = $mulai ?? $selesai ?? '—';
+                                }
+
+                                $contractorStatusMap = [
+                                    'Menunggu HSE Plan' => 'bg-amber-50 text-amber-700 border-amber-200/70',
+                                    'Review Manager' => 'bg-orange-50 text-orange-700 border-orange-200/70',
+                                    'HSE Plan Diajukan' => 'bg-blue-50 text-blue-700 border-blue-200/70',
+                                    'HSE Plan Final' => 'bg-emerald-50 text-emerald-700 border-emerald-200/70',
+                                ];
+                                $contractorStatusBadge = $contractorStatusMap[$contractor->status] ?? 'bg-gray-100 text-gray-600 border-gray-200';
+
+                                $contractorPayload = [
+                                    'vendor' => $contractor->vendor,
+                                    'pic' => $contractor->pic,
+                                    'jenis' => $jenisLabel,
+                                    'nama_pekerjaan' => $contractor->nama_pekerjaan,
+                                    'site' => $contractor->site,
+                                    'lokasi' => $contractor->lokasi ?? '—',
+                                    'periode' => $periode,
+                                    'jumlah' => $contractor->jumlah_pekerja,
+                                    'status' => $contractor->status,
+                                    'status_badge' => $contractorStatusBadge,
+                                    'dokumen' => $contractor->documents_count,
+                                ];
+                            @endphp
+                            <tr class="transition-colors">
+                                <td class="font-semibold text-inka-navy whitespace-nowrap">{{ $contractor->vendor }}</td>
+                                <td class="text-gray-600 whitespace-nowrap">{{ $contractor->pic }}</td>
+                                <td class="whitespace-nowrap">
+                                    <span class="badge bg-blue-50 text-blue-700 border-blue-200/70">{{ $jenisLabel }}</span>
+                                </td>
+                                <td class="text-gray-600 max-w-[260px]">{{ $contractor->nama_pekerjaan }}</td>
+                                <td class="whitespace-nowrap">
+                                    <x-permit-site-badge :site="$contractor->site" />
+                                </td>
+                                <td class="text-gray-600">{{ $contractor->lokasi ?? '—' }}</td>
+                                <td class="whitespace-nowrap text-gray-600">{{ $periode }}</td>
+                                <td class="whitespace-nowrap text-gray-600">{{ $contractor->jumlah_pekerja }} orang</td>
+                                <td class="whitespace-nowrap">
+                                    <span class="badge {{ $contractorStatusBadge }}">{{ $contractor->status }}</span>
+                                </td>
+                                <td class="text-right whitespace-nowrap">
+                                    <button type="button"
+                                            @click="openContractorModal({{ json_encode($contractorPayload, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES) }})"
+                                            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-inka-navy text-white hover:opacity-90 transition-all shadow-sm">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                        Lihat Detail
+                                    </button>
+                                </td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+
+                {{-- HP --}}
+                <div class="md:hidden divide-y divide-gray-100">
+                    @foreach($contractors as $contractor)
+                    @php
+                        $mJenis = $classifications[$contractor->jenis_pekerjaan]
+                            ?? ucwords(str_replace('_', ' ', $contractor->jenis_pekerjaan));
+                        $mMulai = $contractor->tanggal_mulai ? $contractor->tanggal_mulai->format('d/m/Y') : null;
+                        $mSelesai = $contractor->tanggal_selesai ? $contractor->tanggal_selesai->format('d/m/Y') : null;
+                        $mPeriode = ($mMulai && $mSelesai)
+                            ? (($mMulai === $mSelesai) ? $mMulai : "$mMulai – $mSelesai")
+                            : ($mMulai ?? $mSelesai ?? '—');
+                        $mStatusMap = [
+                            'Menunggu HSE Plan' => 'bg-amber-50 text-amber-700 border-amber-200/70',
+                            'Review Manager' => 'bg-orange-50 text-orange-700 border-orange-200/70',
+                            'HSE Plan Diajukan' => 'bg-blue-50 text-blue-700 border-blue-200/70',
+                            'HSE Plan Final' => 'bg-emerald-50 text-emerald-700 border-emerald-200/70',
+                        ];
+                        $mStatusBadge = $mStatusMap[$contractor->status] ?? 'bg-gray-100 text-gray-600 border-gray-200';
+                        $mPayload = [
+                            'vendor' => $contractor->vendor,
+                            'pic' => $contractor->pic,
+                            'jenis' => $mJenis,
+                            'nama_pekerjaan' => $contractor->nama_pekerjaan,
+                            'site' => $contractor->site,
+                            'lokasi' => $contractor->lokasi ?? '—',
+                            'periode' => $mPeriode,
+                            'jumlah' => $contractor->jumlah_pekerja,
+                            'status' => $contractor->status,
+                            'status_badge' => $mStatusBadge,
+                            'dokumen' => $contractor->documents_count,
+                        ];
+                    @endphp
+                    <button type="button" @click="openContractorModal({{ json_encode($mPayload, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES) }})" class="block w-full text-left px-4 py-4 active:bg-emerald-50/50">
+                        <div class="flex items-center justify-between gap-2 mb-1">
+                            <span class="font-bold text-inka-navy text-sm">{{ $contractor->vendor }}</span>
+                            <span class="badge {{ $mStatusBadge }} shrink-0">{{ $contractor->status }}</span>
+                        </div>
+                        <p class="text-sm text-gray-800 font-medium leading-snug">{{ $contractor->nama_pekerjaan }}</p>
+                        <p class="text-xs text-gray-400 mt-0.5 truncate">{{ $contractor->pic }} &middot; {{ $contractor->lokasi ?? '—' }} &middot; {{ $mPeriode }}</p>
+                        <div class="flex items-center gap-1.5 mt-2 flex-wrap">
+                            <x-permit-site-badge :site="$contractor->site" />
+                            <span class="badge bg-blue-50 text-blue-700 border-blue-200/70">{{ $mJenis }}</span>
+                            <span class="text-[11px] text-gray-400">{{ $contractor->jumlah_pekerja }} pekerja &middot; {{ $contractor->documents_count }} dokumen</span>
+                        </div>
+                    </button>
+                    @endforeach
+                </div>
+
+                @if($contractors->hasPages())
+                    <div class="px-6 py-4 border-t border-gray-100 flex items-center justify-between">
+                        {{ $contractors->fragment('monitoring-kontraktor')->links() }}
+                    </div>
+                @endif
+            @endif
+        </div>
+    </div>
+
+    <!-- Modal Detail Kontraktor (Read-Only) -->
+    <div x-show="isContractorModalOpen"
+         x-cloak
+         class="fixed inset-0 z-50 overflow-y-auto flex items-center justify-center p-4 sm:p-6"
+         role="dialog" aria-modal="true">
+        <div x-show="isContractorModalOpen"
+             x-transition:enter="ease-out duration-200"
+             x-transition:enter-start="opacity-0"
+             x-transition:enter-end="opacity-100"
+             x-transition:leave="ease-in duration-150"
+             x-transition:leave-start="opacity-100"
+             x-transition:leave-end="opacity-0"
+             class="fixed inset-0 bg-slate-900/60 md:backdrop-blur-sm transition-opacity"
+             @click="closeContractorModal()"></div>
+
+        <div x-show="isContractorModalOpen"
+             x-transition:enter="ease-out duration-200"
+             x-transition:enter-start="opacity-0 scale-95"
+             x-transition:enter-end="opacity-100 scale-100"
+             x-transition:leave="ease-in duration-150"
+             x-transition:leave-start="opacity-100 scale-100"
+             x-transition:leave-end="opacity-0 scale-95"
+             class="relative w-full max-w-2xl bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-10 my-8">
+            <div class="px-4 sm:px-6 py-4 border-b border-gray-100 bg-gray-50/90 flex items-center justify-between gap-2">
+                <div class="flex items-center gap-2.5 flex-wrap min-w-0">
+                    <span class="font-bold text-gray-900 text-lg truncate" x-text="activeContractor.vendor"></span>
+                    <span class="badge"
+                          :class="activeContractor.site === 'Banyuwangi' ? 'bg-emerald-50 text-emerald-700 border-emerald-200/70' : 'bg-indigo-50 text-indigo-700 border-indigo-200/70'"
+                          x-text="activeContractor.site || 'Madiun'"></span>
+                    <span class="badge"
+                          :class="activeContractor.status_badge || 'bg-gray-100 text-gray-600 border-gray-200'"
+                          x-text="activeContractor.status"></span>
+                </div>
+                <button @click="closeContractorModal()" class="w-8 h-8 rounded-lg hover:bg-gray-200/60 text-gray-400 hover:text-gray-700 flex items-center justify-center transition-colors shrink-0">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+
+            <div class="p-4 sm:p-6 space-y-5 max-h-[75vh] overflow-y-auto">
+                <div>
+                    <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Jenis Pekerjaan</p>
+                    <span class="badge bg-blue-50 text-blue-700 border-blue-200/70" x-text="activeContractor.jenis"></span>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-gray-50/70 rounded-xl p-4 border border-gray-100 text-sm">
+                    <div class="sm:col-span-2">
+                        <p class="text-xs text-gray-500 font-medium">Uraian / Nama Pekerjaan</p>
+                        <p class="font-semibold text-gray-800 mt-0.5" x-text="activeContractor.nama_pekerjaan || '—'"></p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-500 font-medium">PIC / Penanggung Jawab</p>
+                        <p class="font-semibold text-gray-800 mt-0.5" x-text="activeContractor.pic || '—'"></p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-500 font-medium">Site</p>
+                        <p class="font-semibold text-gray-800 mt-0.5" x-text="activeContractor.site || '—'"></p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-500 font-medium">Lokasi Pekerjaan</p>
+                        <p class="font-semibold text-gray-800 mt-0.5" x-text="activeContractor.lokasi"></p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-500 font-medium">Periode Pengerjaan</p>
+                        <p class="font-semibold text-gray-800 mt-0.5" x-text="activeContractor.periode"></p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-500 font-medium">Jumlah Pekerja</p>
+                        <p class="font-semibold text-gray-800 mt-0.5" x-text="(activeContractor.jumlah || '0') + ' orang'"></p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-500 font-medium">Dokumen Pendukung</p>
+                        <p class="font-semibold text-gray-800 mt-0.5" x-text="activeContractor.dokumen ? activeContractor.dokumen + ' berkas' : 'Belum ada dokumen'"></p>
+                    </div>
+                </div>
+
+                <template x-if="activeContractor.status === 'HSE Plan Final'">
+                    <div class="bg-emerald-50 border border-emerald-200/70 rounded-xl p-3.5 flex items-start gap-3">
+                        <svg class="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        <p class="text-xs text-emerald-800 leading-relaxed">
+                            HSE Plan kontraktor ini sudah final. Pekerjaan dapat dilanjutkan sesuai periode dan ketentuan K3 yang berlaku.
+                        </p>
+                    </div>
+                </template>
+
+                <template x-if="activeContractor.status !== 'HSE Plan Final'">
+                    <div class="bg-amber-50 border border-amber-200/70 rounded-xl p-3.5 flex items-start gap-3">
+                        <svg class="w-5 h-5 text-amber-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        <p class="text-xs text-amber-800 leading-relaxed">
+                            HSE Plan kontraktor ini belum final. Kontraktor perlu melengkapi dokumen dan mengajukan HSE Plan sebelum pekerjaan dimulai.
+                        </p>
+                    </div>
+                </template>
+
+                <div class="bg-blue-50 border border-blue-200/70 rounded-xl p-3.5 flex items-start gap-3">
+                    <svg class="w-5 h-5 text-blue-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    <p class="text-xs text-blue-800 leading-relaxed">
+                        Data di atas adalah ringkasan monitoring publik. Dokumen teknis dan detail HSE Plan dapat diakses oleh user berwenang melalui dashboard sistem.
+                    </p>
+                </div>
+            </div>
+
+            <div class="px-4 sm:px-6 py-3.5 border-t border-gray-100 bg-gray-50 flex items-center justify-between gap-3">
+                <button type="button" @click="closeContractorModal()" class="px-4 py-2 rounded-xl text-sm font-semibold text-gray-600 hover:bg-gray-200/60 transition-colors">
+                    Tutup
+                </button>
+                <a href="{{ route('login') }}" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold bg-inka-navy text-white hover:opacity-90 transition-opacity">
+                    <span>Login Sistem</span>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
 <!-- ================= ALUR PENGAJUAN ================= -->
 <section class="py-12 md:py-20 px-4 md:px-6" id="alur">
     <div class="max-w-[1080px] mx-auto">
@@ -893,6 +1262,7 @@
                     <h5 class="text-[11.5px] font-bold uppercase tracking-wide text-[var(--steel-300)] mb-3.5">Navigasi</h5>
                     <ul class="flex flex-col gap-2.5">
                         <li><a href="#monitoring" class="text-sm text-white/85 hover:text-white transition-opacity">Monitoring Permit</a></li>
+                        <li><a href="#monitoring-kontraktor" class="text-sm text-white/85 hover:text-white transition-opacity">Monitoring Kontraktor</a></li>
                         <li><a href="#alur" class="text-sm text-white/85 hover:text-white transition-opacity">Alur Pengajuan</a></li>
                         <li><a href="#tentang" class="text-sm text-white/85 hover:text-white transition-opacity">Tentang Kami</a></li>
                         <li><a href="{{ route('login') }}" class="text-sm text-white/85 hover:text-white transition-opacity">Login</a></li>

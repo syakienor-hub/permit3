@@ -24,7 +24,36 @@ Route::get('/', function () {
         ->withQueryString()
         ->fragment('monitoring');
 
-    return view('welcome', compact('permits'));
+    $contractorStatuses = [
+        \App\Models\Contractor::STATUS_WAITING,
+        \App\Models\Contractor::STATUS_REVIEW,
+        \App\Models\Contractor::STATUS_FORM_SUBMITTED,
+        \App\Models\Contractor::STATUS_FINAL,
+    ];
+
+    $contractors = \App\Models\Contractor::query()
+        ->withCount('documents')
+        ->when(request()->filled('k_site') && in_array(request('k_site'), \App\Models\HsePlan::SITES, true),
+            fn ($q) => $q->where('site', request('k_site')))
+        ->when(request()->filled('k_status') && in_array(request('k_status'), $contractorStatuses, true),
+            fn ($q) => $q->where('status', request('k_status')))
+        ->when(request()->filled('k_search'), function ($q) {
+            $term = '%' . trim((string) request('k_search')) . '%';
+
+            $q->where(fn ($sub) => $sub
+                ->where('vendor', 'like', $term)
+                ->orWhere('pic', 'like', $term)
+                ->orWhere('nama_pekerjaan', 'like', $term)
+                ->orWhere('lokasi', 'like', $term));
+        })
+        ->orderByRaw('COALESCE(tanggal_mulai, created_at) DESC')
+        ->paginate(10, ['*'], 'kontraktor_page')
+        ->withQueryString()
+        ->fragment('monitoring-kontraktor');
+
+    $classifications = \App\Models\Classification::pluck('name', 'code');
+
+    return view('welcome', compact('permits', 'contractors', 'classifications', 'contractorStatuses'));
 });
 
 // ===== CEK STATUS PERMIT PUBLIK (tanpa login) =====

@@ -4,9 +4,11 @@ namespace Tests\Feature;
 
 use App\Models\Classification;
 use App\Models\Contractor;
+use App\Models\ContractorDocument;
 use App\Models\HsePlan;
 use App\Models\HsePlanDocument;
 use Database\Seeders\ClassificationSeeder;
+use Database\Seeders\ContractorSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -164,6 +166,22 @@ class ContractorTest extends TestCase
             'site' => 'Madiun',
             'action' => 'simpan',
         ], $overrides);
+    }
+
+    public function test_contractor_seeder_provides_various_demo_situations(): void
+    {
+        $this->seed(ContractorSeeder::class);
+
+        $this->assertSame(8, Contractor::count());
+        $this->assertSame(3, Contractor::where('status', Contractor::STATUS_WAITING)->count());
+        $this->assertSame(5, Contractor::where('status', Contractor::STATUS_FINAL)->count());
+        $this->assertSame(5, Contractor::whereNotNull('hse_plan_id')->count());
+        $this->assertSame(2, Contractor::whereHas('documents', fn ($q) => $q->where('jenis', 'hse_plan_existing'))->count());
+        $this->assertSame(3, Contractor::whereHas('documents', fn ($q) => $q->where('jenis', 'hse_plan_generated'))->count());
+        $this->assertSame(6, Contractor::query()->distinct()->count('jenis_pekerjaan'));
+        $this->assertEqualsCanonicalizing(['Madiun', 'Banyuwangi'], Contractor::query()->distinct()->pluck('site')->all());
+        $this->assertSame(5, HsePlan::where('status', HsePlan::STATUS_FINAL)->count());
+        $this->assertGreaterThan(0, ContractorDocument::count());
     }
 
     private function contractorAttributes(): array
