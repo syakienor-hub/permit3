@@ -302,21 +302,21 @@
             <section class="bg-white rounded-2xl border border-gray-100 shadow-sm">
                 <div class="px-4 md:px-6 py-4 border-b border-gray-100">
                     <h2 class="text-base font-semibold text-gray-800">9. Job Safety Analysis &amp; Dokumen Pendukung</h2>
-                    <p class="text-sm text-gray-400 mt-0.5">Format PDF, DOC, XLS, atau gambar. Maksimal 10MB per file.</p>
+                    <p class="text-sm text-gray-400 mt-0.5">Opsional. Format PDF, DOC, XLS, atau gambar. Maksimal 10MB per file. Jika pertanyaan di bawah dijawab Ya, dokumen terkait wajib dilampirkan.</p>
                 </div>
                 <div class="px-4 md:px-6 py-5 space-y-5">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label class="form-label">Job Safety Analysis / JSA <span class="text-red-500">*</span></label>
-                            <input type="file" name="jsa_file" class="form-input" accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png" required>
+                            <label class="form-label">Job Safety Analysis / JSA</label>
+                            <input type="file" name="jsa_file" class="form-input" accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png">
                         </div>
                         <div>
-                            <label class="form-label">Sertifikat Keahlian Personil <span class="text-red-500">*</span></label>
-                            <input type="file" name="sertifikat_personil[]" class="form-input" accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png" multiple required>
+                            <label class="form-label">Sertifikat Keahlian Personil</label>
+                            <input type="file" name="sertifikat_personil[]" class="form-input" accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png" multiple>
                         </div>
                         <div>
-                            <label class="form-label">Sertifikat Peralatan <span class="text-red-500">*</span></label>
-                            <input type="file" name="sertifikat_peralatan[]" class="form-input" accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png" multiple required>
+                            <label class="form-label">Sertifikat Peralatan</label>
+                            <input type="file" name="sertifikat_peralatan[]" class="form-input" accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png" multiple>
                         </div>
                     </div>
 
@@ -328,10 +328,10 @@
                                 $number = 10 + $loop->index;
                             @endphp
                             <div>
-                                <p class="text-sm font-semibold text-gray-700">{{ $number }}. {{ $item['label'] }} <span class="text-red-500">*</span></p>
+                                <p class="text-sm font-semibold text-gray-700">{{ $number }}. {{ $item['label'] }}</p>
                                 <div class="mt-2 flex items-center gap-5">
                                     <label class="inline-flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
-                                        <input type="radio" name="{{ $item['field'] }}" value="1" @checked($hasAnswer && $isYes) @if($item['file']) onchange="toggleFile('{{ $item['file_id'] }}', true)" @endif required
+                                        <input type="radio" name="{{ $item['field'] }}" value="1" @checked($hasAnswer && $isYes) @if($item['file']) onchange="toggleFile('{{ $item['file_id'] }}', true)" @endif
                                             class="w-4 h-4 text-inka-navy border-gray-300 focus:ring-inka-navy">
                                         Ya
                                     </label>
@@ -347,7 +347,7 @@
                                 @if($item['file'])
                                     <div id="{{ $item['file_id'] }}" class="{{ $isYes ? '' : 'hidden' }} mt-2">
                                         <label class="block text-xs font-semibold text-gray-500 mb-1">{{ $item['file_label'] }}</label>
-                                        <input type="file" name="{{ $item['file'] }}" class="form-input" accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png">
+                                        <input type="file" name="{{ $item['file'] }}" class="form-input" accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png" @if($isYes) required @endif>
                                     </div>
                                 @endif
                             </div>
@@ -443,6 +443,8 @@
             const element = document.getElementById(id);
             if (!element) return;
             element.classList.toggle('hidden', !show);
+            const input = element.querySelector('input[type="file"]');
+            if (input) input.required = show;
         }
 
         (function () {

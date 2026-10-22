@@ -48,15 +48,27 @@ class HsePlanTest extends TestCase
         }
     }
 
-    public function test_jsa_and_certificates_are_required(): void
+    public function test_hse_plan_can_be_submitted_without_documents_and_unanswered_questions(): void
     {
+        Storage::fake('local');
+
         $payload = $this->validPayload();
-        unset($payload['jsa_file'], $payload['sertifikat_personil'], $payload['sertifikat_peralatan']);
+        unset(
+            $payload['jsa_file'],
+            $payload['sertifikat_personil'],
+            $payload['sertifikat_peralatan'],
+            $payload['bahan_b3'],
+            $payload['limbah_b3'],
+            $payload['prosedur_kerja'],
+            $payload['rencana_inspeksi'],
+            $payload['tanggap_darurat'],
+            $payload['struktur_organisasi'],
+        );
 
-        $this->post('/ajukan-hse-plan', $payload)
-            ->assertSessionHasErrors(['jsa_file', 'sertifikat_personil', 'sertifikat_peralatan']);
+        $this->post('/ajukan-hse-plan', $payload)->assertRedirect();
 
-        $this->assertDatabaseCount('hse_plans', 0);
+        $this->assertDatabaseCount('hse_plans', 1);
+        $this->assertDatabaseCount('hse_plan_documents', 0);
     }
 
     public function test_msds_is_required_when_using_b3_material(): void
