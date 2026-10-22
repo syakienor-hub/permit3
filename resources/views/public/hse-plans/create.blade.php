@@ -113,7 +113,13 @@
                     <span class="block text-[9px] sm:text-[10px] font-semibold text-gray-500 tracking-wide">INKA MADIUN</span>
                 </div>
             </a>
-            <a href="/" class="text-sm font-semibold text-gray-500 hover:text-gray-800 transition-colors whitespace-nowrap">Beranda</a>
+            <a href="/" title="Kembali ke Beranda"
+                class="inline-flex items-center gap-1.5 rounded-xl border border-gray-200 px-3 py-1.5 text-sm font-semibold text-gray-500 hover:border-inka-navy/30 hover:bg-gray-50 hover:text-inka-navy transition-colors whitespace-nowrap">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l9-9 9 9M5 10v10a1 1 0 001 1h3a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1h3a1 1 0 001-1V10"/>
+                </svg>
+                Beranda
+            </a>
         </div>
     </header>
 
