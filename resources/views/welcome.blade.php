@@ -265,7 +265,7 @@
 <body class="bg-[var(--paper)] text-[var(--ink-900)]">
 
 <!-- ================= HEADER ================= -->
-<header class="nav" x-data="{ mobileOpen: false, activeNav: window.location.hash ? window.location.hash.substring(1) : null }">
+<header class="nav" x-data="{ mobileOpen: false, monitoringOpen: false, activeNav: window.location.hash ? window.location.hash.substring(1) : null }">
     <div class="max-w-[1080px] mx-auto px-4 md:px-6 flex items-center h-[60px] md:h-[68px] gap-3">
         <div class="flex items-center gap-2.5 mr-auto min-w-0">
             <img src="{{ asset('assets/images/logoinka.svg') }}" alt="INKA" class="h-6 md:h-7 w-auto shrink-0">
@@ -274,21 +274,39 @@
                 <span class="block text-[9px] md:text-[10px] font-semibold text-[var(--ink-600)] tracking-wide">PT INKA (Persero)</span>
             </div>
         </div>
-        <div class="hidden md:flex items-center gap-6 mr-4 text-sm font-semibold text-[var(--ink-600)]">
-            <a href="#monitoring" @click="activeNav = 'monitoring'" class="hover:text-[var(--navy-950)] transition-colors flex items-center gap-1.5"
-                :class="activeNav === 'monitoring' ? 'text-inka-navy font-bold' : ''">
-                <span x-show="activeNav === 'monitoring'" class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                Monitoring Permit
-            </a>
-            <a href="#monitoring-kontraktor" @click="activeNav = 'monitoring-kontraktor'" class="hover:text-[var(--navy-950)] transition-colors flex items-center gap-1.5"
-                :class="activeNav === 'monitoring-kontraktor' ? 'text-inka-navy font-bold' : ''">
-                <span x-show="activeNav === 'monitoring-kontraktor'" class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                Monitoring Kontraktor
-            </a>
-            <a href="/data-kontraktor" class="hover:text-[var(--navy-950)] transition-colors">Data Kontraktor</a>
-            <a href="#alur" @click="activeNav = 'alur'" class="hover:text-[var(--navy-950)] transition-colors"
+        <div class="hidden lg:flex items-center gap-5 mr-3 text-[13px] xl:text-sm font-semibold text-[var(--ink-600)]">
+            <div class="relative" @click.outside="monitoringOpen = false" @mouseleave="monitoringOpen = false">
+                <button type="button" @click="monitoringOpen = !monitoringOpen" @keydown.escape.window="monitoringOpen = false"
+                    class="hover:text-[var(--navy-950)] transition-colors flex items-center gap-1.5 whitespace-nowrap"
+                    :class="(activeNav === 'monitoring' || activeNav === 'monitoring-kontraktor') ? 'text-inka-navy font-bold' : ''"
+                    :aria-expanded="monitoringOpen ? 'true' : 'false'">
+                    <span x-show="activeNav === 'monitoring' || activeNav === 'monitoring-kontraktor'" class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    Monitoring
+                    <svg class="w-3.5 h-3.5 transition-transform duration-200" :class="monitoringOpen ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                    </svg>
+                </button>
+                <div x-show="monitoringOpen" x-cloak class="absolute left-0 top-full w-60 pt-2 z-50">
+                    <div class="rounded-xl border border-[var(--border)] bg-white p-1.5 shadow-xl">
+                        <a href="#monitoring" @click="activeNav = 'monitoring'; monitoringOpen = false"
+                            class="flex items-center gap-2 rounded-lg px-3 py-2 text-[13px] text-[var(--ink-600)] hover:bg-gray-50 hover:text-[var(--navy-950)] transition-colors"
+                            :class="activeNav === 'monitoring' ? 'text-inka-navy font-bold' : ''">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500" :class="activeNav === 'monitoring' ? 'animate-pulse' : 'opacity-40'"></span>
+                            Monitoring Permit
+                        </a>
+                        <a href="#monitoring-kontraktor" @click="activeNav = 'monitoring-kontraktor'; monitoringOpen = false"
+                            class="flex items-center gap-2 rounded-lg px-3 py-2 text-[13px] text-[var(--ink-600)] hover:bg-gray-50 hover:text-[var(--navy-950)] transition-colors"
+                            :class="activeNav === 'monitoring-kontraktor' ? 'text-inka-navy font-bold' : ''">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500" :class="activeNav === 'monitoring-kontraktor' ? 'animate-pulse' : 'opacity-40'"></span>
+                            Monitoring Kontraktor
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <a href="/data-kontraktor" class="hover:text-[var(--navy-950)] transition-colors whitespace-nowrap">Data Kontraktor</a>
+            <a href="#alur" @click="activeNav = 'alur'" class="hover:text-[var(--navy-950)] transition-colors whitespace-nowrap"
                 :class="activeNav === 'alur' ? 'text-inka-navy font-bold' : ''">Alur Pengajuan</a>
-            <a href="#tentang" @click="activeNav = 'tentang'" class="hover:text-[var(--navy-950)] transition-colors"
+            <a href="#tentang" @click="activeNav = 'tentang'" class="hover:text-[var(--navy-950)] transition-colors whitespace-nowrap"
                 :class="activeNav === 'tentang' ? 'text-inka-navy font-bold' : ''">Tentang Kami</a>
         </div>
         <div class="hidden sm:flex items-center gap-2.5 shrink-0">
@@ -299,12 +317,12 @@
                 <a href="{{ route('login') }}" class="btn btn-solid">Masuk</a>
             @endauth
         </div>
-        <button type="button" @click="mobileOpen = !mobileOpen" class="md:hidden w-10 h-10 -mr-1 flex items-center justify-center rounded-lg hover:bg-gray-100 text-[var(--navy-950)] shrink-0" aria-label="Buka menu">
+        <button type="button" @click="mobileOpen = !mobileOpen" class="lg:hidden w-10 h-10 -mr-1 flex items-center justify-center rounded-lg hover:bg-gray-100 text-[var(--navy-950)] shrink-0" aria-label="Buka menu">
             <svg x-show="!mobileOpen" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
             <svg x-show="mobileOpen" x-cloak class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
         </button>
     </div>
-    <div x-show="mobileOpen" x-cloak class="md:hidden border-t border-[var(--border)] bg-white px-4 pt-2 pb-4">
+    <div x-show="mobileOpen" x-cloak class="lg:hidden border-t border-[var(--border)] bg-white px-4 pt-2 pb-4">
         <nav class="flex flex-col text-sm font-semibold text-[var(--ink-600)]">
             <a href="#monitoring" @click="activeNav = 'monitoring'; mobileOpen = false" class="flex items-center gap-2 py-3 border-b border-gray-100"
                 :class="activeNav === 'monitoring' ? 'text-inka-navy font-bold' : ''">
