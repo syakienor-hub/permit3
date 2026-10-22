@@ -3,12 +3,14 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Contractor;
 use App\Models\HsePlan;
 use App\Models\HsePlanDocument;
 use App\Services\HsePlanPdfService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 
 class HsePlanApprovalController extends Controller
 {
@@ -20,7 +22,9 @@ class HsePlanApprovalController extends Controller
 
     public function index(Request $request)
     {
-        $query = HsePlan::query()->with('reviewer');
+        $query = HsePlan::query()
+            ->visibleTo(Auth::user())
+            ->with('reviewer');
 
         if ($request->filled('site')) {
             $query->forSite($request->site);
@@ -28,7 +32,7 @@ class HsePlanApprovalController extends Controller
 
         if ($request->filled('status') && $request->status !== 'Semua') {
             $query->where('status', $request->status);
-        } elseif (! $request->filled('status')) {
+        } elseif (! $request->filled('status') && Auth::user()->role === 'manager') {
             $query->where('status', HsePlan::STATUS_REVIEW);
         }
 
@@ -46,10 +50,12 @@ class HsePlanApprovalController extends Controller
             ->paginate(15)
             ->withQueryString();
 
+        $visible = HsePlan::query()->visibleTo(Auth::user());
+
         $counts = [
-            'review' => HsePlan::where('status', HsePlan::STATUS_REVIEW)->count(),
-            'approved' => HsePlan::where('status', HsePlan::STATUS_APPROVED)->count(),
-            'rejected' => HsePlan::where('status', HsePlan::STATUS_REJECTED)->count(),
+            'review' => (clone $visible)->where('status', HsePlan::STATUS_REVIEW)->count(),
+            'approved' => (clone $visible)->where('status', HsePlan::STATUS_APPROVED)->count(),
+            'rejected' => (clone $visible)->where('status', HsePlan::STATUS_REJECTED)->count(),
         ];
 
         return view('admin.hse-plans.index', compact('hsePlans', 'counts'));
@@ -58,6 +64,7 @@ class HsePlanApprovalController extends Controller
     public function history(Request $request)
     {
         $query = HsePlan::query()
+            ->visibleTo(Auth::user())
             ->with('reviewer')
             ->whereIn('status', [HsePlan::STATUS_APPROVED, HsePlan::STATUS_REJECTED]);
 
@@ -84,9 +91,11 @@ class HsePlanApprovalController extends Controller
             ->paginate(15)
             ->withQueryString();
 
+        $visible = HsePlan::query()->visibleTo(Auth::user());
+
         $counts = [
-            'approved' => HsePlan::where('status', HsePlan::STATUS_APPROVED)->count(),
-            'rejected' => HsePlan::where('status', HsePlan::STATUS_REJECTED)->count(),
+            'approved' => (clone $visible)->where('status', HsePlan::STATUS_APPROVED)->count(),
+            'rejected' => (clone $visible)->where('status', HsePlan::STATUS_REJECTED)->count(),
         ];
 
         return view('admin.hse-plans.history', compact('hsePlans', 'counts'));
@@ -94,25 +103,38 @@ class HsePlanApprovalController extends Controller
 
     public function show($id)
     {
-        $hsePlan = HsePlan::with(['documents', 'reviewer', 'contractor'])->findOrFail($id);
+        $hsePlan = HsePlan::query()
+            ->visibleTo(Auth::user())
+            ->with(['documents', 'reviewer', 'contractor'])
+            ->findOrFail($id);
 
         return view('admin.hse-plans.show', compact('hsePlan'));
     }
 
     public function edit($id)
     {
-        $hsePlan = HsePlan::with(['documents', 'contractor', 'reviewer'])->findOrFail($id);
+        $hsePlan = HsePlan::query()
+            ->visibleTo(Auth::user())
+            ->with(['documents', 'contractor', 'reviewer'])
+            ->findOrFail($id);
 
         return view('admin.hse-plans.edit', compact('hsePlan'));
     }
 
     public function update(Request $request, $id)
     {
-        $hsePlan = HsePlan::with('contractor')->findOrFail($id);
+        $hsePlan = HsePlan::query()
+            ->visibleTo(Auth::user())
+            ->with('contractor')
+            ->findOrFail($id);
+
+        $siteRule = Auth::user()->role === 'staff'
+            ? Rule::in(array_filter([Auth::user()->site]))
+            : Rule::in(HsePlan::SITES);
 
         $validated = $request->validate([
             'no_po' => 'nullable|string|max:100',
-            'site' => 'required|in:Madiun,Banyuwangi',
+            'site' => ['required', $siteRule],
             'tipe' => 'required|in:Internal,Eksternal',
             'divisi_pengaju' => 'required|string|max:255',
             'nama_kontraktor' => 'required|string|max:255',
@@ -150,7 +172,10 @@ class HsePlanApprovalController extends Controller
             'struktur_file' => 'nullable|' . self::FILE_RULES,
         ]);
 
-        $hsePlan->forceFill([
+        $resetApproval = Auth::user()->role === 'staff'
+            && $hsePlan->status !== HsePlan::STATUS_REVIEW;
+
+        $attributes = [
             'no_po' => $validated['no_po'] ?? null,
             'site' => $validated['site'],
             'tipe' => $validated['tipe'],
@@ -175,7 +200,23 @@ class HsePlanApprovalController extends Controller
             'rencana_inspeksi' => $request->boolean('rencana_inspeksi'),
             'tanggap_darurat' => $request->boolean('tanggap_darurat'),
             'struktur_organisasi' => $request->boolean('struktur_organisasi'),
-        ])->save();
+        ];
+
+        if ($resetApproval) {
+            $attributes += [
+                'status' => HsePlan::STATUS_REVIEW,
+                'manager_signature' => null,
+                'reviewed_by' => null,
+                'reviewed_at' => null,
+                'rejection_reason' => null,
+            ];
+        }
+
+        $hsePlan->forceFill($attributes)->save();
+
+        if ($resetApproval) {
+            $this->invalidateGeneratedDocuments($hsePlan);
+        }
 
         $this->uploadDocuments($request, $hsePlan, 'jsa_file', 'jsa', 'Job Safety Analysis');
         $this->uploadDocuments($request, $hsePlan, 'sertifikat_personil', 'sertifikat_personil');
@@ -198,14 +239,20 @@ class HsePlanApprovalController extends Controller
 
     public function viewPdf($id)
     {
-        $hsePlan = HsePlan::with('reviewer')->findOrFail($id);
+        $hsePlan = HsePlan::query()
+            ->visibleTo(Auth::user())
+            ->with('reviewer')
+            ->findOrFail($id);
 
         return $this->pdfService->make($hsePlan)->stream($this->pdfService->filename($hsePlan));
     }
 
     public function downloadPdf($id)
     {
-        $hsePlan = HsePlan::with('reviewer')->findOrFail($id);
+        $hsePlan = HsePlan::query()
+            ->visibleTo(Auth::user())
+            ->with('reviewer')
+            ->findOrFail($id);
 
         return $this->pdfService->make($hsePlan)->download($this->pdfService->filename($hsePlan));
     }
@@ -262,7 +309,9 @@ class HsePlanApprovalController extends Controller
 
     public function viewDocument($hsePlanId, $documentId)
     {
-        $hsePlan = HsePlan::findOrFail($hsePlanId);
+        $hsePlan = HsePlan::query()
+            ->visibleTo(Auth::user())
+            ->findOrFail($hsePlanId);
         $document = HsePlanDocument::where('hse_plan_id', $hsePlan->id)->findOrFail($documentId);
 
         if (! Storage::disk('local')->exists($document->file_path)) {
@@ -281,6 +330,37 @@ class HsePlanApprovalController extends Controller
             $filename,
             ['Content-Type' => $this->mimeTypeFor($document)]
         );
+    }
+
+    private function invalidateGeneratedDocuments(HsePlan $hsePlan): void
+    {
+        $documents = $hsePlan->documents()->where('jenis', 'hse_plan_generated')->get();
+
+        foreach ($documents as $document) {
+            if (Storage::disk('local')->exists($document->file_path)) {
+                Storage::disk('local')->delete($document->file_path);
+            }
+
+            $document->delete();
+        }
+
+        $contractor = $hsePlan->contractor;
+
+        if (! $contractor) {
+            return;
+        }
+
+        $contractorDocuments = $contractor->documents()->where('jenis', 'hse_plan_generated')->get();
+
+        foreach ($contractorDocuments as $document) {
+            if (Storage::disk('local')->exists($document->file_path)) {
+                Storage::disk('local')->delete($document->file_path);
+            }
+
+            $document->delete();
+        }
+
+        $contractor->update(['status' => Contractor::STATUS_REVIEW]);
     }
 
     private function cleanRows(array $rows): array

@@ -85,4 +85,15 @@ class HsePlan extends Model
 
         return $query;
     }
+
+    public function scopeVisibleTo($query, $user)
+    {
+        if (($user->role ?? null) === 'staff') {
+            return empty($user->site)
+                ? $query->whereRaw('1 = 0')
+                : $query->where('site', $user->site);
+        }
+
+        return $query;
+    }
 }

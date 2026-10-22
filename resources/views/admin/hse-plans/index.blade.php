@@ -131,7 +131,7 @@
                                 <td class="text-right whitespace-nowrap" onclick="event.stopPropagation()">
                                     <a href="/admin/hse-plans/{{ $hsePlan->id }}"
                                        class="inline-flex items-center gap-1.5 bg-inka-navy text-white text-[11px] font-semibold px-3.5 py-2 rounded-lg shadow-sm hover:opacity-90 transition-colors">
-                                        {{ $hsePlan->status === \App\Models\HsePlan::STATUS_REVIEW ? 'Review' : 'Lihat' }}
+                                        {{ $hsePlan->status === \App\Models\HsePlan::STATUS_REVIEW && auth()->user()->role === 'manager' ? 'Review' : 'Lihat' }}
                                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M13 6l6 6-6 6"/>
                                         </svg>

@@ -150,8 +150,8 @@ Route::middleware(['auth', 'prevent-back-history', 'role:divisi'])->group(functi
     Route::get('/divisi/permits/{permitId}/documents/{documentId}/download', [\App\Http\Controllers\Divisi\PermitController::class, 'downloadDocument'])->name('permits.documents.download');
 });
 
-// ===== HSE PLAN (role:manager) =====
-Route::middleware(['auth', 'prevent-back-history', 'role:manager'])->group(function () {
+// ===== HSE PLAN (role:staff, manager) =====
+Route::middleware(['auth', 'prevent-back-history', 'role:staff,manager'])->group(function () {
     Route::get('/admin/hse-plans', [\App\Http\Controllers\Admin\HsePlanApprovalController::class, 'index']);
     Route::get('/admin/hse-plans/history', [\App\Http\Controllers\Admin\HsePlanApprovalController::class, 'history']);
     Route::get('/admin/hse-plans/{id}', [\App\Http\Controllers\Admin\HsePlanApprovalController::class, 'show']);
@@ -159,10 +159,14 @@ Route::middleware(['auth', 'prevent-back-history', 'role:manager'])->group(funct
     Route::put('/admin/hse-plans/{id}', [\App\Http\Controllers\Admin\HsePlanApprovalController::class, 'update']);
     Route::get('/admin/hse-plans/{id}/pdf', [\App\Http\Controllers\Admin\HsePlanApprovalController::class, 'viewPdf']);
     Route::get('/admin/hse-plans/{id}/pdf/download', [\App\Http\Controllers\Admin\HsePlanApprovalController::class, 'downloadPdf']);
-    Route::post('/admin/hse-plans/{id}/approve', [\App\Http\Controllers\Admin\HsePlanApprovalController::class, 'approve']);
-    Route::post('/admin/hse-plans/{id}/reject', [\App\Http\Controllers\Admin\HsePlanApprovalController::class, 'reject']);
     Route::get('/admin/hse-plans/{hsePlanId}/documents/{documentId}/view', [\App\Http\Controllers\Admin\HsePlanApprovalController::class, 'viewDocument'])
         ->name('admin.hse-plans.documents.view');
+});
+
+// ===== PERSETUJUAN HSE PLAN (role:manager) =====
+Route::middleware(['auth', 'prevent-back-history', 'role:manager'])->group(function () {
+    Route::post('/admin/hse-plans/{id}/approve', [\App\Http\Controllers\Admin\HsePlanApprovalController::class, 'approve']);
+    Route::post('/admin/hse-plans/{id}/reject', [\App\Http\Controllers\Admin\HsePlanApprovalController::class, 'reject']);
 });
 
 // ===== ADMIN (role:staff, manager) =====

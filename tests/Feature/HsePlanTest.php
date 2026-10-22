@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Contractor;
 use App\Models\HsePlan;
 use App\Models\HsePlanDocument;
 use App\Models\User;
@@ -230,13 +231,129 @@ class HsePlanTest extends TestCase
         $this->assertSame('JSA belum memuat identifikasi bahaya.', $hsePlan->rejection_reason);
     }
 
-    public function test_staff_cannot_access_hse_plan_review(): void
+    public function test_staff_can_only_see_hse_plans_from_their_site_without_approval_controls(): void
     {
         $staff = User::factory()->create(['role' => 'staff', 'site' => 'Madiun']);
+        $own = $this->makeHsePlan(['site' => 'Madiun']);
+        $other = $this->makeHsePlan(['site' => 'Banyuwangi']);
 
         $this->actingAs($staff)
             ->get('/admin/hse-plans')
+            ->assertOk()
+            ->assertSee($own->no_hse_plan)
+            ->assertDontSee($other->no_hse_plan);
+
+        $this->actingAs($staff)
+            ->get('/admin/hse-plans/' . $own->id)
+            ->assertOk()
+            ->assertSee('Edit HSE Plan')
+            ->assertDontSee('Setujui HSE Plan')
+            ->assertDontSee('Tolak HSE Plan');
+
+        $this->actingAs($staff)
+            ->get('/admin/hse-plans/' . $other->id)
+            ->assertNotFound();
+    }
+
+    public function test_staff_cannot_approve_or_reject_hse_plan(): void
+    {
+        $staff = User::factory()->create(['role' => 'staff', 'site' => 'Madiun']);
+        $hsePlan = $this->makeHsePlan();
+
+        $this->actingAs($staff)
+            ->post('/admin/hse-plans/' . $hsePlan->id . '/approve', [
+                'tanda_tangan' => 'data:image/png;base64,abc',
+            ])
             ->assertForbidden();
+
+        $this->actingAs($staff)
+            ->post('/admin/hse-plans/' . $hsePlan->id . '/reject', [
+                'rejection_reason' => 'Dokumen belum lengkap.',
+            ])
+            ->assertForbidden();
+
+        $this->assertSame(HsePlan::STATUS_REVIEW, $hsePlan->fresh()->status);
+    }
+
+    public function test_staff_edit_of_approved_hse_plan_returns_it_to_manager_review(): void
+    {
+        Storage::fake('local');
+
+        $staff = User::factory()->create(['role' => 'staff', 'site' => 'Madiun']);
+        $hsePlan = $this->makeHsePlan([
+            'status' => HsePlan::STATUS_APPROVED,
+            'manager_signature' => 'data:image/png;base64,abc',
+            'reviewed_by' => User::factory()->create(['role' => 'manager'])->id,
+            'reviewed_at' => now(),
+        ]);
+
+        $contractor = Contractor::create([
+            'token' => 'staff-reset-token',
+            'vendor' => 'PT Contoh Kontraktor',
+            'pic' => 'Budi Santoso',
+            'jenis_pekerjaan' => 'Pekerjaan Sipil',
+            'telepon' => '08123456789',
+            'nama_pekerjaan' => 'Perbaikan atap gudang',
+            'tanggal_mulai' => now(),
+            'tanggal_selesai' => now()->addDays(5),
+            'jumlah_pekerja' => '2',
+            'lokasi' => 'Gudang',
+            'site' => 'Madiun',
+            'status' => Contractor::STATUS_FINAL,
+            'hse_plan_id' => $hsePlan->id,
+        ]);
+
+        $path = 'hse-plans/' . $hsePlan->id . '/generated.pdf';
+        Storage::disk('local')->put($path, '%PDF-1.4 lama');
+
+        HsePlanDocument::create([
+            'hse_plan_id' => $hsePlan->id,
+            'jenis' => 'hse_plan_generated',
+            'nama_dokumen' => 'HSE Plan Disetujui',
+            'file_path' => $path,
+            'file_type' => 'pdf',
+            'file_size' => 3,
+        ]);
+
+        $contractor->documents()->create([
+            'jenis' => 'hse_plan_generated',
+            'nama_dokumen' => 'HSE Plan Disetujui',
+            'file_path' => $path,
+            'file_type' => 'pdf',
+            'file_size' => 3,
+        ]);
+
+        $payload = $this->validPayload();
+        unset(
+            $payload['jsa_file'],
+            $payload['sertifikat_personil'],
+            $payload['sertifikat_peralatan'],
+            $payload['tanda_tangan'],
+        );
+        $payload['nama_kontraktor'] = 'PT Kontraktor Diperbarui Staff';
+
+        $this->actingAs($staff)
+            ->put('/admin/hse-plans/' . $hsePlan->id, $payload)
+            ->assertRedirect('/admin/hse-plans/' . $hsePlan->id);
+
+        $hsePlan->refresh();
+        $contractor->refresh();
+
+        $this->assertSame('PT Kontraktor Diperbarui Staff', $hsePlan->nama_kontraktor);
+        $this->assertSame(HsePlan::STATUS_REVIEW, $hsePlan->status);
+        $this->assertNull($hsePlan->manager_signature);
+        $this->assertNull($hsePlan->reviewed_by);
+        $this->assertNull($hsePlan->reviewed_at);
+        $this->assertSame(Contractor::STATUS_REVIEW, $contractor->status);
+        $this->assertDatabaseMissing('hse_plan_documents', [
+            'hse_plan_id' => $hsePlan->id,
+            'jenis' => 'hse_plan_generated',
+        ]);
+        $this->assertDatabaseMissing('contractor_documents', [
+            'contractor_id' => $contractor->id,
+            'jenis' => 'hse_plan_generated',
+        ]);
+        Storage::disk('local')->assertMissing($path);
     }
 
     public function test_manager_dashboard_combines_safety_permit_and_hse_plan(): void

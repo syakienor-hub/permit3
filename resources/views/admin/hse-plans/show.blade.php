@@ -245,7 +245,7 @@
                 </div>
             </section>
 
-            @if($hsePlan->status === \App\Models\HsePlan::STATUS_REVIEW)
+            @if($hsePlan->status === \App\Models\HsePlan::STATUS_REVIEW && auth()->user()->role === 'manager')
                 <section class="bg-white rounded-2xl border border-gray-100 shadow-sm">
                     <div class="px-4 md:px-6 py-4 border-b border-gray-100">
                         <h2 class="text-base font-semibold text-gray-800">Keputusan Manager HSE</h2>
@@ -275,7 +275,7 @@
                         </form>
                     </div>
                 </section>
-            @else
+            @elseif($hsePlan->status !== \App\Models\HsePlan::STATUS_REVIEW)
                 <section class="bg-white rounded-2xl border border-gray-100 shadow-sm">
                     <div class="px-4 md:px-6 py-4 border-b border-gray-100">
                         <h2 class="text-base font-semibold text-gray-800">Riwayat Keputusan</h2>
@@ -295,7 +295,7 @@
         </div>
     </div>
 
-    @if($hsePlan->status === \App\Models\HsePlan::STATUS_REVIEW)
+    @if($hsePlan->status === \App\Models\HsePlan::STATUS_REVIEW && auth()->user()->role === 'manager')
         <script>
             (function () {
                 const canvas = document.getElementById('signature-canvas');

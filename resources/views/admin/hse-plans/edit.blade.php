@@ -63,6 +63,13 @@
         </div>
     @endif
 
+    @if(auth()->user()->role === 'staff' && $hsePlan->status !== \App\Models\HsePlan::STATUS_REVIEW)
+        <div class="mb-5 rounded-2xl border border-orange-200 bg-orange-50 px-5 py-4">
+            <p class="text-sm font-semibold text-orange-800">Persetujuan akan direset</p>
+            <p class="text-sm text-orange-700 mt-1">HSE Plan ini berstatus {{ $hsePlan->status }}. Setelah disimpan, status kembali ke Review Manager dan tanda tangan persetujuan sebelumnya tidak berlaku.</p>
+        </div>
+    @endif
+
     <div class="mb-5">
         <a href="/admin/hse-plans/{{ $hsePlan->id }}" class="text-sm font-semibold text-gray-500 hover:text-inka-navy">&larr; Kembali ke Detail HSE Plan</a>
         <h1 class="text-xl sm:text-2xl font-extrabold text-gray-800 mt-1">Edit HSE Plan</h1>
@@ -76,7 +83,13 @@
         <section class="bg-white rounded-2xl border border-gray-100 shadow-sm">
             <div class="px-4 md:px-6 py-4 border-b border-gray-100">
                 <h2 class="text-base font-semibold text-gray-800">Data Pengajuan</h2>
-                <p class="text-sm text-gray-400 mt-0.5">Perubahan data akan memperbarui file PDF HSE Plan bila sudah disetujui.</p>
+                <p class="text-sm text-gray-400 mt-0.5">
+                    @if(auth()->user()->role === 'staff')
+                        Perubahan data akan mengembalikan HSE Plan ke Review Manager.
+                    @else
+                        Perubahan data akan memperbarui file PDF HSE Plan bila sudah disetujui.
+                    @endif
+                </p>
             </div>
             <div class="px-4 md:px-6 py-5 grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
@@ -126,11 +139,18 @@
             <div class="px-4 md:px-6 py-5 grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
                     <label class="form-label">Site <span class="text-red-500">*</span></label>
-                    <select name="site" class="form-input" required>
-                        @foreach(\App\Models\HsePlan::SITES as $site)
-                            <option value="{{ $site }}" @selected(old('site', $hsePlan->site) === $site)>Site {{ $site }}</option>
-                        @endforeach
-                    </select>
+                    @if(auth()->user()->role === 'staff')
+                        <input type="hidden" name="site" value="{{ $hsePlan->site }}">
+                        <select class="form-input" disabled>
+                            <option selected>Site {{ $hsePlan->site }}</option>
+                        </select>
+                    @else
+                        <select name="site" class="form-input" required>
+                            @foreach(\App\Models\HsePlan::SITES as $site)
+                                <option value="{{ $site }}" @selected(old('site', $hsePlan->site) === $site)>Site {{ $site }}</option>
+                            @endforeach
+                        </select>
+                    @endif
                 </div>
                 <div>
                     <label class="form-label">Tipe Pekerjaan <span class="text-red-500">*</span></label>
