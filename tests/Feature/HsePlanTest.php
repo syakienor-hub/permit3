@@ -120,6 +120,32 @@ class HsePlanTest extends TestCase
             ->assertHeader('content-type', 'application/pdf');
     }
 
+    public function test_manager_can_view_supporting_document_inline(): void
+    {
+        Storage::fake('local');
+
+        $manager = User::factory()->create(['role' => 'manager']);
+        $hsePlan = $this->makeHsePlan();
+        Storage::disk('local')->put('hse-plans/' . $hsePlan->id . '/dokumen.pdf', '%PDF-1.4 test');
+
+        $document = HsePlanDocument::create([
+            'hse_plan_id' => $hsePlan->id,
+            'jenis' => 'dokumen_lainnya',
+            'nama_dokumen' => 'Dokumen Pendukung',
+            'file_path' => 'hse-plans/' . $hsePlan->id . '/dokumen.pdf',
+            'file_type' => 'pdf',
+            'file_size' => 13,
+        ]);
+
+        $response = $this->actingAs($manager)
+            ->get('/admin/hse-plans/' . $hsePlan->id . '/documents/' . $document->id . '/view');
+
+        $response->assertOk()
+            ->assertHeader('content-type', 'application/pdf');
+
+        $this->assertStringStartsWith('inline', $response->headers->get('content-disposition'));
+    }
+
     public function test_manager_can_download_hse_plan_pdf(): void
     {
         $manager = User::factory()->create(['role' => 'manager']);

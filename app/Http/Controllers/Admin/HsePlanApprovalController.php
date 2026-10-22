@@ -169,7 +169,7 @@ class HsePlanApprovalController extends Controller
             ->with('success', 'HSE Plan ditolak dan alasan sudah dicatat.');
     }
 
-    public function downloadDocument($hsePlanId, $documentId)
+    public function viewDocument($hsePlanId, $documentId)
     {
         $hsePlan = HsePlan::findOrFail($hsePlanId);
         $document = HsePlanDocument::where('hse_plan_id', $hsePlan->id)->findOrFail($documentId);
@@ -178,9 +178,35 @@ class HsePlanApprovalController extends Controller
             abort(404);
         }
 
-        return Storage::disk('local')->download(
+        $extension = pathinfo($document->file_path, PATHINFO_EXTENSION);
+        $filename = $document->nama_dokumen;
+
+        if ($extension && ! str_ends_with(strtolower($filename), '.' . strtolower($extension))) {
+            $filename .= '.' . $extension;
+        }
+
+        return Storage::disk('local')->response(
             $document->file_path,
-            $document->nama_dokumen . '.' . pathinfo($document->file_path, PATHINFO_EXTENSION)
+            $filename,
+            ['Content-Type' => $this->mimeTypeFor($document)]
         );
+    }
+
+    private function mimeTypeFor(HsePlanDocument $document): string
+    {
+        $mimeTypes = [
+            'pdf' => 'application/pdf',
+            'jpg' => 'image/jpeg',
+            'jpeg' => 'image/jpeg',
+            'png' => 'image/png',
+            'doc' => 'application/msword',
+            'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'xls' => 'application/vnd.ms-excel',
+            'xlsx' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        ];
+
+        return $mimeTypes[strtolower($document->file_type)]
+            ?? Storage::disk('local')->mimeType($document->file_path)
+            ?: 'application/octet-stream';
     }
 }

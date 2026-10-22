@@ -190,7 +190,7 @@
                 </div>
                 <div class="px-4 md:px-6 py-5 space-y-2">
                     @forelse($hsePlan->documents as $document)
-                        <a href="/admin/hse-plans/{{ $hsePlan->id }}/documents/{{ $document->id }}/download"
+                        <a href="/admin/hse-plans/{{ $hsePlan->id }}/documents/{{ $document->id }}/view" target="_blank" rel="noopener"
                            class="flex items-center gap-3 px-3 py-2.5 rounded-xl border border-gray-100 hover:border-inka-navy/30 hover:bg-blue-50/30 transition-colors">
                             <svg class="w-5 h-5 text-inka-navy shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
@@ -199,7 +199,7 @@
                                 <p class="text-sm font-semibold text-gray-700 truncate">{{ $document->nama_dokumen }}</p>
                                 <p class="text-xs text-gray-400">{{ $docLabels[$document->jenis] ?? $document->jenis }} &middot; {{ number_format($document->file_size / 1024, 0) }} KB</p>
                             </div>
-                            <span class="text-xs font-semibold text-inka-navy shrink-0">Unduh</span>
+                            <span class="text-xs font-semibold text-inka-navy shrink-0">Lihat</span>
                         </a>
                     @empty
                         <p class="text-sm text-gray-400">Tidak ada dokumen.</p>

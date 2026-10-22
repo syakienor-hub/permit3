@@ -127,8 +127,8 @@ Route::middleware(['auth', 'prevent-back-history', 'role:manager'])->group(funct
     Route::get('/admin/hse-plans/{id}/pdf/download', [\App\Http\Controllers\Admin\HsePlanApprovalController::class, 'downloadPdf']);
     Route::post('/admin/hse-plans/{id}/approve', [\App\Http\Controllers\Admin\HsePlanApprovalController::class, 'approve']);
     Route::post('/admin/hse-plans/{id}/reject', [\App\Http\Controllers\Admin\HsePlanApprovalController::class, 'reject']);
-    Route::get('/admin/hse-plans/{hsePlanId}/documents/{documentId}/download', [\App\Http\Controllers\Admin\HsePlanApprovalController::class, 'downloadDocument'])
-        ->name('admin.hse-plans.documents.download');
+    Route::get('/admin/hse-plans/{hsePlanId}/documents/{documentId}/view', [\App\Http\Controllers\Admin\HsePlanApprovalController::class, 'viewDocument'])
+        ->name('admin.hse-plans.documents.view');
 });
 
 // ===== ADMIN (role:staff, manager) =====
