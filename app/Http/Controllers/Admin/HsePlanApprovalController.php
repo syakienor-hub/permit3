@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\Storage;
 
 class HsePlanApprovalController extends Controller
 {
+    private const FILE_RULES = 'file|max:10240|mimes:pdf,doc,docx,xls,xlsx,jpg,jpeg,png';
+
     public function __construct(private HsePlanPdfService $pdfService)
     {
     }
@@ -138,6 +140,16 @@ class HsePlanApprovalController extends Controller
             'rencana_inspeksi' => 'nullable|boolean',
             'tanggap_darurat' => 'nullable|boolean',
             'struktur_organisasi' => 'nullable|boolean',
+            'jsa_file' => 'nullable|' . self::FILE_RULES,
+            'sertifikat_personil' => 'nullable|array',
+            'sertifikat_personil.*' => self::FILE_RULES,
+            'sertifikat_peralatan' => 'nullable|array',
+            'sertifikat_peralatan.*' => self::FILE_RULES,
+            'msds_file' => 'nullable|' . self::FILE_RULES,
+            'limbah_b3_file' => 'nullable|' . self::FILE_RULES,
+            'prosedur_kerja_file' => 'nullable|' . self::FILE_RULES,
+            'inspeksi_file' => 'nullable|' . self::FILE_RULES,
+            'struktur_file' => 'nullable|' . self::FILE_RULES,
         ]);
 
         $hsePlan->forceFill([
@@ -166,6 +178,15 @@ class HsePlanApprovalController extends Controller
             'tanggap_darurat' => $request->boolean('tanggap_darurat'),
             'struktur_organisasi' => $request->boolean('struktur_organisasi'),
         ])->save();
+
+        $this->uploadDocuments($request, $hsePlan, 'jsa_file', 'jsa', 'Job Safety Analysis');
+        $this->uploadDocuments($request, $hsePlan, 'sertifikat_personil', 'sertifikat_personil');
+        $this->uploadDocuments($request, $hsePlan, 'sertifikat_peralatan', 'sertifikat_peralatan');
+        $this->uploadDocuments($request, $hsePlan, 'msds_file', 'msds', 'MSDS Bahan B3');
+        $this->uploadDocuments($request, $hsePlan, 'limbah_b3_file', 'limbah_b3', 'Rencana Pengelolaan Limbah B3');
+        $this->uploadDocuments($request, $hsePlan, 'prosedur_kerja_file', 'prosedur_kerja', 'Prosedur / Instruksi Kerja');
+        $this->uploadDocuments($request, $hsePlan, 'inspeksi_file', 'inspeksi', 'Rencana Pemantauan / Inspeksi');
+        $this->uploadDocuments($request, $hsePlan, 'struktur_file', 'struktur_organisasi', 'Struktur Organisasi Proyek');
 
         $hasGenerated = $hsePlan->documents()->where('jenis', 'hse_plan_generated')->exists();
 
@@ -269,6 +290,38 @@ class HsePlanApprovalController extends Controller
         return array_values(array_filter($rows, function ($row) {
             return is_array($row) && trim((string) ($row['nama'] ?? '')) !== '';
         }));
+    }
+
+    private function uploadDocuments(Request $request, HsePlan $hsePlan, string $field, string $jenis, ?string $defaultName = null): void
+    {
+        $files = $request->file($field);
+
+        if (! $files) {
+            return;
+        }
+
+        if (! is_array($files)) {
+            $files = [$files];
+        }
+
+        foreach ($files as $file) {
+            if (! $file || ! $file->isValid()) {
+                continue;
+            }
+
+            $ext = strtolower($file->getClientOriginalExtension());
+            $filename = time() . '-' . bin2hex(random_bytes(4)) . '.' . $ext;
+            $path = $file->storeAs('hse-plans/' . $hsePlan->id, $filename);
+
+            HsePlanDocument::create([
+                'hse_plan_id' => $hsePlan->id,
+                'jenis' => $jenis,
+                'nama_dokumen' => $defaultName ?? $file->getClientOriginalName(),
+                'file_path' => $path,
+                'file_type' => $ext,
+                'file_size' => $file->getSize(),
+            ]);
+        }
     }
 
     private function mimeTypeFor(HsePlanDocument $document): string

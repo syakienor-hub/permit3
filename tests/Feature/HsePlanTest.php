@@ -340,6 +340,40 @@ class HsePlanTest extends TestCase
         $this->assertStringStartsWith('%PDF', Storage::disk('local')->get($path));
     }
 
+    public function test_manager_can_add_supporting_documents_when_editing_hse_plan(): void
+    {
+        Storage::fake('local');
+
+        $manager = User::factory()->create(['role' => 'manager']);
+        $hsePlan = $this->makeHsePlan();
+
+        $payload = $this->validPayload();
+        unset(
+            $payload['jsa_file'],
+            $payload['sertifikat_personil'],
+            $payload['sertifikat_peralatan'],
+            $payload['tanda_tangan'],
+        );
+
+        $payload['_method'] = 'PUT';
+        $payload['jsa_file'] = UploadedFile::fake()->create('jsa-baru.pdf', 100, 'application/pdf');
+        $payload['sertifikat_personil'] = [
+            UploadedFile::fake()->create('sertifikat-baru.pdf', 100, 'application/pdf'),
+        ];
+
+        $this->actingAs($manager)
+            ->post('/admin/hse-plans/' . $hsePlan->id, $payload)
+            ->assertRedirect('/admin/hse-plans/' . $hsePlan->id);
+
+        $jsa = HsePlanDocument::where('hse_plan_id', $hsePlan->id)->where('jenis', 'jsa')->firstOrFail();
+        $sertifikat = HsePlanDocument::where('hse_plan_id', $hsePlan->id)->where('jenis', 'sertifikat_personil')->firstOrFail();
+
+        $this->assertSame('Job Safety Analysis', $jsa->nama_dokumen);
+        $this->assertSame('sertifikat-baru.pdf', $sertifikat->nama_dokumen);
+        Storage::disk('local')->assertExists($jsa->file_path);
+        Storage::disk('local')->assertExists($sertifikat->file_path);
+    }
+
     public function test_hse_plan_seeder_creates_five_varied_examples(): void
     {
         Storage::fake('local');

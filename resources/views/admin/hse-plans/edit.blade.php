@@ -69,7 +69,7 @@
         <p class="text-sm text-gray-500 mt-0.5 font-mono">{{ $hsePlan->no_hse_plan }}</p>
     </div>
 
-    <form action="/admin/hse-plans/{{ $hsePlan->id }}" method="POST" id="hse-plan-edit-form" class="space-y-5">
+    <form action="/admin/hse-plans/{{ $hsePlan->id }}" method="POST" enctype="multipart/form-data" id="hse-plan-edit-form" class="space-y-5">
         @csrf
         @method('PUT')
 
@@ -213,7 +213,7 @@
         <section class="bg-white rounded-2xl border border-gray-100 shadow-sm">
             <div class="px-4 md:px-6 py-4 border-b border-gray-100">
                 <h2 class="text-base font-semibold text-gray-800">9. Pernyataan K3LH &amp; Dokumen</h2>
-                <p class="text-sm text-gray-400 mt-0.5">Dokumen pendukung yang sudah diunggah tidak diubah dari halaman ini.</p>
+                <p class="text-sm text-gray-400 mt-0.5">Dokumen baru akan ditambahkan; dokumen yang sudah ada tetap tersimpan.</p>
             </div>
             <div class="px-4 md:px-6 py-5 space-y-5">
                 @if($hsePlan->documents->isNotEmpty())
@@ -228,6 +228,45 @@
                         @endforeach
                     </div>
                 @endif
+
+                <div class="border-t border-gray-100 pt-4">
+                    <p class="text-sm font-semibold text-gray-700">Tambah dokumen pendukung</p>
+                    <p class="text-xs text-gray-400 mt-0.5">Opsional. PDF, DOC, XLS, atau gambar. Maksimal 10MB per file.</p>
+                    <div class="mt-3 grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="form-label">Job Safety Analysis / JSA</label>
+                            <input type="file" name="jsa_file" class="form-input" accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png">
+                        </div>
+                        <div>
+                            <label class="form-label">Sertifikat Keahlian Personil</label>
+                            <input type="file" name="sertifikat_personil[]" class="form-input" accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png" multiple>
+                        </div>
+                        <div>
+                            <label class="form-label">Sertifikat Peralatan</label>
+                            <input type="file" name="sertifikat_peralatan[]" class="form-input" accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png" multiple>
+                        </div>
+                        <div>
+                            <label class="form-label">MSDS Bahan B3</label>
+                            <input type="file" name="msds_file" class="form-input" accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png">
+                        </div>
+                        <div>
+                            <label class="form-label">Rencana Pengelolaan Limbah B3</label>
+                            <input type="file" name="limbah_b3_file" class="form-input" accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png">
+                        </div>
+                        <div>
+                            <label class="form-label">Prosedur / Instruksi Kerja</label>
+                            <input type="file" name="prosedur_kerja_file" class="form-input" accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png">
+                        </div>
+                        <div>
+                            <label class="form-label">Rencana Pemantauan / Inspeksi</label>
+                            <input type="file" name="inspeksi_file" class="form-input" accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png">
+                        </div>
+                        <div>
+                            <label class="form-label">Struktur Organisasi Proyek</label>
+                            <input type="file" name="struktur_file" class="form-input" accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png">
+                        </div>
+                    </div>
+                </div>
 
                 <div class="space-y-5 border-t border-gray-100 pt-4">
                     @foreach($pernyataan as $item)
