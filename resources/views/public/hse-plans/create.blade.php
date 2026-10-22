@@ -14,8 +14,17 @@
         .form-label { display: block; font-size: 0.875rem; font-weight: 600; color: #4b5563; margin-bottom: 6px; }
         .form-input {
             width: 100%; padding: 9px 12px; border: 1px solid #e5e7eb; border-radius: 10px;
-            font-size: 0.95rem; color: #1f2937; background: white;
+            font-size: 0.95rem; color: #1f2937; background-color: #fff;
             transition: border-color 0.15s, box-shadow 0.15s;
+        }
+        select.form-input {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+            background-position: right 12px center;
+            background-repeat: no-repeat;
+            background-size: 18px 18px;
+            padding-right: 38px;
+            cursor: pointer;
         }
         .form-input:focus { outline: none; border-color: #111d33; box-shadow: 0 0 0 3px rgba(17,29,51,0.08); }
         .form-input:disabled { background: #f9fafb; color: #9ca3af; }
