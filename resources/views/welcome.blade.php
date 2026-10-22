@@ -344,7 +344,6 @@
         <div class="flex flex-col sm:flex-row gap-3 justify-center items-stretch sm:items-center sm:flex-wrap hero-animate px-2 sm:px-0" id="hero-actions">
             <a href="/ajukan-permit" class="btn btn-outline-light btn-lg w-full sm:w-auto">
                 Ajukan Safety Permit
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
             </a>
             @auth
                 <a href="{{ route('dashboard') }}" class="btn btn-outline-light btn-lg w-full sm:w-auto">
