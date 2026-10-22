@@ -9,7 +9,6 @@ class HsePlan extends Model
     public const STATUS_REVIEW = 'Review Manager';
     public const STATUS_APPROVED = 'Approved';
     public const STATUS_REJECTED = 'Rejected';
-    public const STATUS_FINAL = 'Final';
 
     public const SITES = ['Madiun', 'Banyuwangi'];
 

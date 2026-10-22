@@ -20,9 +20,7 @@ class HsePlanApprovalController extends Controller
 
     public function index(Request $request)
     {
-        $query = HsePlan::query()
-            ->with('reviewer')
-            ->where('status', '!=', HsePlan::STATUS_FINAL);
+        $query = HsePlan::query()->with('reviewer');
 
         if ($request->filled('site')) {
             $query->forSite($request->site);
@@ -103,7 +101,7 @@ class HsePlanApprovalController extends Controller
 
     public function edit($id)
     {
-        $hsePlan = HsePlan::with(['documents', 'contractor'])->findOrFail($id);
+        $hsePlan = HsePlan::with(['documents', 'contractor', 'reviewer'])->findOrFail($id);
 
         return view('admin.hse-plans.edit', compact('hsePlan'));
     }
@@ -190,7 +188,7 @@ class HsePlanApprovalController extends Controller
 
         $hasGenerated = $hsePlan->documents()->where('jenis', 'hse_plan_generated')->exists();
 
-        if ($hsePlan->contractor || $hasGenerated) {
+        if ($hasGenerated && $hsePlan->status === HsePlan::STATUS_APPROVED) {
             $this->pdfService->storeFinal($hsePlan, $hsePlan->contractor);
         }
 

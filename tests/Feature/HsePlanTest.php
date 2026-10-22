@@ -9,7 +9,6 @@ use Database\Seeders\HsePlanSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\URL;
 use Tests\TestCase;
 
 class HsePlanTest extends TestCase
@@ -20,8 +19,8 @@ class HsePlanTest extends TestCase
     {
         $this->get('/ajukan-hse-plan')
             ->assertOk()
-            ->assertSee('Form HSE Plan')
-            ->assertSee('Simpan File HSE Plan');
+            ->assertSee('Ajukan HSE Plan')
+            ->assertSee('Kirim HSE Plan');
     }
 
     public function test_public_can_submit_hse_plan_with_documents(): void
@@ -36,13 +35,13 @@ class HsePlanTest extends TestCase
 
         $this->assertSame('PT Contoh Kontraktor', $hsePlan->nama_kontraktor);
         $this->assertMatchesRegularExpression('#^\d{3}/HSEPLAN/HSE/\d{4}$#', $hsePlan->no_hse_plan);
-        $this->assertSame(HsePlan::STATUS_FINAL, $hsePlan->status);
+        $this->assertSame(HsePlan::STATUS_REVIEW, $hsePlan->status);
         $this->assertNotNull($hsePlan->submitted_at);
-        $this->assertNotNull($hsePlan->manager_signature);
+        $this->assertNull($hsePlan->manager_signature);
         $this->assertCount(1, $hsePlan->personil);
         $this->assertSame('Gerinda', $hsePlan->peralatan[0]['nama']);
         $this->assertSame(
-            ['jsa', 'sertifikat_personil', 'sertifikat_peralatan', 'hse_plan_generated'],
+            ['jsa', 'sertifikat_personil', 'sertifikat_peralatan'],
             HsePlanDocument::orderBy('id')->pluck('jenis')->all()
         );
 
@@ -50,9 +49,10 @@ class HsePlanTest extends TestCase
             Storage::disk('local')->assertExists($document->file_path);
         }
 
-        $this->get(URL::signedRoute('public.hse-plans.file', ['hsePlan' => $hsePlan->id]))
+        $this->get($response->headers->get('Location'))
             ->assertOk()
-            ->assertHeader('content-type', 'application/pdf');
+            ->assertSee('HSE Plan Berhasil Dikirim')
+            ->assertSee($hsePlan->no_hse_plan);
     }
 
     public function test_hse_plan_can_be_submitted_without_documents_and_unanswered_questions(): void
@@ -75,14 +75,11 @@ class HsePlanTest extends TestCase
         $this->post('/ajukan-hse-plan', $payload)->assertRedirect();
 
         $this->assertDatabaseCount('hse_plans', 1);
-        $this->assertDatabaseCount('hse_plan_documents', 1);
-        $this->assertDatabaseHas('hse_plan_documents', ['jenis' => 'hse_plan_generated']);
-
-        $document = HsePlanDocument::where('jenis', 'hse_plan_generated')->firstOrFail();
-        Storage::disk('local')->assertExists($document->file_path);
+        $this->assertDatabaseCount('hse_plan_documents', 0);
+        $this->assertSame(HsePlan::STATUS_REVIEW, HsePlan::firstOrFail()->status);
     }
 
-    public function test_final_hse_plan_does_not_enter_manager_review_queue(): void
+    public function test_submitted_hse_plan_enters_manager_review_queue(): void
     {
         Storage::fake('local');
 
@@ -95,7 +92,7 @@ class HsePlanTest extends TestCase
         $this->actingAs($manager)
             ->get('/admin/hse-plans')
             ->assertOk()
-            ->assertDontSee($hsePlan->no_hse_plan);
+            ->assertSee($hsePlan->no_hse_plan);
     }
 
     public function test_msds_is_required_when_using_b3_material(): void
@@ -291,7 +288,7 @@ class HsePlanTest extends TestCase
 
         $manager = User::factory()->create(['role' => 'manager']);
         $hsePlan = $this->makeHsePlan([
-            'status' => HsePlan::STATUS_FINAL,
+            'status' => HsePlan::STATUS_APPROVED,
             'manager_signature' => 'data:image/png;base64,abc',
             'reviewed_at' => now(),
         ]);
@@ -301,7 +298,7 @@ class HsePlanTest extends TestCase
         HsePlanDocument::create([
             'hse_plan_id' => $hsePlan->id,
             'jenis' => 'hse_plan_generated',
-            'nama_dokumen' => 'HSE Plan Final',
+            'nama_dokumen' => 'HSE Plan Disetujui',
             'file_path' => $path,
             'file_type' => 'pdf',
             'file_size' => 3,
@@ -336,7 +333,7 @@ class HsePlanTest extends TestCase
         $this->assertSame('Pekerjaan diperbarui oleh Manager HSE.', $hsePlan->deskripsi_pekerjaan);
         $this->assertSame('Andi Wijaya', $hsePlan->personil[0]['nama']);
         $this->assertSame('Bor', $hsePlan->peralatan[0]['nama']);
-        $this->assertSame(HsePlan::STATUS_FINAL, $hsePlan->status);
+        $this->assertSame(HsePlan::STATUS_APPROVED, $hsePlan->status);
         $this->assertStringStartsWith('%PDF', Storage::disk('local')->get($path));
     }
 

@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Form HSE Plan — PT INKA (Persero)</title>
+    <title>Ajukan HSE Plan — PT INKA (Persero)</title>
     <link rel="icon" type="image/png" href="{{ asset('assets/images/logok3.png') }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -126,8 +126,8 @@
 
     <main class="max-w-5xl mx-auto px-4 md:px-6 py-6 md:py-8">
         <div class="mb-6">
-            <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight">Form HSE Plan</h1>
-            <p class="text-sm text-gray-500 mt-1">Tanpa login. Isi rencana keselamatan kerja, lalu simpan sebagai <span class="font-semibold text-gray-700">file HSE Plan final</span>.</p>
+            <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight">Ajukan HSE Plan</h1>
+            <p class="text-sm text-gray-500 mt-1">Tanpa login. Isi rencana keselamatan kerja, lalu kirim untuk persetujuan <span class="font-semibold text-gray-700">Manager HSE</span>.</p>
         </div>
 
         @if($prefill)
@@ -361,7 +361,7 @@
                 <div class="px-4 md:px-6 py-4 border-b border-gray-100 flex items-center justify-between gap-3">
                     <div>
                         <h2 class="text-base font-semibold text-gray-800">Pengesahan</h2>
-                        <p class="text-sm text-gray-400 mt-0.5">Dibuat oleh Kontraktor dan disahkan otomatis oleh Manager HSE.</p>
+                        <p class="text-sm text-gray-400 mt-0.5">Dibuat oleh Kontraktor dan disetujui oleh Manager HSE.</p>
                     </div>
                     <button type="button" onclick="clearSignature()" class="text-sm font-semibold text-gray-400 hover:text-red-500 border border-gray-200 hover:border-red-300 px-3 py-1.5 rounded-lg transition-colors">Hapus</button>
                 </div>
@@ -380,10 +380,10 @@
                         </div>
                         <div>
                             <p class="text-sm font-semibold text-gray-700">Disetujui oleh,<br>Manager HSE</p>
-                            <div class="mt-3 w-full aspect-[2/1] rounded-xl border border-gray-200 bg-white flex items-center justify-center px-4 text-center overflow-hidden">
-                                <img src="{{ asset('assets/images/ttd-manager.png') }}" alt="Tanda tangan Manager HSE" class="max-h-full max-w-full object-contain">
+                            <div class="mt-3 w-full aspect-[2/1] rounded-xl border border-dashed border-gray-200 bg-gray-50 flex items-center justify-center px-4 text-center">
+                                <p class="text-xs text-gray-400">Diisi oleh Manager HSE setelah HSE Plan direview.</p>
                             </div>
-                            <p class="mt-2 text-sm font-semibold text-gray-700">({{ config('hse_plan.manager_name') }})</p>
+                            <p class="mt-2 text-sm font-semibold text-gray-400">(..............................)</p>
                         </div>
                     </div>
                 </div>
@@ -391,7 +391,7 @@
 
             <div class="flex flex-col sm:flex-row gap-3 sm:justify-end pb-8">
                 <a href="/" class="px-5 py-2.5 rounded-xl border border-gray-200 text-sm font-semibold text-gray-600 text-center hover:bg-gray-50 transition-colors">Batal</a>
-                <button type="submit" class="px-5 py-2.5 rounded-xl bg-inka-navy text-white text-sm font-semibold hover:opacity-90 transition-opacity">Simpan File HSE Plan</button>
+                <button type="submit" class="px-5 py-2.5 rounded-xl bg-inka-navy text-white text-sm font-semibold hover:opacity-90 transition-opacity">Kirim HSE Plan</button>
             </div>
         </form>
     </main>

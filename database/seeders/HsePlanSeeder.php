@@ -167,7 +167,7 @@ class HsePlanSeeder extends Seeder
                 'reviewed_by' => $manager->id,
                 'reviewed_at' => Carbon::now()->subDay(),
                 'rejection_reason' => null,
-                'manager_signature' => self::SIGNATURE,
+                'manager_signature' => null,
                 'documents' => ['jsa', 'sertifikat_personil', 'sertifikat_peralatan', 'msds', 'limbah_b3', 'prosedur_kerja', 'inspeksi', 'struktur_organisasi'],
             ],
             [
@@ -254,7 +254,7 @@ class HsePlanSeeder extends Seeder
                 'reviewed_by' => $manager->id,
                 'reviewed_at' => Carbon::now()->subDays(2),
                 'rejection_reason' => null,
-                'manager_signature' => self::SIGNATURE,
+                'manager_signature' => null,
                 'documents' => ['jsa', 'sertifikat_personil', 'sertifikat_peralatan', 'msds', 'limbah_b3', 'prosedur_kerja', 'inspeksi', 'struktur_organisasi'],
             ],
         ];

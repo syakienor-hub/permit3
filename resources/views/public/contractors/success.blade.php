@@ -12,11 +12,6 @@
     <style>body { font-family: 'Inter', sans-serif; }</style>
 </head>
 <body class="bg-slate-50 text-gray-900 min-h-screen">
-    @php
-        $hsePlanDocument = $contractor->documents->firstWhere('jenis', 'hse_plan_generated')
-            ?? $contractor->documents->firstWhere('jenis', 'hse_plan_existing');
-    @endphp
-
     <header class="bg-white border-b border-gray-100">
         <div class="max-w-3xl mx-auto px-4 md:px-6 h-16 flex items-center gap-2.5">
             <a href="/" class="flex items-center gap-2.5">
@@ -57,54 +52,33 @@
             </div>
             @if($contractor->documents->isNotEmpty())
                 <div class="px-6 pb-5">
-                    <p class="text-sm text-gray-400 mb-2">Dokumen</p>
-                    <div class="space-y-1.5">
+                    <p class="text-sm text-gray-400 mb-2">Dokumen terunggah</p>
+                    <ul class="space-y-1.5">
                         @foreach($contractor->documents as $document)
-                            <a href="{{ URL::signedRoute('public.contractors.documents.view', ['contractor' => $contractor->id, 'document' => $document->id]) }}"
-                               target="_blank" rel="noopener"
-                               class="flex items-center gap-2 text-sm text-gray-600 rounded-lg px-2 py-2 hover:bg-blue-50/40 transition-colors">
+                            <li class="flex items-center gap-2 text-sm text-gray-600">
                                 <svg class="w-4 h-4 text-inka-navy shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                                <span class="truncate">{{ $document->nama_dokumen }}</span>
-                                <span class="ml-auto text-xs font-semibold text-inka-navy shrink-0">Lihat</span>
-                            </a>
+                                {{ $document->nama_dokumen }}
+                            </li>
                         @endforeach
-                    </div>
+                    </ul>
                 </div>
             @endif
         </div>
 
-        @if($hsePlanDocument)
-            <div class="bg-green-50 border border-green-100 rounded-2xl px-5 py-5 mt-5">
-                <p class="text-base font-semibold text-gray-800">File HSE Plan sudah tersimpan</p>
-                <p class="text-sm text-gray-500 mt-1">File HSE Plan final otomatis terhubung dengan data kontraktor ini dan tidak memerlukan review Manager HSE.</p>
-                <div class="flex flex-col sm:flex-row gap-3 mt-4">
-                    <a href="{{ URL::signedRoute('public.contractors.documents.view', ['contractor' => $contractor->id, 'document' => $hsePlanDocument->id]) }}"
-                        target="_blank" rel="noopener"
-                        class="inline-flex items-center justify-center rounded-xl bg-inka-navy px-5 py-2.5 text-sm font-semibold text-white hover:opacity-90 transition-opacity">
-                        Lihat File HSE Plan
-                    </a>
-                    <a href="/"
-                        class="inline-flex items-center justify-center rounded-xl border border-gray-200 bg-white px-5 py-2.5 text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-colors">
-                        Kembali ke Beranda
-                    </a>
-                </div>
+        <div class="bg-blue-50 border border-blue-100 rounded-2xl px-5 py-5 mt-5">
+            <p class="text-base font-semibold text-gray-800">Langkah selanjutnya</p>
+            <p class="text-sm text-gray-500 mt-1">Data kontraktor belum memiliki HSE Plan. Isi form HSE Plan agar pengajuan dapat direview oleh Manager HSE. Data yang sudah Anda isi akan otomatis terisi.</p>
+            <div class="flex flex-col sm:flex-row gap-3 mt-4">
+                <a href="{{ $hsePlanFormUrl }}"
+                    class="inline-flex items-center justify-center rounded-xl bg-inka-navy px-5 py-2.5 text-sm font-semibold text-white hover:opacity-90 transition-opacity">
+                    Isi Form HSE Plan
+                </a>
+                <a href="/"
+                    class="inline-flex items-center justify-center rounded-xl border border-gray-200 bg-white px-5 py-2.5 text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-colors">
+                    Kembali ke Beranda
+                </a>
             </div>
-        @else
-            <div class="bg-blue-50 border border-blue-100 rounded-2xl px-5 py-5 mt-5">
-                <p class="text-base font-semibold text-gray-800">Langkah selanjutnya</p>
-                <p class="text-sm text-gray-500 mt-1">Data kontraktor belum memiliki HSE Plan. Isi form HSE Plan agar file final otomatis dibuat dan tersimpan ke data kontraktor ini.</p>
-                <div class="flex flex-col sm:flex-row gap-3 mt-4">
-                    <a href="{{ $hsePlanFormUrl }}"
-                        class="inline-flex items-center justify-center rounded-xl bg-inka-navy px-5 py-2.5 text-sm font-semibold text-white hover:opacity-90 transition-opacity">
-                        Isi Form HSE Plan
-                    </a>
-                    <a href="/"
-                        class="inline-flex items-center justify-center rounded-xl border border-gray-200 bg-white px-5 py-2.5 text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-colors">
-                        Kembali ke Beranda
-                    </a>
-                </div>
-            </div>
-        @endif
+        </div>
     </main>
 </body>
 </html>

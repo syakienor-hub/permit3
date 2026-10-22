@@ -7,7 +7,6 @@ use App\Models\ContractorDocument;
 use App\Models\HsePlan;
 use App\Models\HsePlanDocument;
 use App\Services\HsePlanPdfService;
-use App\Support\HsePlanSignature;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Storage;
@@ -45,7 +44,7 @@ class ContractorSeeder extends Seeder
             $hsePlan = null;
 
             if ($planData) {
-                $hsePlan = $this->createFinalPlan($contractor, $planData);
+                $hsePlan = $this->createApprovedPlan($contractor, $planData);
 
                 $contractor->forceFill([
                     'hse_plan_id' => $hsePlan->id,
@@ -69,7 +68,7 @@ class ContractorSeeder extends Seeder
         $this->command->info('ContractorSeeder: 8 contoh kontraktor berhasil dibuat.');
     }
 
-    private function createFinalPlan(Contractor $contractor, array $data): HsePlan
+    private function createApprovedPlan(Contractor $contractor, array $data): HsePlan
     {
         $documents = $data['documents'];
 
@@ -106,12 +105,12 @@ class ContractorSeeder extends Seeder
                 'tanggap_darurat' => true,
                 'struktur_organisasi' => in_array('struktur_organisasi', $documents, true),
                 'tanda_tangan' => '',
-                'status' => HsePlan::STATUS_FINAL,
+                'status' => HsePlan::STATUS_APPROVED,
                 'submitted_at' => $data['submitted_at'],
-                'reviewed_by' => null,
+                'reviewed_by' => \App\Models\User::where('role', 'manager')->value('id'),
                 'reviewed_at' => $data['reviewed_at'],
                 'rejection_reason' => null,
-                'manager_signature' => HsePlanSignature::manager(),
+                'manager_signature' => null,
             ]
         );
 

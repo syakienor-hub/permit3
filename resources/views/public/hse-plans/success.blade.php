@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>File HSE Plan Tersimpan — PT INKA (Persero)</title>
+    <title>HSE Plan Terkirim — PT INKA (Persero)</title>
     <link rel="icon" type="image/png" href="{{ asset('assets/images/logok3.png') }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -16,8 +16,8 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
             </svg>
         </div>
-        <h1 class="text-xl sm:text-2xl font-extrabold text-gray-800">File HSE Plan Berhasil Disimpan</h1>
-        <p class="text-sm text-gray-500 mt-1">File HSE Plan final sudah dibuat dan tidak memerlukan review Manager HSE.</p>
+        <h1 class="text-xl sm:text-2xl font-extrabold text-gray-800">HSE Plan Berhasil Dikirim</h1>
+        <p class="text-sm text-gray-500 mt-1">Pengajuan Anda sudah masuk ke antrean persetujuan Manager HSE.</p>
 
         <div class="mt-6 rounded-xl border border-gray-100 bg-gray-50/60 px-4 py-4 text-left">
             <p class="text-xs text-gray-400">Nomor HSE Plan</p>
@@ -29,13 +29,10 @@
             </div>
         </div>
 
-        <p class="text-sm text-gray-500 mt-4">Simpan nomor HSE Plan ini. Status dan file dapat dicek kapan saja menggunakan nomor HSE Plan dan nomor telepon yang Anda isi.</p>
+        <p class="text-sm text-gray-500 mt-4">Simpan nomor HSE Plan ini. Status dapat dicek kapan saja menggunakan nomor HSE Plan dan nomor telepon yang Anda isi.</p>
 
         <div class="flex flex-col sm:flex-row gap-2.5 mt-6">
-            @if($fileUrl)
-                <a href="{{ $fileUrl }}" target="_blank" rel="noopener" class="flex-1 px-5 py-2.5 rounded-xl bg-inka-navy text-white text-sm font-semibold hover:opacity-90 transition-opacity">Lihat File HSE Plan</a>
-            @endif
-            <a href="{{ $statusUrl }}" class="flex-1 px-5 py-2.5 rounded-xl border border-gray-200 text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-colors">Cek Status HSE Plan</a>
+            <a href="{{ $statusUrl }}" class="flex-1 px-5 py-2.5 rounded-xl bg-inka-navy text-white text-sm font-semibold hover:opacity-90 transition-opacity">Cek Status HSE Plan</a>
             <a href="/" class="flex-1 px-5 py-2.5 rounded-xl border border-gray-200 text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-colors">Kembali ke Beranda</a>
         </div>
     </div>

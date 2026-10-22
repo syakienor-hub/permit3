@@ -40,7 +40,7 @@ class HsePlanPdfService
         $document = HsePlanDocument::updateOrCreate(
             ['hse_plan_id' => $hsePlan->id, 'jenis' => 'hse_plan_generated'],
             [
-                'nama_dokumen' => 'HSE Plan Final',
+                'nama_dokumen' => 'HSE Plan Disetujui',
                 'file_path' => $path,
                 'file_type' => 'pdf',
                 'file_size' => strlen($pdf),
@@ -55,7 +55,7 @@ class HsePlanPdfService
         $contractorDocument = $existing->shift();
 
         $attributes = [
-            'nama_dokumen' => 'HSE Plan Final',
+            'nama_dokumen' => 'HSE Plan Disetujui',
             'file_path' => $path,
             'file_type' => 'pdf',
             'file_size' => strlen($pdf),

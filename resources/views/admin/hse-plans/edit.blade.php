@@ -76,7 +76,7 @@
         <section class="bg-white rounded-2xl border border-gray-100 shadow-sm">
             <div class="px-4 md:px-6 py-4 border-b border-gray-100">
                 <h2 class="text-base font-semibold text-gray-800">Data Pengajuan</h2>
-                <p class="text-sm text-gray-400 mt-0.5">Perubahan data akan memperbarui file HSE Plan final bila sudah tersimpan.</p>
+                <p class="text-sm text-gray-400 mt-0.5">Perubahan data akan memperbarui file PDF HSE Plan bila sudah disetujui.</p>
             </div>
             <div class="px-4 md:px-6 py-5 grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
@@ -297,7 +297,7 @@
         <section class="bg-white rounded-2xl border border-gray-100 shadow-sm">
             <div class="px-4 md:px-6 py-4 border-b border-gray-100">
                 <h2 class="text-base font-semibold text-gray-800">Pengesahan</h2>
-                <p class="text-sm text-gray-400 mt-0.5">Tanda tangan tidak diubah dari halaman edit.</p>
+                <p class="text-sm text-gray-400 mt-0.5">Tanda tangan Manager HSE diisi saat persetujuan.</p>
             </div>
             <div class="px-4 md:px-6 py-5 grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
@@ -313,10 +313,14 @@
                 </div>
                 <div>
                     <p class="text-sm font-semibold text-gray-700">Disetujui oleh,<br>Manager HSE</p>
-                    <div class="mt-3 w-full aspect-[2/1] rounded-xl border border-gray-200 bg-white flex items-center justify-center px-4 text-center overflow-hidden">
-                        <img src="{{ asset('assets/images/ttd-manager.png') }}" alt="Tanda tangan Manager HSE" class="max-h-full max-w-full object-contain">
+                    <div class="mt-3 w-full aspect-[2/1] rounded-xl border {{ $hsePlan->manager_signature ? 'border-gray-200 bg-white' : 'border-dashed border-gray-200 bg-gray-50' }} flex items-center justify-center px-4 text-center overflow-hidden">
+                        @if($hsePlan->manager_signature)
+                            <img src="{{ $hsePlan->manager_signature }}" alt="Tanda tangan Manager HSE" class="max-h-full max-w-full object-contain">
+                        @else
+                            <p class="text-xs text-gray-400">Diisi oleh Manager HSE setelah HSE Plan disetujui.</p>
+                        @endif
                     </div>
-                    <p class="mt-2 text-sm font-semibold text-gray-700">({{ config('hse_plan.manager_name') }})</p>
+                    <p class="mt-2 text-sm font-semibold {{ $hsePlan->reviewer ? 'text-gray-700' : 'text-gray-400' }}">({{ $hsePlan->reviewer?->name ?? '..............................' }})</p>
                 </div>
             </div>
         </section>

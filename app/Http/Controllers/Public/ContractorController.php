@@ -8,7 +8,6 @@ use App\Models\Contractor;
 use App\Models\ContractorDocument;
 use App\Models\HsePlan;
 use App\Models\HsePlanDocument;
-use App\Support\HsePlanSignature;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -117,10 +116,8 @@ class ContractorController extends Controller
             'tanggap_darurat' => false,
             'struktur_organisasi' => false,
             'tanda_tangan' => '',
-            'status' => HsePlan::STATUS_FINAL,
-            'manager_signature' => HsePlanSignature::manager(),
+            'status' => HsePlan::STATUS_REVIEW,
             'submitted_at' => now(),
-            'reviewed_at' => now(),
         ]);
 
         foreach ($contractor->documents as $document) {
@@ -140,7 +137,7 @@ class ContractorController extends Controller
 
         $contractor->forceFill([
             'hse_plan_id' => $hsePlan->id,
-            'status' => Contractor::STATUS_FINAL,
+            'status' => Contractor::STATUS_REVIEW,
         ])->save();
 
         return $hsePlan;
