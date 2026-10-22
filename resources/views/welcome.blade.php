@@ -312,9 +312,9 @@
         <div class="hidden sm:flex items-center gap-2.5 shrink-0">
             <a href="/ajukan-permit" class="text-[13.5px] font-semibold text-[var(--navy-950)] hover:text-[var(--amber-600)] transition-colors whitespace-nowrap">Ajukan Permit</a>
             @auth
-                <a href="{{ route('dashboard') }}" class="btn btn-solid">Dashboard</a>
+                <a href="{{ route('dashboard') }}" class="btn btn-solid lg:translate-x-2">Dashboard</a>
             @else
-                <a href="{{ route('login') }}" class="btn btn-solid">Masuk</a>
+                <a href="{{ route('login') }}" class="btn btn-solid lg:translate-x-2">Masuk</a>
             @endauth
         </div>
         <button type="button" @click="mobileOpen = !mobileOpen" class="lg:hidden w-10 h-10 -mr-1 flex items-center justify-center rounded-lg hover:bg-gray-100 text-[var(--navy-950)] shrink-0" aria-label="Buka menu">
