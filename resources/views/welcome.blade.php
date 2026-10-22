@@ -194,9 +194,13 @@
         .btn-lg { padding: 13px 24px; font-size: 14.5px; }
 
         .btn-outline-light {
-            background: rgba(255,255,255,.06); border-color: rgba(255,255,255,.18); color: #fff;
+            background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.22); color: #fff;
+            backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
         }
-        .btn-outline-light:hover { background: rgba(255,255,255,.12); border-color: rgba(255,255,255,.3); }
+        .btn-outline-light:hover {
+            background: rgba(20,33,58,.55); border-color: rgba(255,255,255,.38);
+            transform: translateY(-1px);
+        }
 
         /* Scroll Animations */
         .reveal {
@@ -331,7 +335,7 @@
         <p class="text-sm sm:text-[15.5px] text-white/100 mb-6 md:mb-8 hero-animate px-1" id="hero-sub">
         Sistem Informasi Monitoring dan Izin Kerja INKA Madiun        </p>
         <div class="flex flex-col sm:flex-row gap-3 justify-center items-stretch sm:items-center sm:flex-wrap hero-animate px-2 sm:px-0" id="hero-actions">
-            <a href="/ajukan-permit" class="btn btn-amber btn-lg w-full sm:w-auto">
+            <a href="/ajukan-permit" class="btn btn-outline-light btn-lg w-full sm:w-auto">
                 Ajukan Safety Permit
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
             </a>
