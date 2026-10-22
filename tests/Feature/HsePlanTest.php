@@ -285,6 +285,61 @@ class HsePlanTest extends TestCase
             ->assertDontSee($pending->no_hse_plan);
     }
 
+    public function test_manager_can_edit_hse_plan_and_refresh_generated_pdf(): void
+    {
+        Storage::fake('local');
+
+        $manager = User::factory()->create(['role' => 'manager']);
+        $hsePlan = $this->makeHsePlan([
+            'status' => HsePlan::STATUS_FINAL,
+            'manager_signature' => 'data:image/png;base64,abc',
+            'reviewed_at' => now(),
+        ]);
+
+        $path = 'hse-plans/' . $hsePlan->id . '/HSE-Plan-' . str_replace('/', '-', $hsePlan->no_hse_plan) . '.pdf';
+        Storage::disk('local')->put($path, 'old');
+        HsePlanDocument::create([
+            'hse_plan_id' => $hsePlan->id,
+            'jenis' => 'hse_plan_generated',
+            'nama_dokumen' => 'HSE Plan Final',
+            'file_path' => $path,
+            'file_type' => 'pdf',
+            'file_size' => 3,
+        ]);
+
+        $this->actingAs($manager)
+            ->get('/admin/hse-plans/' . $hsePlan->id . '/edit')
+            ->assertOk()
+            ->assertSee('Edit HSE Plan')
+            ->assertSee('Simpan Perubahan');
+
+        $payload = $this->validPayload();
+        unset(
+            $payload['jsa_file'],
+            $payload['sertifikat_personil'],
+            $payload['sertifikat_peralatan'],
+            $payload['tanda_tangan'],
+        );
+        $payload['nama_kontraktor'] = 'PT Kontraktor Diperbarui';
+        $payload['deskripsi_pekerjaan'] = 'Pekerjaan diperbarui oleh Manager HSE.';
+        $payload['personil'] = [['nama' => 'Andi Wijaya', 'tugas' => 'Pengawas']];
+        $payload['peralatan'] = [['nama' => 'Bor', 'jumlah' => '3']];
+
+        $this->actingAs($manager)
+            ->put('/admin/hse-plans/' . $hsePlan->id, $payload)
+            ->assertRedirect('/admin/hse-plans/' . $hsePlan->id)
+            ->assertSessionHas('success', 'HSE Plan berhasil diperbarui.');
+
+        $hsePlan->refresh();
+
+        $this->assertSame('PT Kontraktor Diperbarui', $hsePlan->nama_kontraktor);
+        $this->assertSame('Pekerjaan diperbarui oleh Manager HSE.', $hsePlan->deskripsi_pekerjaan);
+        $this->assertSame('Andi Wijaya', $hsePlan->personil[0]['nama']);
+        $this->assertSame('Bor', $hsePlan->peralatan[0]['nama']);
+        $this->assertSame(HsePlan::STATUS_FINAL, $hsePlan->status);
+        $this->assertStringStartsWith('%PDF', Storage::disk('local')->get($path));
+    }
+
     public function test_hse_plan_seeder_creates_five_varied_examples(): void
     {
         Storage::fake('local');

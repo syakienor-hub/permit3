@@ -99,6 +99,84 @@ class HsePlanApprovalController extends Controller
         return view('admin.hse-plans.show', compact('hsePlan'));
     }
 
+    public function edit($id)
+    {
+        $hsePlan = HsePlan::with(['documents', 'contractor'])->findOrFail($id);
+
+        return view('admin.hse-plans.edit', compact('hsePlan'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $hsePlan = HsePlan::with('contractor')->findOrFail($id);
+
+        $validated = $request->validate([
+            'no_po' => 'nullable|string|max:100',
+            'site' => 'required|in:Madiun,Banyuwangi',
+            'tipe' => 'required|in:Internal,Eksternal',
+            'divisi_pengaju' => 'required|string|max:255',
+            'nama_kontraktor' => 'required|string|max:255',
+            'nama_pimpinan_proyek' => 'required|string|max:255',
+            'telepon' => 'required|string|max:50',
+            'deskripsi_pekerjaan' => 'required|string|max:2000',
+            'tanggal_mulai' => 'required|date',
+            'tanggal_selesai' => 'required|date|after_or_equal:tanggal_mulai',
+            'jam_mulai' => 'required|date_format:H:i',
+            'jam_selesai' => 'required|date_format:H:i',
+            'personil' => 'required|array|min:1',
+            'personil.*.nama' => 'required|string|max:255',
+            'personil.*.tugas' => 'required|string|max:255',
+            'apd' => 'required|array|min:1',
+            'apd.*' => 'string|max:100',
+            'apd_lainnya' => 'nullable|string|max:255',
+            'peralatan' => 'required|array|min:1',
+            'peralatan.*.nama' => 'required|string|max:255',
+            'peralatan.*.jumlah' => 'required|string|max:50',
+            'bahan_b3' => 'nullable|boolean',
+            'limbah_b3' => 'nullable|boolean',
+            'prosedur_kerja' => 'nullable|boolean',
+            'rencana_inspeksi' => 'nullable|boolean',
+            'tanggap_darurat' => 'nullable|boolean',
+            'struktur_organisasi' => 'nullable|boolean',
+        ]);
+
+        $hsePlan->forceFill([
+            'no_po' => $validated['no_po'] ?? null,
+            'site' => $validated['site'],
+            'tipe' => $validated['tipe'],
+            'divisi_pengaju' => $validated['divisi_pengaju'],
+            'nama_kontraktor' => $validated['nama_kontraktor'],
+            'nama_pimpinan_proyek' => $validated['nama_pimpinan_proyek'],
+            'telepon' => $validated['telepon'],
+            'deskripsi_pekerjaan' => $validated['deskripsi_pekerjaan'],
+            'lama_pekerjaan' => $validated['tanggal_mulai'] . ' s/d ' . $validated['tanggal_selesai']
+                . ' (' . $validated['jam_mulai'] . ' - ' . $validated['jam_selesai'] . ')',
+            'tanggal_mulai' => $validated['tanggal_mulai'],
+            'tanggal_selesai' => $validated['tanggal_selesai'],
+            'jam_mulai' => $validated['jam_mulai'],
+            'jam_selesai' => $validated['jam_selesai'],
+            'personil' => $this->cleanRows($validated['personil']),
+            'apd' => array_values($validated['apd']),
+            'apd_lainnya' => $validated['apd_lainnya'] ?? null,
+            'peralatan' => $this->cleanRows($validated['peralatan']),
+            'bahan_b3' => $request->boolean('bahan_b3'),
+            'limbah_b3' => $request->boolean('limbah_b3'),
+            'prosedur_kerja' => $request->boolean('prosedur_kerja'),
+            'rencana_inspeksi' => $request->boolean('rencana_inspeksi'),
+            'tanggap_darurat' => $request->boolean('tanggap_darurat'),
+            'struktur_organisasi' => $request->boolean('struktur_organisasi'),
+        ])->save();
+
+        $hasGenerated = $hsePlan->documents()->where('jenis', 'hse_plan_generated')->exists();
+
+        if ($hsePlan->contractor || $hasGenerated) {
+            $this->pdfService->storeFinal($hsePlan, $hsePlan->contractor);
+        }
+
+        return redirect('/admin/hse-plans/' . $hsePlan->id)
+            ->with('success', 'HSE Plan berhasil diperbarui.');
+    }
+
     public function viewPdf($id)
     {
         $hsePlan = HsePlan::with('reviewer')->findOrFail($id);
@@ -184,6 +262,13 @@ class HsePlanApprovalController extends Controller
             $filename,
             ['Content-Type' => $this->mimeTypeFor($document)]
         );
+    }
+
+    private function cleanRows(array $rows): array
+    {
+        return array_values(array_filter($rows, function ($row) {
+            return is_array($row) && trim((string) ($row['nama'] ?? '')) !== '';
+        }));
     }
 
     private function mimeTypeFor(HsePlanDocument $document): string

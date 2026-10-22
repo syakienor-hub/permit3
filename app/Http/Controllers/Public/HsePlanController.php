@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Public;
 
 use App\Http\Controllers\Controller;
 use App\Models\Contractor;
-use App\Models\ContractorDocument;
 use App\Models\HsePlan;
 use App\Models\HsePlanDocument;
 use App\Services\HsePlanPdfService;
@@ -127,7 +126,7 @@ class HsePlanController extends Controller
             $this->uploadDocuments($request, $hsePlan, 'struktur_file', 'struktur_organisasi', 'Struktur Organisasi Proyek');
 
             $this->linkContractor($contractor, $hsePlan);
-            $this->storeFinalPdf($hsePlan, $contractor);
+            $this->pdfService->storeFinal($hsePlan, $contractor);
 
             return $hsePlan;
         });
@@ -243,41 +242,6 @@ class HsePlanController extends Controller
             'hse_plan_id' => $hsePlan->id,
             'status' => Contractor::STATUS_FINAL,
         ])->save();
-    }
-
-    private function storeFinalPdf(HsePlan $hsePlan, ?Contractor $contractor): void
-    {
-        $pdf = $this->pdfService->output($hsePlan);
-        $path = 'hse-plans/' . $hsePlan->id . '/' . $this->pdfService->filename($hsePlan);
-
-        Storage::disk('local')->put($path, $pdf);
-
-        HsePlanDocument::create([
-            'hse_plan_id' => $hsePlan->id,
-            'jenis' => 'hse_plan_generated',
-            'nama_dokumen' => 'HSE Plan Final',
-            'file_path' => $path,
-            'file_type' => 'pdf',
-            'file_size' => strlen($pdf),
-        ]);
-
-        if (! $contractor) {
-            return;
-        }
-
-        foreach ($contractor->documents()->where('jenis', 'hse_plan_generated')->get() as $oldDocument) {
-            Storage::disk('local')->delete($oldDocument->file_path);
-            $oldDocument->delete();
-        }
-
-        ContractorDocument::create([
-            'contractor_id' => $contractor->id,
-            'jenis' => 'hse_plan_generated',
-            'nama_dokumen' => 'HSE Plan Final',
-            'file_path' => $path,
-            'file_type' => 'pdf',
-            'file_size' => strlen($pdf),
-        ]);
     }
 
     private function cleanPersonil(array $rows): array
