@@ -330,7 +330,6 @@
             <span class="eyebrow" id="hero-eyebrow"><span class="dot"></span> SISTEM ONLINE · MONITORING REALTIME</span>
             <span class="hidden sm:block h-4 w-px bg-white/25"></span>
             <span id="hero-realtime" class="inline-flex items-center gap-2 whitespace-nowrap text-[11px] sm:text-xs font-medium text-white/90">
-                <svg class="w-3.5 h-3.5 text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                 <span id="hero-realtime-date">Memuat tanggal…</span>
                 <span class="text-white/40">•</span>
                 <span id="hero-realtime-time" class="tabular-nums font-semibold text-white">--:--:--</span>
