@@ -12,8 +12,14 @@
     <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-6">
         <div>
             <p class="text-[11px] font-bold uppercase tracking-[0.14em] text-gray-400">Dashboard {{ $roleName }}</p>
-            <h1 class="text-xl font-bold text-gray-800 mt-1">Ringkasan HSE Hari Ini</h1>
-            <p class="text-sm text-gray-400 mt-1">Pantau antrean Safety Permit dan HSE Plan dalam satu tampilan.</p>
+            <h1 class="text-xl font-bold text-gray-800 mt-1">
+                {{ $role === 'manager' ? 'Ringkasan HSE Hari Ini' : 'Ringkasan Permit Hari Ini' }}
+            </h1>
+            <p class="text-sm text-gray-400 mt-1">
+                {{ $role === 'manager'
+                    ? 'Pantau antrean Safety Permit dan HSE Plan dalam satu tampilan.'
+                    : 'Pantau antrean Safety Permit yang menunggu review Anda.' }}
+            </p>
         </div>
         <div class="flex flex-wrap gap-2">
             <a href="/admin/approvals"
