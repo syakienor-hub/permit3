@@ -280,7 +280,7 @@
                 <span x-show="activeNav === 'monitoring'" class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                 Monitoring Permit
             </a>
-            <a href="/ajukan-hse-plan" class="hover:text-[var(--navy-950)] transition-colors">HSE Plan</a>
+            <a href="/ajukan-hse-plan" class="hover:text-[var(--navy-950)] transition-colors">Data Kontraktor</a>
             <a href="#alur" @click="activeNav = 'alur'" class="hover:text-[var(--navy-950)] transition-colors"
                 :class="activeNav === 'alur' ? 'text-inka-navy font-bold' : ''">Alur Pengajuan</a>
             <a href="#tentang" @click="activeNav = 'tentang'" class="hover:text-[var(--navy-950)] transition-colors"
@@ -306,7 +306,7 @@
                 <span x-show="activeNav === 'monitoring'" class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                 Monitoring Permit
             </a>
-            <a href="/ajukan-hse-plan" @click="mobileOpen = false" class="py-3 border-b border-gray-100">Ajukan HSE Plan</a>
+            <a href="/ajukan-hse-plan" @click="mobileOpen = false" class="py-3 border-b border-gray-100">Ajukan Data Kontraktor</a>
             <a href="#alur" @click="activeNav = 'alur'; mobileOpen = false" class="py-3 border-b border-gray-100"
                 :class="activeNav === 'alur' ? 'text-inka-navy font-bold' : ''">Alur Pengajuan</a>
             <a href="#tentang" @click="activeNav = 'tentang'; mobileOpen = false" class="py-3 border-b border-gray-100"
@@ -355,7 +355,7 @@
                 </a>
             @endauth
             <a href="/ajukan-hse-plan" class="btn btn-outline-light btn-lg w-full sm:w-auto">
-                Ajukan HSE Plan
+                Ajukan Data Kontraktor
             </a>
             <a href="/cek-permit" class="btn btn-outline-light btn-lg w-full sm:w-auto">
                 Cek Status
