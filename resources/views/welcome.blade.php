@@ -198,7 +198,7 @@
             backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
         }
         .btn-outline-light:hover {
-            background: rgba(20,33,58,.55); border-color: rgba(255,255,255,.38);
+            background: rgba(255,255,255,.22); border-color: rgba(255,255,255,.5);
             transform: translateY(-1px);
         }
 
