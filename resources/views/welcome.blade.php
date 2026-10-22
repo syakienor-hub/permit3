@@ -310,6 +310,7 @@
                 :class="activeNav === 'tentang' ? 'text-inka-navy font-bold' : ''">Tentang Kami</a>
         </div>
         <div class="hidden sm:flex items-center gap-2.5 shrink-0">
+            <a href="/ajukan-permit" class="text-[13.5px] font-semibold text-[var(--navy-950)] hover:text-[var(--amber-600)] transition-colors whitespace-nowrap">Ajukan Permit</a>
             @auth
                 <a href="{{ route('dashboard') }}" class="btn btn-solid">Dashboard</a>
             @else
@@ -340,6 +341,7 @@
                 :class="activeNav === 'tentang' ? 'text-inka-navy font-bold' : ''">Tentang Kami</a>
         </nav>
         <div class="flex flex-col gap-2.5 mt-3 sm:hidden">
+            <a href="/ajukan-permit" class="text-sm font-semibold text-[var(--navy-950)] text-center py-2">Ajukan Permit</a>
             @auth
                 <a href="{{ route('dashboard') }}" class="btn btn-solid btn-lg w-full">Dashboard</a>
             @else
