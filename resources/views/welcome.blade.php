@@ -268,8 +268,8 @@
         <div class="flex items-center gap-2.5 mr-auto min-w-0">
             <img src="{{ asset('assets/images/logoinka.svg') }}" alt="INKA" class="h-6 md:h-7 w-auto shrink-0">
             <div class="border-l border-[var(--border)] pl-2.5 md:pl-3 whitespace-nowrap">
-                <span class="text-[13px] md:text-sm font-bold">Safety Permit</span>
-                <span class="block text-[9px] md:text-[10px] font-semibold text-[var(--ink-600)] tracking-wide">INKA MADIUN</span>
+                <span class="text-[13px] md:text-sm font-bold">SIMONIKA</span>
+                <span class="block text-[9px] md:text-[10px] font-semibold text-[var(--ink-600)] tracking-wide">PT INKA (Persero)</span>
             </div>
         </div>
         <div class="hidden md:flex items-center gap-6 mr-4 text-sm font-semibold text-[var(--ink-600)]">
