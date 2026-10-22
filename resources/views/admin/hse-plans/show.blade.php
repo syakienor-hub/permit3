@@ -33,6 +33,8 @@
             'prosedur_kerja' => 'Prosedur / Instruksi Kerja',
             'inspeksi' => 'Rencana Pemantauan / Inspeksi',
             'struktur_organisasi' => 'Struktur Organisasi Proyek',
+            'hse_plan_existing' => 'Dokumen HSE Plan',
+            'dokumen_lainnya' => 'Dokumen Pendukung Lainnya',
         ];
     @endphp
 
@@ -104,6 +106,25 @@
                     <div><p class="text-gray-400">Diajukan</p><p class="font-semibold text-gray-700">{{ ($hsePlan->submitted_at ?? $hsePlan->created_at)?->format('d/m/Y H:i') }}</p></div>
                 </div>
             </section>
+
+            @if($hsePlan->contractor)
+                @php $contractor = $hsePlan->contractor; @endphp
+                <section class="bg-white rounded-2xl border border-gray-100 shadow-sm">
+                    <div class="px-4 md:px-6 py-4 border-b border-gray-100">
+                        <h2 class="text-base font-semibold text-gray-800">Data Kontraktor</h2>
+                    </div>
+                    <div class="px-4 md:px-6 py-5 grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+                        <div><p class="text-gray-400">Vendor / Perusahaan</p><p class="font-semibold text-gray-700">{{ $contractor->vendor }}</p></div>
+                        <div><p class="text-gray-400">PIC</p><p class="font-semibold text-gray-700">{{ $contractor->pic }}</p></div>
+                        <div><p class="text-gray-400">Jenis Pekerjaan</p><p class="font-semibold text-gray-700">{{ \App\Models\Classification::where('code', $contractor->jenis_pekerjaan)->value('name') ?? $contractor->jenis_pekerjaan }}</p></div>
+                        <div><p class="text-gray-400">No. Telepon</p><p class="font-semibold text-gray-700">{{ $contractor->telepon }}</p></div>
+                        <div><p class="text-gray-400">Jumlah Pekerja</p><p class="font-semibold text-gray-700">{{ $contractor->jumlah_pekerja }}</p></div>
+                        <div><p class="text-gray-400">Lokasi</p><p class="font-semibold text-gray-700">{{ $contractor->lokasi }}</p></div>
+                        <div><p class="text-gray-400">Tanggal Pekerjaan</p><p class="font-semibold text-gray-700">{{ $contractor->tanggal_mulai?->format('d/m/Y') }} s/d {{ $contractor->tanggal_selesai?->format('d/m/Y') }}</p></div>
+                        <div><p class="text-gray-400">Site</p><p class="font-semibold text-gray-700">{{ $contractor->site }}</p></div>
+                    </div>
+                </section>
+            @endif
 
             <section class="bg-white rounded-2xl border border-gray-100 shadow-sm">
                 <div class="px-4 md:px-6 py-4 border-b border-gray-100">

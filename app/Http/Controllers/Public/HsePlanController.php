@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Public;
 
 use App\Http\Controllers\Controller;
+use App\Models\Contractor;
 use App\Models\HsePlan;
 use App\Models\HsePlanDocument;
 use Illuminate\Http\Request;
@@ -14,9 +15,13 @@ class HsePlanController extends Controller
 {
     private const FILE_RULES = 'file|max:10240|mimes:pdf,doc,docx,xls,xlsx,jpg,jpeg,png';
 
-    public function create()
+    public function create(Request $request)
     {
-        return view('public.hse-plans.create');
+        $contractor = $request->filled('ref')
+            ? Contractor::where('token', $request->query('ref'))->first()
+            : null;
+
+        return view('public.hse-plans.create', compact('contractor'));
     }
 
     public function store(Request $request)
@@ -60,6 +65,7 @@ class HsePlanController extends Controller
             'prosedur_kerja_file' => [Rule::requiredIf($request->boolean('prosedur_kerja')), self::FILE_RULES],
             'inspeksi_file' => [Rule::requiredIf($request->boolean('rencana_inspeksi')), self::FILE_RULES],
             'struktur_file' => [Rule::requiredIf($request->boolean('struktur_organisasi')), self::FILE_RULES],
+            'contractor_ref' => 'nullable|string|max:40',
         ]);
 
         $hsePlan = DB::transaction(function () use ($request) {
@@ -106,6 +112,8 @@ class HsePlanController extends Controller
             $this->uploadDocuments($request, $hsePlan, 'inspeksi_file', 'inspeksi', 'Rencana Pemantauan / Inspeksi');
             $this->uploadDocuments($request, $hsePlan, 'struktur_file', 'struktur_organisasi', 'Struktur Organisasi Proyek');
 
+            $this->linkContractor($request->contractor_ref, $hsePlan);
+
             return $hsePlan;
         });
 
@@ -146,6 +154,35 @@ class HsePlanController extends Controller
         }
 
         return view('public.hse-plans.status', ['hsePlan' => $hsePlan]);
+    }
+
+    private function linkContractor(?string $token, HsePlan $hsePlan): void
+    {
+        if (! $token) {
+            return;
+        }
+
+        $contractor = Contractor::where('token', $token)->first();
+
+        if (! $contractor) {
+            return;
+        }
+
+        foreach ($contractor->documents as $document) {
+            HsePlanDocument::create([
+                'hse_plan_id' => $hsePlan->id,
+                'jenis' => $document->jenis,
+                'nama_dokumen' => $document->nama_dokumen,
+                'file_path' => $document->file_path,
+                'file_type' => $document->file_type,
+                'file_size' => $document->file_size,
+            ]);
+        }
+
+        $contractor->forceFill([
+            'hse_plan_id' => $hsePlan->id,
+            'status' => Contractor::STATUS_FORM_SUBMITTED,
+        ])->save();
     }
 
     private function cleanPersonil(array $rows): array

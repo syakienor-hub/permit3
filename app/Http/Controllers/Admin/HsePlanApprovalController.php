@@ -88,7 +88,7 @@ class HsePlanApprovalController extends Controller
 
     public function show($id)
     {
-        $hsePlan = HsePlan::with(['documents', 'reviewer'])->findOrFail($id);
+        $hsePlan = HsePlan::with(['documents', 'reviewer', 'contractor'])->findOrFail($id);
 
         return view('admin.hse-plans.show', compact('hsePlan'));
     }

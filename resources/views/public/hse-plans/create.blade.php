@@ -32,6 +32,7 @@
 </head>
 <body class="bg-slate-50 text-gray-900 min-h-screen">
     @php
+        $prefill = $contractor ?? null;
         $personilRows = old('personil', [['nama' => '', 'tugas' => '']]);
         if (! is_array($personilRows) || empty($personilRows)) {
             $personilRows = [['nama' => '', 'tugas' => '']];
@@ -129,6 +130,13 @@
             <p class="text-sm text-gray-500 mt-1">Tanpa login. Isi rencana keselamatan kerja, lalu kirim untuk persetujuan <span class="font-semibold text-gray-700">Manager HSE</span>.</p>
         </div>
 
+        @if($prefill)
+            <div class="mb-5 bg-blue-50 border border-blue-100 rounded-xl px-5 py-4">
+                <p class="text-sm font-semibold text-gray-800">Data kontraktor {{ $prefill->vendor }} berhasil dimuat.</p>
+                <p class="text-sm text-gray-500 mt-0.5">Lengkapi bagian personil, APD, peralatan, dan dokumen sebelum mengirim HSE Plan.</p>
+            </div>
+        @endif
+
         @if($errors->any())
             <div class="mb-6 bg-red-50 border border-red-200 rounded-xl px-5 py-4">
                 <p class="text-sm font-semibold text-red-700 mb-1">Ada yang perlu diperbaiki:</p>
@@ -142,6 +150,9 @@
 
         <form action="/ajukan-hse-plan" method="POST" enctype="multipart/form-data" id="hse-plan-form" class="space-y-5">
             @csrf
+            @if($prefill)
+                <input type="hidden" name="contractor_ref" value="{{ $prefill->token }}">
+            @endif
 
             {{-- DATA PENGAJUAN (sesuai Form K3LH IV-01.053) --}}
             <section class="bg-white rounded-2xl border border-gray-100 shadow-sm">
@@ -156,18 +167,18 @@
                     </div>
                     <div class="md:col-span-2">
                         <label class="form-label">2. Deskripsi Pekerjaan <span class="text-red-500">*</span></label>
-                        <textarea name="deskripsi_pekerjaan" rows="3" class="form-input" placeholder="Uraikan lingkup dan tahapan pekerjaan" required>{{ old('deskripsi_pekerjaan') }}</textarea>
+                        <textarea name="deskripsi_pekerjaan" rows="3" class="form-input" placeholder="Uraikan lingkup dan tahapan pekerjaan" required>{{ old('deskripsi_pekerjaan', $prefill?->nama_pekerjaan) }}</textarea>
                     </div>
                     <div class="md:col-span-2">
                         <p class="form-label mb-2">3. Lama Pekerjaan <span class="text-red-500">*</span></p>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-xs font-semibold text-gray-500 mb-1">a. Tanggal Mulai</label>
-                                <input type="date" name="tanggal_mulai" class="form-input" value="{{ old('tanggal_mulai') }}" required>
+                                <input type="date" name="tanggal_mulai" class="form-input" value="{{ old('tanggal_mulai', $prefill?->tanggal_mulai?->format('Y-m-d')) }}" required>
                             </div>
                             <div>
                                 <label class="block text-xs font-semibold text-gray-500 mb-1">Tanggal Selesai</label>
-                                <input type="date" name="tanggal_selesai" class="form-input" value="{{ old('tanggal_selesai') }}" required>
+                                <input type="date" name="tanggal_selesai" class="form-input" value="{{ old('tanggal_selesai', $prefill?->tanggal_selesai?->format('Y-m-d')) }}" required>
                             </div>
                             <div>
                                 <label class="block text-xs font-semibold text-gray-500 mb-1">b. Jam Mulai</label>
@@ -181,11 +192,11 @@
                     </div>
                     <div>
                         <label class="form-label">4. Nama Kontraktor <span class="text-red-500">*</span></label>
-                        <input type="text" name="nama_kontraktor" class="form-input" value="{{ old('nama_kontraktor') }}" placeholder="Nama perusahaan pelaksana" required>
+                        <input type="text" name="nama_kontraktor" class="form-input" value="{{ old('nama_kontraktor', $prefill?->vendor) }}" placeholder="Nama perusahaan pelaksana" required>
                     </div>
                     <div>
                         <label class="form-label">5. Nama Pimpinan Proyek <span class="text-red-500">*</span></label>
-                        <input type="text" name="nama_pimpinan_proyek" class="form-input" value="{{ old('nama_pimpinan_proyek') }}" placeholder="Penanggung jawab proyek" required>
+                        <input type="text" name="nama_pimpinan_proyek" class="form-input" value="{{ old('nama_pimpinan_proyek', $prefill?->pic) }}" placeholder="Penanggung jawab proyek" required>
                     </div>
                 </div>
             </section>
@@ -200,15 +211,15 @@
                     <div>
                         <label class="form-label">Site <span class="text-red-500">*</span></label>
                         <select name="site" id="site-select" class="form-input" required>
-                            <option value="Madiun" @selected(old('site', 'Madiun') === 'Madiun')>Madiun</option>
-                            <option value="Banyuwangi" @selected(old('site') === 'Banyuwangi')>Banyuwangi</option>
+                            <option value="Madiun" @selected(old('site', $prefill?->site ?? 'Madiun') === 'Madiun')>Madiun</option>
+                            <option value="Banyuwangi" @selected(old('site', $prefill?->site) === 'Banyuwangi')>Banyuwangi</option>
                         </select>
                     </div>
                     <div>
                         <label class="form-label">Tipe Pekerjaan <span class="text-red-500">*</span></label>
                         <select name="tipe" class="form-input" required>
-                            <option value="Internal" @selected(old('tipe', 'Internal') === 'Internal')>Internal</option>
-                            <option value="Eksternal" @selected(old('tipe') === 'Eksternal')>Eksternal</option>
+                            <option value="Internal" @selected(old('tipe', $prefill ? 'Eksternal' : 'Internal') === 'Internal')>Internal</option>
+                            <option value="Eksternal" @selected(old('tipe', $prefill ? 'Eksternal' : null) === 'Eksternal')>Eksternal</option>
                         </select>
                     </div>
                     <div>
@@ -217,7 +228,7 @@
                     </div>
                     <div>
                         <label class="form-label">Nomor Telepon <span class="text-red-500">*</span></label>
-                        <input type="text" name="telepon" class="form-input" value="{{ old('telepon') }}" placeholder="Nomor untuk cek status" required>
+                        <input type="text" name="telepon" class="form-input" value="{{ old('telepon', $prefill?->telepon) }}" placeholder="Nomor untuk cek status" required>
                     </div>
                 </div>
             </section>
@@ -355,7 +366,7 @@
                     <button type="button" onclick="clearSignature()" class="text-sm font-semibold text-gray-400 hover:text-red-500 border border-gray-200 hover:border-red-300 px-3 py-1.5 rounded-lg transition-colors">Hapus</button>
                 </div>
                 <div class="px-4 md:px-6 py-5">
-                    <p class="text-sm text-gray-600 mb-5"><span id="pengesahan-kota">{{ old('site') === 'Banyuwangi' ? 'Banyuwangi' : 'Madiun' }}</span>, ................................</p>
+                    <p class="text-sm text-gray-600 mb-5"><span id="pengesahan-kota">{{ old('site', $prefill?->site) === 'Banyuwangi' ? 'Banyuwangi' : 'Madiun' }}</span>, ................................</p>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <p class="text-sm font-semibold text-gray-700">Dibuat oleh,<br>Kontraktor</p>
@@ -365,7 +376,7 @@
                             </div>
                             <input type="hidden" name="tanda_tangan" id="tanda-tangan-input">
                             <p id="signature-error" class="text-sm text-red-500 mt-1.5 hidden">Tanda tangan wajib diisi sebelum mengirim.</p>
-                            <p class="mt-2 text-sm font-semibold text-gray-700">({{ old('nama_pimpinan_proyek') ?: 'Pimpinan Proyek' }})</p>
+                            <p class="mt-2 text-sm font-semibold text-gray-700">({{ old('nama_pimpinan_proyek', $prefill?->pic) ?: 'Pimpinan Proyek' }})</p>
                         </div>
                         <div>
                             <p class="text-sm font-semibold text-gray-700">Disetujui oleh,<br>Manager HSE</p>

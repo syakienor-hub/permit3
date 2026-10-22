@@ -67,6 +67,11 @@ class HsePlan extends Model
         return $this->hasMany(HsePlanDocument::class);
     }
 
+    public function contractor()
+    {
+        return $this->hasOne(Contractor::class, 'hse_plan_id');
+    }
+
     public function reviewer()
     {
         return $this->belongsTo(User::class, 'reviewed_by');

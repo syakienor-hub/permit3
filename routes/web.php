@@ -34,6 +34,15 @@ Route::post('/cek-permit', [\App\Http\Controllers\Public\PermitStatusController:
     ->middleware('throttle:10,1')
     ->name('public.permits.status');
 
+// ===== DATA KONTRAKTOR PUBLIK (tanpa login) =====
+Route::get('/data-kontraktor', [\App\Http\Controllers\Public\ContractorController::class, 'create'])
+    ->middleware('throttle:10,1');
+Route::post('/data-kontraktor', [\App\Http\Controllers\Public\ContractorController::class, 'store'])
+    ->middleware('throttle:10,1');
+Route::get('/data-kontraktor/sukses/{contractor}', [\App\Http\Controllers\Public\ContractorController::class, 'success'])
+    ->middleware('signed')
+    ->name('public.contractors.success');
+
 // ===== HSE PLAN PUBLIK (tanpa login) =====
 Route::get('/ajukan-hse-plan', [\App\Http\Controllers\Public\HsePlanController::class, 'create'])
     ->middleware('throttle:10,1');
