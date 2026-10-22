@@ -32,7 +32,7 @@ class ContractorTest extends TestCase
             ->assertSee('Isi Form HSE Plan');
     }
 
-    public function test_contractor_with_existing_hse_plan_goes_to_review_manager(): void
+    public function test_contractor_with_existing_hse_plan_is_final_without_manager_review(): void
     {
         $response = $this->post('/data-kontraktor', $this->validPayload([
             'hse_plan_file' => UploadedFile::fake()->create('hse-plan.pdf', 100, 'application/pdf'),
@@ -45,12 +45,13 @@ class ContractorTest extends TestCase
 
         $contractor = Contractor::firstOrFail();
 
-        $this->assertSame(Contractor::STATUS_REVIEW, $contractor->status);
+        $this->assertSame(Contractor::STATUS_FINAL, $contractor->status);
         $this->assertNotNull($contractor->hse_plan_id);
 
         $hsePlan = HsePlan::findOrFail($contractor->hse_plan_id);
 
-        $this->assertSame(HsePlan::STATUS_REVIEW, $hsePlan->status);
+        $this->assertSame(HsePlan::STATUS_FINAL, $hsePlan->status);
+        $this->assertNotNull($hsePlan->manager_signature);
         $this->assertSame('Eksternal', $hsePlan->tipe);
         $this->assertSame('PT Contoh Kontraktor', $hsePlan->nama_kontraktor);
         $this->assertSame('Budi Santoso', $hsePlan->nama_pimpinan_proyek);
@@ -66,7 +67,8 @@ class ContractorTest extends TestCase
 
         $this->get($response->headers->get('Location'))
             ->assertOk()
-            ->assertSee('HSE Plan Berhasil Dikirim');
+            ->assertSee('File HSE Plan Berhasil Disimpan')
+            ->assertSee('Lihat File HSE Plan');
     }
 
     public function test_contractor_without_hse_plan_is_asked_to_fill_the_form(): void
@@ -115,18 +117,36 @@ class ContractorTest extends TestCase
         $payload = $this->hsePlanPayload();
         $payload['contractor_ref'] = $contractor->token;
 
-        $this->post('/ajukan-hse-plan', $payload)->assertRedirect();
+        $response = $this->post('/ajukan-hse-plan', $payload);
+        $response->assertRedirect();
+
+        $this->get($response->headers->get('Location'))
+            ->assertOk()
+            ->assertSee('File HSE Plan sudah tersimpan')
+            ->assertSee('Lihat File HSE Plan');
 
         $contractor->refresh();
         $hsePlan = HsePlan::firstOrFail();
 
         $this->assertSame($hsePlan->id, $contractor->hse_plan_id);
-        $this->assertSame(Contractor::STATUS_FORM_SUBMITTED, $contractor->status);
+        $this->assertSame(Contractor::STATUS_FINAL, $contractor->status);
+        $this->assertSame(HsePlan::STATUS_FINAL, $hsePlan->status);
         $this->assertDatabaseHas('hse_plan_documents', [
             'hse_plan_id' => $hsePlan->id,
             'jenis' => 'dokumen_lainnya',
             'file_path' => 'contractors/1/npwp.pdf',
         ]);
+        $this->assertDatabaseHas('hse_plan_documents', [
+            'hse_plan_id' => $hsePlan->id,
+            'jenis' => 'hse_plan_generated',
+        ]);
+        $this->assertDatabaseHas('contractor_documents', [
+            'contractor_id' => $contractor->id,
+            'jenis' => 'hse_plan_generated',
+        ]);
+
+        $generated = HsePlanDocument::where('jenis', 'hse_plan_generated')->firstOrFail();
+        Storage::disk('local')->assertExists($generated->file_path);
     }
 
     private function validPayload(array $overrides = []): array

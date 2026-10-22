@@ -86,7 +86,7 @@
 
         $tanggal = $hsePlan->submitted_at ?? $hsePlan->created_at;
         $manager = $hsePlan->reviewer;
-        $approved = $hsePlan->status === \App\Models\HsePlan::STATUS_APPROVED;
+        $approved = in_array($hsePlan->status, [\App\Models\HsePlan::STATUS_APPROVED, \App\Models\HsePlan::STATUS_FINAL], true);
         $logoPath = public_path('assets/images/logoinka.svg');
     @endphp
 
@@ -316,7 +316,7 @@
                             @endif
                         </div>
                         <p class="signature-name">
-                            ({{ $approved && $manager ? $manager->name : '..............................' }})
+                            ({{ $approved ? ($manager?->name ?? config('hse_plan.manager_name')) : '..............................' }})
                         </p>
                     </td>
                 </tr>

@@ -15,8 +15,12 @@
             'Review Manager' => ['label' => 'Menunggu Persetujuan Manager HSE', 'class' => 'bg-orange-100 text-orange-700'],
             'Approved' => ['label' => 'Disetujui', 'class' => 'bg-green-100 text-green-700'],
             'Rejected' => ['label' => 'Ditolak', 'class' => 'bg-red-600 text-white'],
+            'Final' => ['label' => 'Final', 'class' => 'bg-green-100 text-green-700'],
         ];
         $status = isset($hsePlan) ? ($statusMap[$hsePlan->status] ?? ['label' => $hsePlan->status, 'class' => 'bg-gray-100 text-gray-600']) : null;
+        $finalFile = isset($hsePlan)
+            ? $hsePlan->documents()->where('jenis', 'hse_plan_generated')->first()
+            : null;
     @endphp
 
     <div class="bg-white rounded-2xl border border-gray-100 shadow-sm max-w-2xl w-full p-6 sm:p-8">
@@ -75,11 +79,17 @@
                             <p class="text-xs text-red-600 mt-2">Diproses pada {{ $hsePlan->reviewed_at->format('d/m/Y H:i') }}</p>
                         @endif
                     </div>
-                @elseif($hsePlan->status === 'Approved')
+                @elseif(in_array($hsePlan->status, ['Approved', 'Final'], true))
                     <div class="rounded-xl border border-green-200 bg-green-50 px-4 py-4 mb-4">
-                        <h2 class="font-bold text-green-800">HSE Plan Disetujui</h2>
+                        <h2 class="font-bold text-green-800">{{ $hsePlan->status === 'Final' ? 'HSE Plan Final' : 'HSE Plan Disetujui' }}</h2>
                         @if($hsePlan->reviewed_at)
-                            <p class="text-xs text-green-700 mt-2">Disetujui pada {{ $hsePlan->reviewed_at->format('d/m/Y H:i') }}</p>
+                            <p class="text-xs text-green-700 mt-2">Disahkan pada {{ $hsePlan->reviewed_at->format('d/m/Y H:i') }}</p>
+                        @endif
+                        @if($finalFile)
+                            <a href="{{ URL::signedRoute('public.hse-plans.file', ['hsePlan' => $hsePlan->id]) }}" target="_blank" rel="noopener"
+                                class="inline-flex items-center justify-center mt-3 px-4 py-2 rounded-lg bg-green-700 text-white text-sm font-semibold hover:bg-green-800 transition-colors">
+                                Lihat File HSE Plan
+                            </a>
                         @endif
                     </div>
                 @endif

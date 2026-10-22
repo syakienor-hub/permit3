@@ -5,16 +5,22 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\HsePlan;
 use App\Models\HsePlanDocument;
-use Barryvdh\DomPDF\Facade\Pdf;
+use App\Services\HsePlanPdfService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
 class HsePlanApprovalController extends Controller
 {
+    public function __construct(private HsePlanPdfService $pdfService)
+    {
+    }
+
     public function index(Request $request)
     {
-        $query = HsePlan::query()->with('reviewer');
+        $query = HsePlan::query()
+            ->with('reviewer')
+            ->where('status', '!=', HsePlan::STATUS_FINAL);
 
         if ($request->filled('site')) {
             $query->forSite($request->site);
@@ -97,26 +103,14 @@ class HsePlanApprovalController extends Controller
     {
         $hsePlan = HsePlan::with('reviewer')->findOrFail($id);
 
-        return $this->hsePlanPdf($hsePlan)->stream($this->hsePlanPdfName($hsePlan));
+        return $this->pdfService->make($hsePlan)->stream($this->pdfService->filename($hsePlan));
     }
 
     public function downloadPdf($id)
     {
         $hsePlan = HsePlan::with('reviewer')->findOrFail($id);
 
-        return $this->hsePlanPdf($hsePlan)->download($this->hsePlanPdfName($hsePlan));
-    }
-
-    private function hsePlanPdf(HsePlan $hsePlan)
-    {
-        return Pdf::loadView('admin.hse-plans.pdf', compact('hsePlan'))
-            ->setPaper('A4', 'portrait')
-            ->setOptions(['defaultFont' => 'sans-serif']);
-    }
-
-    private function hsePlanPdfName(HsePlan $hsePlan): string
-    {
-        return 'HSE-Plan-' . str_replace('/', '-', $hsePlan->no_hse_plan) . '.pdf';
+        return $this->pdfService->make($hsePlan)->download($this->pdfService->filename($hsePlan));
     }
 
     public function approve(Request $request, $id)

@@ -42,6 +42,9 @@ Route::post('/data-kontraktor', [\App\Http\Controllers\Public\ContractorControll
 Route::get('/data-kontraktor/sukses/{contractor}', [\App\Http\Controllers\Public\ContractorController::class, 'success'])
     ->middleware('signed')
     ->name('public.contractors.success');
+Route::get('/data-kontraktor/{contractor}/dokumen/{document}', [\App\Http\Controllers\Public\ContractorController::class, 'viewDocument'])
+    ->middleware(['signed', 'throttle:30,1'])
+    ->name('public.contractors.documents.view');
 
 // ===== HSE PLAN PUBLIK (tanpa login) =====
 Route::get('/ajukan-hse-plan', [\App\Http\Controllers\Public\HsePlanController::class, 'create'])
@@ -51,6 +54,9 @@ Route::post('/ajukan-hse-plan', [\App\Http\Controllers\Public\HsePlanController:
 Route::get('/ajukan-hse-plan/sukses/{hsePlan}', [\App\Http\Controllers\Public\HsePlanController::class, 'success'])
     ->middleware('signed')
     ->name('public.hse-plans.success');
+Route::get('/ajukan-hse-plan/sukses/{hsePlan}/file', [\App\Http\Controllers\Public\HsePlanController::class, 'file'])
+    ->middleware(['signed', 'throttle:30,1'])
+    ->name('public.hse-plans.file');
 Route::get('/cek-hse-plan', [\App\Http\Controllers\Public\HsePlanController::class, 'statusForm'])
     ->name('public.hse-plans.status.form');
 Route::post('/cek-hse-plan', [\App\Http\Controllers\Public\HsePlanController::class, 'statusShow'])

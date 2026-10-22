@@ -9,6 +9,7 @@ class Contractor extends Model
     public const STATUS_WAITING = 'Menunggu HSE Plan';
     public const STATUS_REVIEW = 'Review Manager';
     public const STATUS_FORM_SUBMITTED = 'HSE Plan Diajukan';
+    public const STATUS_FINAL = 'HSE Plan Final';
 
     protected $fillable = [
         'token',

@@ -9,6 +9,7 @@ use Database\Seeders\HsePlanSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\URL;
 use Tests\TestCase;
 
 class HsePlanTest extends TestCase
@@ -19,7 +20,8 @@ class HsePlanTest extends TestCase
     {
         $this->get('/ajukan-hse-plan')
             ->assertOk()
-            ->assertSee('Ajukan HSE Plan');
+            ->assertSee('Form HSE Plan')
+            ->assertSee('Simpan File HSE Plan');
     }
 
     public function test_public_can_submit_hse_plan_with_documents(): void
@@ -34,18 +36,23 @@ class HsePlanTest extends TestCase
 
         $this->assertSame('PT Contoh Kontraktor', $hsePlan->nama_kontraktor);
         $this->assertMatchesRegularExpression('#^\d{3}/HSEPLAN/HSE/\d{4}$#', $hsePlan->no_hse_plan);
-        $this->assertSame(HsePlan::STATUS_REVIEW, $hsePlan->status);
+        $this->assertSame(HsePlan::STATUS_FINAL, $hsePlan->status);
         $this->assertNotNull($hsePlan->submitted_at);
+        $this->assertNotNull($hsePlan->manager_signature);
         $this->assertCount(1, $hsePlan->personil);
         $this->assertSame('Gerinda', $hsePlan->peralatan[0]['nama']);
         $this->assertSame(
-            ['jsa', 'sertifikat_personil', 'sertifikat_peralatan'],
+            ['jsa', 'sertifikat_personil', 'sertifikat_peralatan', 'hse_plan_generated'],
             HsePlanDocument::orderBy('id')->pluck('jenis')->all()
         );
 
         foreach (HsePlanDocument::all() as $document) {
             Storage::disk('local')->assertExists($document->file_path);
         }
+
+        $this->get(URL::signedRoute('public.hse-plans.file', ['hsePlan' => $hsePlan->id]))
+            ->assertOk()
+            ->assertHeader('content-type', 'application/pdf');
     }
 
     public function test_hse_plan_can_be_submitted_without_documents_and_unanswered_questions(): void
@@ -68,7 +75,27 @@ class HsePlanTest extends TestCase
         $this->post('/ajukan-hse-plan', $payload)->assertRedirect();
 
         $this->assertDatabaseCount('hse_plans', 1);
-        $this->assertDatabaseCount('hse_plan_documents', 0);
+        $this->assertDatabaseCount('hse_plan_documents', 1);
+        $this->assertDatabaseHas('hse_plan_documents', ['jenis' => 'hse_plan_generated']);
+
+        $document = HsePlanDocument::where('jenis', 'hse_plan_generated')->firstOrFail();
+        Storage::disk('local')->assertExists($document->file_path);
+    }
+
+    public function test_final_hse_plan_does_not_enter_manager_review_queue(): void
+    {
+        Storage::fake('local');
+
+        $manager = User::factory()->create(['role' => 'manager']);
+
+        $this->post('/ajukan-hse-plan', $this->validPayload())->assertRedirect();
+
+        $hsePlan = HsePlan::firstOrFail();
+
+        $this->actingAs($manager)
+            ->get('/admin/hse-plans')
+            ->assertOk()
+            ->assertDontSee($hsePlan->no_hse_plan);
     }
 
     public function test_msds_is_required_when_using_b3_material(): void

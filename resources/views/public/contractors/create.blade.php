@@ -150,7 +150,7 @@
                 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <div>
                         <p class="text-base font-semibold text-gray-800">Belum memiliki dokumen HSE Plan?</p>
-                        <p class="text-sm text-gray-500 mt-1">Klik tombol di samping untuk mengisi form HSE Plan. Data kontraktor yang sudah Anda isi akan otomatis terisi di form tersebut.</p>
+                        <p class="text-sm text-gray-500 mt-1">Klik tombol di samping untuk mengisi form HSE Plan. Data kontraktor akan otomatis terisi, lalu file HSE Plan final otomatis tersimpan ke data kontraktor ini.</p>
                     </div>
                     <button type="submit" name="action" value="isi_form"
                         class="shrink-0 inline-flex items-center justify-center gap-2 rounded-xl border border-inka-navy bg-white px-4 py-2.5 text-sm font-semibold text-inka-navy hover:bg-inka-navy hover:text-white transition-colors whitespace-nowrap">

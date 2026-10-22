@@ -4,16 +4,24 @@ namespace App\Http\Controllers\Public;
 
 use App\Http\Controllers\Controller;
 use App\Models\Contractor;
+use App\Models\ContractorDocument;
 use App\Models\HsePlan;
 use App\Models\HsePlanDocument;
+use App\Services\HsePlanPdfService;
+use App\Support\HsePlanSignature;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Validation\Rule;
 
 class HsePlanController extends Controller
 {
     private const FILE_RULES = 'file|max:10240|mimes:pdf,doc,docx,xls,xlsx,jpg,jpeg,png';
+
+    public function __construct(private HsePlanPdfService $pdfService)
+    {
+    }
 
     public function create(Request $request)
     {
@@ -68,7 +76,11 @@ class HsePlanController extends Controller
             'contractor_ref' => 'nullable|string|max:40',
         ]);
 
-        $hsePlan = DB::transaction(function () use ($request) {
+        $contractor = $request->filled('contractor_ref')
+            ? Contractor::where('token', $request->contractor_ref)->first()
+            : null;
+
+        $hsePlan = DB::transaction(function () use ($request, $contractor) {
             $year = date('Y');
             $sequence = HsePlan::where('no_hse_plan', 'like', '%/HSEPLAN/HSE/' . $year)->count() + 1;
 
@@ -99,8 +111,10 @@ class HsePlanController extends Controller
                 'tanggap_darurat' => $request->boolean('tanggap_darurat'),
                 'struktur_organisasi' => $request->boolean('struktur_organisasi'),
                 'tanda_tangan' => $request->tanda_tangan,
-                'status' => HsePlan::STATUS_REVIEW,
+                'status' => HsePlan::STATUS_FINAL,
+                'manager_signature' => HsePlanSignature::manager(),
                 'submitted_at' => now(),
+                'reviewed_at' => now(),
             ]);
 
             $this->uploadDocuments($request, $hsePlan, 'jsa_file', 'jsa', 'Job Safety Analysis');
@@ -112,20 +126,68 @@ class HsePlanController extends Controller
             $this->uploadDocuments($request, $hsePlan, 'inspeksi_file', 'inspeksi', 'Rencana Pemantauan / Inspeksi');
             $this->uploadDocuments($request, $hsePlan, 'struktur_file', 'struktur_organisasi', 'Struktur Organisasi Proyek');
 
-            $this->linkContractor($request->contractor_ref, $hsePlan);
+            $this->linkContractor($contractor, $hsePlan);
+            $this->storeFinalPdf($hsePlan, $contractor);
 
             return $hsePlan;
         });
+
+        if ($contractor) {
+            return redirect(URL::signedRoute('public.contractors.success', ['contractor' => $contractor->id]));
+        }
 
         return redirect(URL::signedRoute('public.hse-plans.success', ['hsePlan' => $hsePlan->id]));
     }
 
     public function success(HsePlan $hsePlan)
     {
+        $hasFile = $hsePlan->documents()
+            ->whereIn('jenis', ['hse_plan_generated', 'hse_plan_existing'])
+            ->exists();
+
         return view('public.hse-plans.success', [
             'hsePlan' => $hsePlan,
             'statusUrl' => url('/cek-hse-plan'),
+            'fileUrl' => $hasFile
+                ? URL::signedRoute('public.hse-plans.file', ['hsePlan' => $hsePlan->id])
+                : null,
         ]);
+    }
+
+    public function file(HsePlan $hsePlan)
+    {
+        $document = $hsePlan->documents()
+            ->whereIn('jenis', ['hse_plan_generated', 'hse_plan_existing'])
+            ->orderByRaw("CASE WHEN jenis = 'hse_plan_generated' THEN 0 ELSE 1 END")
+            ->firstOrFail();
+
+        if (! Storage::disk('local')->exists($document->file_path)) {
+            abort(404);
+        }
+
+        $extension = pathinfo($document->file_path, PATHINFO_EXTENSION);
+        $filename = $document->nama_dokumen;
+
+        if ($extension && ! str_ends_with(strtolower($filename), '.' . strtolower($extension))) {
+            $filename .= '.' . $extension;
+        }
+
+        $mimeTypes = [
+            'pdf' => 'application/pdf',
+            'jpg' => 'image/jpeg',
+            'jpeg' => 'image/jpeg',
+            'png' => 'image/png',
+            'doc' => 'application/msword',
+            'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'xls' => 'application/vnd.ms-excel',
+            'xlsx' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        ];
+
+        return Storage::disk('local')->response(
+            $document->file_path,
+            $filename,
+            ['Content-Type' => $mimeTypes[strtolower($document->file_type)] ?? 'application/octet-stream']
+        );
     }
 
     public function statusForm()
@@ -156,19 +218,17 @@ class HsePlanController extends Controller
         return view('public.hse-plans.status', ['hsePlan' => $hsePlan]);
     }
 
-    private function linkContractor(?string $token, HsePlan $hsePlan): void
+    private function linkContractor(?Contractor $contractor, HsePlan $hsePlan): void
     {
-        if (! $token) {
-            return;
-        }
-
-        $contractor = Contractor::where('token', $token)->first();
-
         if (! $contractor) {
             return;
         }
 
         foreach ($contractor->documents as $document) {
+            if ($document->jenis === 'hse_plan_generated') {
+                continue;
+            }
+
             HsePlanDocument::create([
                 'hse_plan_id' => $hsePlan->id,
                 'jenis' => $document->jenis,
@@ -181,8 +241,43 @@ class HsePlanController extends Controller
 
         $contractor->forceFill([
             'hse_plan_id' => $hsePlan->id,
-            'status' => Contractor::STATUS_FORM_SUBMITTED,
+            'status' => Contractor::STATUS_FINAL,
         ])->save();
+    }
+
+    private function storeFinalPdf(HsePlan $hsePlan, ?Contractor $contractor): void
+    {
+        $pdf = $this->pdfService->output($hsePlan);
+        $path = 'hse-plans/' . $hsePlan->id . '/' . $this->pdfService->filename($hsePlan);
+
+        Storage::disk('local')->put($path, $pdf);
+
+        HsePlanDocument::create([
+            'hse_plan_id' => $hsePlan->id,
+            'jenis' => 'hse_plan_generated',
+            'nama_dokumen' => 'HSE Plan Final',
+            'file_path' => $path,
+            'file_type' => 'pdf',
+            'file_size' => strlen($pdf),
+        ]);
+
+        if (! $contractor) {
+            return;
+        }
+
+        foreach ($contractor->documents()->where('jenis', 'hse_plan_generated')->get() as $oldDocument) {
+            Storage::disk('local')->delete($oldDocument->file_path);
+            $oldDocument->delete();
+        }
+
+        ContractorDocument::create([
+            'contractor_id' => $contractor->id,
+            'jenis' => 'hse_plan_generated',
+            'nama_dokumen' => 'HSE Plan Final',
+            'file_path' => $path,
+            'file_type' => 'pdf',
+            'file_size' => strlen($pdf),
+        ]);
     }
 
     private function cleanPersonil(array $rows): array

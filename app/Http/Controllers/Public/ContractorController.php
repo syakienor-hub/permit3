@@ -8,8 +8,10 @@ use App\Models\Contractor;
 use App\Models\ContractorDocument;
 use App\Models\HsePlan;
 use App\Models\HsePlanDocument;
+use App\Support\HsePlanSignature;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -115,11 +117,17 @@ class ContractorController extends Controller
             'tanggap_darurat' => false,
             'struktur_organisasi' => false,
             'tanda_tangan' => '',
-            'status' => HsePlan::STATUS_REVIEW,
+            'status' => HsePlan::STATUS_FINAL,
+            'manager_signature' => HsePlanSignature::manager(),
             'submitted_at' => now(),
+            'reviewed_at' => now(),
         ]);
 
         foreach ($contractor->documents as $document) {
+            if ($document->jenis === 'hse_plan_generated') {
+                continue;
+            }
+
             HsePlanDocument::create([
                 'hse_plan_id' => $hsePlan->id,
                 'jenis' => $document->jenis,
@@ -132,10 +140,43 @@ class ContractorController extends Controller
 
         $contractor->forceFill([
             'hse_plan_id' => $hsePlan->id,
-            'status' => Contractor::STATUS_REVIEW,
+            'status' => Contractor::STATUS_FINAL,
         ])->save();
 
         return $hsePlan;
+    }
+
+    public function viewDocument(Contractor $contractor, ContractorDocument $document)
+    {
+        abort_unless($document->contractor_id === $contractor->id, 404);
+
+        if (! Storage::disk('local')->exists($document->file_path)) {
+            abort(404);
+        }
+
+        $extension = pathinfo($document->file_path, PATHINFO_EXTENSION);
+        $filename = $document->nama_dokumen;
+
+        if ($extension && ! str_ends_with(strtolower($filename), '.' . strtolower($extension))) {
+            $filename .= '.' . $extension;
+        }
+
+        $mimeTypes = [
+            'pdf' => 'application/pdf',
+            'jpg' => 'image/jpeg',
+            'jpeg' => 'image/jpeg',
+            'png' => 'image/png',
+            'doc' => 'application/msword',
+            'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'xls' => 'application/vnd.ms-excel',
+            'xlsx' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        ];
+
+        return Storage::disk('local')->response(
+            $document->file_path,
+            $filename,
+            ['Content-Type' => $mimeTypes[strtolower($document->file_type)] ?? 'application/octet-stream']
+        );
     }
 
     private function uploadDocuments(Request $request, Contractor $contractor, string $field, string $jenis): void

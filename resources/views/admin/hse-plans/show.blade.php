@@ -3,12 +3,13 @@
 
     @php
         $statusBadge = match($hsePlan->status) {
-            \App\Models\HsePlan::STATUS_APPROVED => 'bg-green-100 text-green-700',
+            \App\Models\HsePlan::STATUS_APPROVED, \App\Models\HsePlan::STATUS_FINAL => 'bg-green-100 text-green-700',
             \App\Models\HsePlan::STATUS_REJECTED => 'bg-red-100 text-red-700',
             default => 'bg-orange-100 text-orange-700',
         };
         $statusLabel = match($hsePlan->status) {
             \App\Models\HsePlan::STATUS_APPROVED => 'Disetujui',
+            \App\Models\HsePlan::STATUS_FINAL => 'Final',
             \App\Models\HsePlan::STATUS_REJECTED => 'Ditolak',
             default => 'Menunggu Persetujuan Manager HSE',
         };
@@ -34,6 +35,7 @@
             'inspeksi' => 'Rencana Pemantauan / Inspeksi',
             'struktur_organisasi' => 'Struktur Organisasi Proyek',
             'hse_plan_existing' => 'Dokumen HSE Plan',
+            'hse_plan_generated' => 'HSE Plan Final',
             'dokumen_lainnya' => 'Dokumen Pendukung Lainnya',
         ];
     @endphp
@@ -276,7 +278,7 @@
                     </div>
                     <div class="px-4 md:px-6 py-4 text-sm space-y-2">
                         <p class="text-gray-400">Diproses oleh</p>
-                        <p class="font-semibold text-gray-700">{{ optional($hsePlan->reviewer)->name ?? 'Manager HSE' }}</p>
+                        <p class="font-semibold text-gray-700">{{ optional($hsePlan->reviewer)->name ?? config('hse_plan.manager_name') }}</p>
                         <p class="text-gray-400">Pada</p>
                         <p class="font-semibold text-gray-700">{{ $hsePlan->reviewed_at?->format('d/m/Y H:i') ?? '-' }}</p>
                         @if($hsePlan->manager_signature)
