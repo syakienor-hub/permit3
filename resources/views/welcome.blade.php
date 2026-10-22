@@ -940,18 +940,21 @@
             @else
                 {{-- Desktop/laptop --}}
                 <div class="overflow-x-auto -mx-4 md:mx-0 px-4 md:px-0 hidden md:block">
-                    <table class="data-table min-w-[1100px]">
+                    <table class="data-table min-w-[1320px]">
                         <thead>
                             <tr>
-                                <th>Kontraktor</th>
-                                <th>PIC</th>
+                                <th class="text-center">No</th>
+                                <th>Status</th>
+                                <th>Vendor</th>
                                 <th>Jenis Pekerjaan</th>
-                                <th>Nama Pekerjaan</th>
-                                <th>Site</th>
+                                <th>Pekerjaan</th>
                                 <th>Lokasi</th>
-                                <th>Periode</th>
-                                <th>Pekerja</th>
-                                <th>Status HSE Plan</th>
+                                <th>PIC</th>
+                                <th>No. Telepon</th>
+                                <th>Tgl Mulai</th>
+                                <th>Tgl Selesai</th>
+                                <th>Lama Kerja</th>
+                                <th>Jumlah Pekerja</th>
                                 <th class="text-right">Aksi</th>
                             </tr>
                         </thead>
@@ -969,6 +972,10 @@
                                 } else {
                                     $periode = $mulai ?? $selesai ?? '—';
                                 }
+
+                                $lamaKerja = ($contractor->tanggal_mulai && $contractor->tanggal_selesai)
+                                    ? ((int) $contractor->tanggal_mulai->diffInDays($contractor->tanggal_selesai) + 1)
+                                    : null;
 
                                 $contractorStatusMap = [
                                     'Menunggu HSE Plan' => 'bg-amber-50 text-amber-700 border-amber-200/70',
@@ -993,21 +1000,22 @@
                                 ];
                             @endphp
                             <tr class="transition-colors">
-                                <td class="font-semibold text-inka-navy whitespace-nowrap">{{ $contractor->vendor }}</td>
-                                <td class="text-gray-600 whitespace-nowrap">{{ $contractor->pic }}</td>
-                                <td class="whitespace-nowrap">
-                                    <span class="badge bg-blue-50 text-blue-700 border-blue-200/70">{{ $jenisLabel }}</span>
-                                </td>
-                                <td class="text-gray-600 max-w-[260px]">{{ $contractor->nama_pekerjaan }}</td>
-                                <td class="whitespace-nowrap">
-                                    <x-permit-site-badge :site="$contractor->site" />
-                                </td>
-                                <td class="text-gray-600">{{ $contractor->lokasi ?? '—' }}</td>
-                                <td class="whitespace-nowrap text-gray-600">{{ $periode }}</td>
-                                <td class="whitespace-nowrap text-gray-600">{{ $contractor->jumlah_pekerja }} orang</td>
+                                <td class="text-center text-gray-500">{{ ($contractors->currentPage() - 1) * $contractors->perPage() + $loop->iteration }}</td>
                                 <td class="whitespace-nowrap">
                                     <span class="badge {{ $contractorStatusBadge }}">{{ $contractor->status }}</span>
                                 </td>
+                                <td class="font-semibold text-inka-navy whitespace-nowrap">{{ $contractor->vendor }}</td>
+                                <td class="whitespace-nowrap">
+                                    <span class="badge bg-blue-50 text-blue-700 border-blue-200/70">{{ $jenisLabel }}</span>
+                                </td>
+                                <td class="text-gray-600 min-w-[220px] max-w-[320px]">{{ $contractor->nama_pekerjaan }}</td>
+                                <td class="text-gray-600">{{ $contractor->lokasi ?? '—' }}</td>
+                                <td class="text-gray-600 whitespace-nowrap">{{ $contractor->pic }}</td>
+                                <td class="text-gray-600 whitespace-nowrap">{{ $contractor->telepon }}</td>
+                                <td class="whitespace-nowrap text-gray-600">{{ $mulai ?? '—' }}</td>
+                                <td class="whitespace-nowrap text-gray-600">{{ $selesai ?? '—' }}</td>
+                                <td class="whitespace-nowrap text-gray-600">{{ $lamaKerja ? $lamaKerja . ' hari' : '—' }}</td>
+                                <td class="whitespace-nowrap text-gray-600">{{ $contractor->jumlah_pekerja }} orang</td>
                                 <td class="text-right whitespace-nowrap">
                                     <button type="button"
                                             @click="openContractorModal({{ json_encode($contractorPayload, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES) }})"
