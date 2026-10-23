@@ -11,7 +11,6 @@
         .header td { border: 1px solid #000; padding: 5px 7px; vertical-align: middle; }
         .header-logo { width: 22%; text-align: center; }
         .header-title { width: 48%; text-align: center; font-size: 13px; font-weight: bold; letter-spacing: .3px; }
-        .header-title span { display: block; font-size: 8.5px; font-weight: normal; margin-top: 2px; }
         .header-meta { width: 30%; font-size: 8.3px; }
         .header-meta table td { border: none; padding: 0; }
         .logo { width: 80px; height: auto; }
@@ -36,7 +35,9 @@
         .sig-img { max-height: 36px; max-width: 160px; }
         .status-line { margin: 8px 0 0; font-size: 9px; }
         .rejected { margin-top: 6px; border: 1px solid #b91c1c; color: #b91c1c; padding: 5px 7px; }
-        .footer { margin-top: 10px; font-size: 8px; color: #555; text-align: right; }
+        .page-footer { position: fixed; bottom: 0; left: 0; right: 0; font-size: 8px; color: #000; }
+        .page-footer table td { border: none; padding: 0; }
+        .page-footer .print-info { text-align: right; color: #555; }
         .muted { color: #555; }
     </style>
 </head>
@@ -66,7 +67,6 @@
                 </td>
                 <td class="header-title">
                     DAFTAR PERIKSA IZIN PEKERJAAN BERISIKO TINGGI
-                    <span>Form K3LH IV-01.013 Rev. 0</span>
                 </td>
                 <td class="header-meta">
                     <table>
@@ -235,7 +235,15 @@
             </tr>
         </table>
 
-        <div class="footer">Dicetak dari SIMONIKA &middot; {{ now()->format('d/m/Y H:i') }}</div>
+    </div>
+
+    <div class="page-footer">
+        <table>
+            <tr>
+                <td>Form K3LH: IV-01.013 Rev. 0</td>
+                <td class="print-info">Dicetak dari SIMONIKA &middot; {{ now()->format('d/m/Y H:i') }}</td>
+            </tr>
+        </table>
     </div>
 </body>
 </html>
