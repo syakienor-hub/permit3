@@ -13,7 +13,7 @@
         .header-title { width: 48%; text-align: center; font-size: 13px; font-weight: bold; letter-spacing: .3px; }
         .header-meta { width: 30%; font-size: 8.3px; }
         .header-meta table td { border: none; padding: 0; }
-        .logo { width: 80px; height: auto; }
+        .logo { width: 100px; height: auto; }
         .section-title { background: #e8e8e8; border: 1px solid #000; border-bottom: none; padding: 3px 6px; font-weight: bold; font-size: 9.2px; margin-top: 8px; }
         .data-table td { border: 1px solid #000; padding: 3px 5px; }
         .data-label { width: 22%; background: #f7f7f7; }
