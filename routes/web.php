@@ -20,7 +20,7 @@ Route::get('/', function () {
                 ->orWhere('lokasi', 'like', $term));
         })
         ->orderByRaw('COALESCE(submitted_at, created_at) DESC')
-        ->paginate(10)
+        ->paginate(5)
         ->withQueryString()
         ->fragment('monitoring');
 
@@ -47,7 +47,7 @@ Route::get('/', function () {
                 ->orWhere('lokasi', 'like', $term));
         })
         ->orderByRaw('COALESCE(tanggal_mulai, created_at) DESC')
-        ->paginate(10, ['*'], 'kontraktor_page')
+        ->paginate(5, ['*'], 'kontraktor_page')
         ->withQueryString()
         ->fragment('monitoring-kontraktor');
 

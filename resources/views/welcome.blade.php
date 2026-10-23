@@ -510,7 +510,7 @@
                     </div>
                     <div>
                         <h3 class="text-base font-bold text-gray-900">Daftar Permit Kerja Terkini</h3>
-                        <p class="text-xs text-gray-500">Menampilkan 10 permit terbaru dengan update berkala</p>
+                        <p class="text-xs text-gray-500">Menampilkan 5 permit terbaru dengan update berkala</p>
                     </div>
                 </div>
                 <div class="text-xs font-semibold text-gray-500 bg-white px-3 py-1.5 rounded-lg border border-gray-200">
@@ -882,7 +882,7 @@
                     </div>
                     <div>
                         <h3 class="text-base font-bold text-gray-900">Daftar Kontraktor Terkini</h3>
-                        <p class="text-xs text-gray-500">Menampilkan 10 kontraktor terbaru beserta status HSE Plan</p>
+                        <p class="text-xs text-gray-500">Menampilkan 5 kontraktor terbaru beserta status HSE Plan</p>
                     </div>
                 </div>
                 <div class="text-xs font-semibold text-gray-500 bg-white px-3 py-1.5 rounded-lg border border-gray-200">
