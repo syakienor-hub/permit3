@@ -6,23 +6,32 @@ use App\Http\Controllers\Controller;
 use App\Models\Classification;
 use App\Models\Permit;
 use App\Models\PermitDocument;
+use App\Models\WorkInspection;
 use App\Services\PermitMailNotifier;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\URL;
+use Illuminate\Validation\ValidationException;
 
 class PermitController extends Controller
 {
     /** Tampilkan form wizard publik (tanpa login) */
     public function create()
     {
-        return view('public.permits.create');
+        $inspections = WorkInspection::query()
+            ->approved()
+            ->whereDoesntHave('permit')
+            ->orderByDesc('reviewed_at')
+            ->get();
+
+        return view('public.permits.create', compact('inspections'));
     }
 
     /** Simpan permit publik — langsung Review Staff, user_id = null */
     public function store(Request $request)
     {
         $request->validate([
+            'work_inspection_id' => 'required|integer|exists:work_inspections,id',
             'divisi_pengaju'   => 'required|string|max:255',
             'tipe'             => 'required|in:Internal,Eksternal',
             'site'             => 'required|in:Madiun,Banyuwangi',
@@ -34,7 +43,27 @@ class PermitController extends Controller
             'tanggal_mulai'    => 'nullable|date',
             'tanggal_selesai'  => 'nullable|date|after_or_equal:tanggal_mulai',
             'tanda_tangan'     => 'required|string',
+        ], [
+            'work_inspection_id.required' => 'Pilih Daftar Periksa Izin Kerja yang sudah disetujui Staff HSE sebelum mengajukan Safety Permit.',
+            'work_inspection_id.exists' => 'Daftar Periksa Izin Kerja tidak ditemukan.',
         ]);
+
+        $inspection = WorkInspection::query()
+            ->approved()
+            ->whereDoesntHave('permit')
+            ->find($request->input('work_inspection_id'));
+
+        if (! $inspection) {
+            throw ValidationException::withMessages([
+                'work_inspection_id' => 'Daftar Periksa Izin Kerja harus sudah disetujui Staff HSE dan belum dipakai permit lain.',
+            ]);
+        }
+
+        if ($inspection->site !== $request->input('site') || $inspection->tipe !== $request->input('tipe')) {
+            throw ValidationException::withMessages([
+                'work_inspection_id' => 'Site dan tipe permit harus sama dengan Daftar Periksa Izin Kerja yang dipilih.',
+            ]);
+        }
 
         if ($request->input('tipe') === 'Eksternal') {
             $request->validate([
@@ -52,12 +81,13 @@ class PermitController extends Controller
             ]);
         }
 
-        $permit = DB::transaction(function () use ($request) {
+        $permit = DB::transaction(function () use ($request, $inspection) {
             $noPermit = 'WP-' . date('Y') . '-' . strtoupper(substr(bin2hex(random_bytes(4)), 0, 8));
 
             $permit = Permit::create([
                 'no_permit'             => $noPermit,
                 'user_id'               => null,
+                'work_inspection_id'    => $inspection->id,
                 'divisi_pengaju'        => $request->divisi_pengaju,
                 'tipe'                  => $request->input('tipe', 'Internal'),
                 'site'                  => $request->input('site', 'Madiun'),

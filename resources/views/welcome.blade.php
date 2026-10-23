@@ -303,6 +303,7 @@
                     </div>
                 </div>
             </div>
+            <a href="/daftar-periksa" class="hover:text-[var(--navy-950)] transition-colors whitespace-nowrap">Daftar Periksa</a>
             <a href="/data-kontraktor" class="hover:text-[var(--navy-950)] transition-colors whitespace-nowrap">Data Kontraktor</a>
             <a href="#alur" @click="activeNav = 'alur'" class="hover:text-[var(--navy-950)] transition-colors whitespace-nowrap"
                 :class="activeNav === 'alur' ? 'text-inka-navy font-bold' : ''">Alur Pengajuan</a>
@@ -334,6 +335,7 @@
                 <span x-show="activeNav === 'monitoring-kontraktor'" class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                 Monitoring Kontraktor
             </a>
+            <a href="/daftar-periksa" @click="mobileOpen = false" class="py-3 border-b border-gray-100">Daftar Periksa Izin</a>
             <a href="/data-kontraktor" @click="mobileOpen = false" class="py-3 border-b border-gray-100">Ajukan Data Kontraktor</a>
             <a href="#alur" @click="activeNav = 'alur'; mobileOpen = false" class="py-3 border-b border-gray-100"
                 :class="activeNav === 'alur' ? 'text-inka-navy font-bold' : ''">Alur Pengajuan</a>
@@ -370,6 +372,9 @@
         <p class="text-sm sm:text-[15.5px] text-white/100 mb-6 md:mb-8 hero-animate px-1" id="hero-sub">
         Sistem Informasi Monitoring dan Izin Kerja PT INKA (Persero)        </p>
         <div class="flex flex-col sm:flex-row gap-3 justify-center items-stretch sm:items-center sm:flex-wrap hero-animate px-2 sm:px-0" id="hero-actions">
+            <a href="/daftar-periksa" class="btn btn-outline-light btn-lg w-full sm:w-auto">
+                Daftar Periksa Izin
+            </a>
             <a href="/ajukan-permit" class="btn btn-outline-light btn-lg w-full sm:w-auto">
                 Ajukan Safety Permit
             </a>
@@ -1243,7 +1248,7 @@
 
         <div class="flow-note reveal-scale" style="transition-delay:200ms">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="shrink-0 mt-0.5"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg>
-            <span><strong>Info:</strong> pengajuan tidak memerlukan akun. Isi nama divisi/unit pengaju langsung di form, seluruh permit publik otomatis masuk antrian verifikasi Staff HSE dan terpantau di tabel Monitoring.</span>
+            <span><strong>Info:</strong> pengajuan tidak memerlukan akun. Untuk pekerjaan berisiko tinggi, isi <strong>Daftar Periksa Izin Kerja</strong> dan tunggu persetujuan Staff HSE sebelum mengajukan Safety Permit. Seluruh permit publik otomatis masuk antrian verifikasi Staff HSE dan terpantau di tabel Monitoring.</span>
         </div>
     </div>
 </section>
@@ -1289,6 +1294,7 @@
                     <ul class="flex flex-col gap-2.5">
                         <li><a href="#monitoring" class="text-sm text-white/85 hover:text-white transition-opacity">Monitoring Permit</a></li>
                         <li><a href="#monitoring-kontraktor" class="text-sm text-white/85 hover:text-white transition-opacity">Monitoring Kontraktor</a></li>
+                        <li><a href="/daftar-periksa" class="text-sm text-white/85 hover:text-white transition-opacity">Daftar Periksa Izin</a></li>
                         <li><a href="#alur" class="text-sm text-white/85 hover:text-white transition-opacity">Alur Pengajuan</a></li>
                         <li><a href="#tentang" class="text-sm text-white/85 hover:text-white transition-opacity">Tentang Kami</a></li>
                         <li><a href="{{ route('login') }}" class="text-sm text-white/85 hover:text-white transition-opacity">Login</a></li>

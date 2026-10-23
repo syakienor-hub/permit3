@@ -89,6 +89,18 @@ Route::post('/cek-hse-plan', [\App\Http\Controllers\Public\HsePlanController::cl
     ->middleware('throttle:10,1')
     ->name('public.hse-plans.status');
 
+// ===== DAFTAR PERIKSA IZIN PEKERJAAN BERISIKO TINGGI (publik, tanpa login) =====
+Route::get('/daftar-periksa', [\App\Http\Controllers\Public\WorkInspectionController::class, 'create']);
+Route::post('/daftar-periksa', [\App\Http\Controllers\Public\WorkInspectionController::class, 'store'])
+    ->middleware('throttle:10,1');
+Route::get('/daftar-periksa/sukses/{workInspection}', [\App\Http\Controllers\Public\WorkInspectionController::class, 'success'])
+    ->name('public.work-inspections.success');
+Route::get('/cek-daftar-periksa', [\App\Http\Controllers\Public\WorkInspectionController::class, 'statusForm'])
+    ->name('public.work-inspections.status.form');
+Route::post('/cek-daftar-periksa', [\App\Http\Controllers\Public\WorkInspectionController::class, 'statusShow'])
+    ->middleware('throttle:10,1')
+    ->name('public.work-inspections.status');
+
 // ===== PENGAJUAN PUBLIK (tanpa login) =====
 Route::middleware(['throttle:10,1'])->group(function () {
     Route::get('/ajukan-permit', [\App\Http\Controllers\Public\PermitController::class, 'create']);
@@ -167,6 +179,19 @@ Route::middleware(['auth', 'prevent-back-history', 'role:staff,manager'])->group
 Route::middleware(['auth', 'prevent-back-history', 'role:manager'])->group(function () {
     Route::post('/admin/hse-plans/{id}/approve', [\App\Http\Controllers\Admin\HsePlanApprovalController::class, 'approve']);
     Route::post('/admin/hse-plans/{id}/reject', [\App\Http\Controllers\Admin\HsePlanApprovalController::class, 'reject']);
+});
+
+// ===== DAFTAR PERIKSA IZIN PEKERJAAN (role:staff, manager) =====
+Route::middleware(['auth', 'prevent-back-history', 'role:staff,manager'])->group(function () {
+    Route::get('/admin/work-inspections', [\App\Http\Controllers\Admin\WorkInspectionApprovalController::class, 'index']);
+    Route::get('/admin/work-inspections/history', [\App\Http\Controllers\Admin\WorkInspectionApprovalController::class, 'history']);
+    Route::get('/admin/work-inspections/{id}', [\App\Http\Controllers\Admin\WorkInspectionApprovalController::class, 'show']);
+});
+
+// ===== PERSETUJUAN DAFTAR PERIKSA (role:staff) =====
+Route::middleware(['auth', 'prevent-back-history', 'role:staff'])->group(function () {
+    Route::post('/admin/work-inspections/{id}/approve', [\App\Http\Controllers\Admin\WorkInspectionApprovalController::class, 'approve']);
+    Route::post('/admin/work-inspections/{id}/reject', [\App\Http\Controllers\Admin\WorkInspectionApprovalController::class, 'reject']);
 });
 
 // ===== ADMIN (role:staff, manager) =====
