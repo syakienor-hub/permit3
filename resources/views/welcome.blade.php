@@ -138,10 +138,17 @@
             transform: scale(1.1);
         }
 
-        .flow-step:nth-child(5) .sn { background: var(--amber-500); color: var(--navy-950); }
+        .flow-step:last-child .sn { background: var(--amber-500); color: var(--navy-950); }
 
         .flow-step h4 { font-size: 13.5px; font-weight: 700; margin-bottom: 7px; color: var(--navy-950); }
         .flow-step p { font-size: 12px; color: var(--ink-600); line-height: 1.5; }
+
+        .flow-step .flow-link {
+            display: inline-flex; align-items: center; gap: 4px; margin-top: 8px;
+            font-size: 11.5px; font-weight: 700; color: var(--amber-600);
+            transition: color .2s ease;
+        }
+        .flow-step .flow-link:hover { color: var(--amber-500); text-decoration: underline; }
 
         .flow-note {
             display: flex; gap: 12px; align-items: flex-start;
@@ -260,6 +267,7 @@
         .flow-step:nth-child(3) .sn { transition-delay: 160ms; }
         .flow-step:nth-child(4) .sn { transition-delay: 240ms; }
         .flow-step:nth-child(5) .sn { transition-delay: 320ms; }
+        .flow-step:nth-child(6) .sn { transition-delay: 400ms; }
     </style>
 </head>
 <body class="bg-[var(--paper)] text-[var(--ink-900)]">
@@ -1212,43 +1220,53 @@
         <div class="max-w-[560px] mx-auto text-center mb-8 md:mb-[46px] reveal">
             <div class="sec-tag">Alur Pengajuan</div>
             <h2 class="text-[22px] sm:text-[28px] font-extrabold tracking-[-.01em] mb-3 text-[var(--navy-950)]">Bagaimana Cara Mengajukan Izin Kerja</h2>
-            <p class="text-[14.5px] text-[var(--ink-600)]">Tanpa akun — isi form langsung di landing page, permit otomatis masuk verifikasi HSE.</p>
+            <p class="text-[14.5px] text-[var(--ink-600)]">Satu alur terpadu — dari data kontraktor, HSE Plan, daftar periksa, sampai Safety Permit dan monitoring.</p>
         </div>
 
         <div class="flow">
             <div class="flow-line"></div>
-            <div class="flow-grid grid grid-cols-1 md:grid-cols-5 gap-4 relative z-10">
+            <div class="flow-grid grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4 relative z-10">
                 <div class="flow-step reveal" style="transition-delay:0ms">
                     <div class="sn">1</div>
-                    <h4>Buka Form Pengajuan</h4>
-                    <p>Klik <strong>Ajukan Safety Permit</strong> di atas — tanpa login, tanpa akun.</p>
+                    <h4>Data Kontraktor</h4>
+                    <p>Daftarkan vendor, PIC, pekerjaan, dan dokumen pendukung kontraktor.</p>
+                    <a href="/data-kontraktor" class="flow-link">Isi Data &rarr;</a>
                 </div>
                 <div class="flow-step reveal" style="transition-delay:80ms">
                     <div class="sn">2</div>
-                    <h4>Isi Data & Divisi</h4>
-                    <p>Tulis nama divisi/unit pengaju, data kontraktor, dan detail pekerjaan.</p>
+                    <h4>HSE Plan</h4>
+                    <p>Ajukan rencana K3, lalu diperiksa dan disetujui Manager HSE.</p>
+                    <a href="/ajukan-hse-plan" class="flow-link">Ajukan HSE Plan &rarr;</a>
                 </div>
                 <div class="flow-step reveal" style="transition-delay:160ms">
                     <div class="sn">3</div>
-                    <h4>Identifikasi Pekerjaan</h4>
-                    <p>Klasifikasi pekerjaan, bahaya, serta APD didiskusikan bersama kontraktor.</p>
+                    <h4>Daftar Periksa Izin</h4>
+                    <p>Isi checklist pekerjaan berisiko tinggi untuk diverifikasi Staff HSE.</p>
+                    <a href="/daftar-periksa" class="flow-link">Isi Daftar Periksa &rarr;</a>
                 </div>
                 <div class="flow-step reveal" style="transition-delay:240ms">
                     <div class="sn">4</div>
-                    <h4>Lengkapi Berkas K3</h4>
-                    <p>Lampirkan dokumen pendukung seperti HIRADC, JSA, atau HSE Plan (wajib untuk Eksternal).</p>
+                    <h4>Ajukan Safety Permit</h4>
+                    <p>Pilih daftar periksa yang disetujui, lengkapi klasifikasi, bahaya, APD, dan dokumen.</p>
+                    <a href="/ajukan-permit" class="flow-link">Ajukan Permit &rarr;</a>
                 </div>
                 <div class="flow-step reveal" style="transition-delay:320ms">
                     <div class="sn">5</div>
-                    <h4>Kirim &amp; Verifikasi</h4>
-                    <p>Permit langsung berstatus Review Staff untuk diverifikasi sebelum pekerjaan dimulai.</p>
+                    <h4>Verifikasi Berlapis</h4>
+                    <p>Staff HSE memverifikasi permit, lalu Manager HSE menyetujui sebelum pekerjaan aktif.</p>
+                </div>
+                <div class="flow-step reveal" style="transition-delay:400ms">
+                    <div class="sn">6</div>
+                    <h4>Monitoring &amp; Status</h4>
+                    <p>Pantau permit, HSE Plan, dan daftar periksa secara real-time.</p>
+                    <a href="#monitoring" class="flow-link">Lihat Monitoring &rarr;</a>
                 </div>
             </div>
         </div>
 
         <div class="flow-note reveal-scale" style="transition-delay:200ms">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="shrink-0 mt-0.5"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg>
-            <span><strong>Info:</strong> pengajuan tidak memerlukan akun. Untuk pekerjaan berisiko tinggi, isi <strong>Daftar Periksa Izin Kerja</strong> dan tunggu persetujuan Staff HSE sebelum mengajukan Safety Permit. Seluruh permit publik otomatis masuk antrian verifikasi Staff HSE dan terpantau di tabel Monitoring.</span>
+            <span><strong>Info:</strong> pengajuan publik tidak memerlukan akun. Pekerjaan oleh <strong>kontraktor (Eksternal)</strong> melalui Data Kontraktor &rarr; HSE Plan &rarr; Daftar Periksa &rarr; Safety Permit. Pekerjaan <strong>Internal</strong> dapat langsung ke Daftar Periksa lalu Safety Permit. Semua status terpantau di tabel Monitoring dan dapat dicek kapan saja.</span>
         </div>
     </div>
 </section>
