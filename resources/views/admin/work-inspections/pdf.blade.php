@@ -36,8 +36,6 @@
         .status-line { margin: 8px 0 0; font-size: 9px; }
         .rejected { margin-top: 6px; border: 1px solid #b91c1c; color: #b91c1c; padding: 5px 7px; }
         .page-footer { position: fixed; bottom: 0; left: 0; right: 0; font-size: 8px; color: #000; }
-        .page-footer table td { border: none; padding: 0; }
-        .page-footer .print-info { text-align: right; color: #555; }
         .muted { color: #555; }
     </style>
 </head>
@@ -237,13 +235,6 @@
 
     </div>
 
-    <div class="page-footer">
-        <table>
-            <tr>
-                <td>Form K3LH: IV-01.013 Rev. 0</td>
-                <td class="print-info">Dicetak dari SIMONIKA &middot; {{ now()->format('d/m/Y H:i') }}</td>
-            </tr>
-        </table>
-    </div>
+    <div class="page-footer">Form K3LH: IV-01.013 Rev. 0</div>
 </body>
 </html>
