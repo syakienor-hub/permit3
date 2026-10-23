@@ -35,6 +35,7 @@
         .alat-table td { height: 18px; }
         .apd-table td { height: 21px; font-size: 9.5px; }
         .apd-box { font-family: monospace; font-size: 10px; }
+        .answer-box { font-family: "DejaVu Sans", sans-serif; font-size: 10px; font-weight: bold; }
         .note { font-style: italic; font-size: 9.5px; margin: 2px 0 10px 4px; }
         .section-title { margin: 13px 0 0; font-weight: normal; }
         .section-title-bold { margin: 18px 0 0; font-weight: bold; }
@@ -221,8 +222,8 @@
             <p class="section-title">10. Apakah pekerjaan menggunakan bahan-bahan B3?</p>
             <table class="answer-table">
                 <tr>
-                    <td>Ya <span class="apd-box">[{{ $hsePlan->bahan_b3 ? 'X' : ' ' }}]</span></td>
-                    <td>Tidak <span class="apd-box">[{{ $hsePlan->bahan_b3 ? ' ' : 'X' }}]</span></td>
+                    <td>Ya <span class="answer-box">[{!! $hsePlan->bahan_b3 ? '&#10003;' : '&nbsp;' !!}]</span></td>
+                    <td>Tidak <span class="answer-box">[{!! $hsePlan->bahan_b3 ? '&nbsp;' : '&#10007;' !!}]</span></td>
                 </tr>
             </table>
             <p class="answer-note">Jika &ldquo;Ya&rdquo; maka wajib melampirkan MSDS</p>
@@ -254,8 +255,8 @@
             <p class="section-title" style="margin-top: 0;">11. Apakah pekerjaan menghasilkan limbah B3?</p>
             <table class="answer-table">
                 <tr>
-                    <td>Ya <span class="apd-box">[{{ $hsePlan->limbah_b3 ? 'X' : ' ' }}]</span></td>
-                    <td>Tidak <span class="apd-box">[{{ $hsePlan->limbah_b3 ? ' ' : 'X' }}]</span></td>
+                    <td>Ya <span class="answer-box">[{!! $hsePlan->limbah_b3 ? '&#10003;' : '&nbsp;' !!}]</span></td>
+                    <td>Tidak <span class="answer-box">[{!! $hsePlan->limbah_b3 ? '&nbsp;' : '&#10007;' !!}]</span></td>
                 </tr>
             </table>
             <p class="answer-note">Jika &ldquo;Ya&rdquo; maka wajib melampirkan rencana pengelolaan limbah B3</p>
@@ -263,8 +264,8 @@
             <p class="section-title">12. Memiliki prosedur/instruksi kerja yang terkait</p>
             <table class="answer-table">
                 <tr>
-                    <td>Ya <span class="apd-box">[{{ $hsePlan->prosedur_kerja ? 'X' : ' ' }}]</span></td>
-                    <td>Tidak <span class="apd-box">[{{ $hsePlan->prosedur_kerja ? ' ' : 'X' }}]</span></td>
+                    <td>Ya <span class="answer-box">[{!! $hsePlan->prosedur_kerja ? '&#10003;' : '&nbsp;' !!}]</span></td>
+                    <td>Tidak <span class="answer-box">[{!! $hsePlan->prosedur_kerja ? '&nbsp;' : '&#10007;' !!}]</span></td>
                 </tr>
             </table>
             <p class="answer-note">Jika &ldquo;Ya&rdquo; maka wajib melampirkan prosedur/instruksi kerja</p>
@@ -272,8 +273,8 @@
             <p class="section-title">13. Memiliki rencana pemantauan/inspeksi selama proses pekerjaan berlangsung</p>
             <table class="answer-table">
                 <tr>
-                    <td>Ya <span class="apd-box">[{{ $hsePlan->rencana_inspeksi ? 'X' : ' ' }}]</span></td>
-                    <td>Tidak <span class="apd-box">[{{ $hsePlan->rencana_inspeksi ? ' ' : 'X' }}]</span></td>
+                    <td>Ya <span class="answer-box">[{!! $hsePlan->rencana_inspeksi ? '&#10003;' : '&nbsp;' !!}]</span></td>
+                    <td>Tidak <span class="answer-box">[{!! $hsePlan->rencana_inspeksi ? '&nbsp;' : '&#10007;' !!}]</span></td>
                 </tr>
             </table>
             <p class="answer-note">Jika &ldquo;Ya&rdquo; maka wajib melampirkan rencana pemantauan/inspeksi</p>
@@ -281,16 +282,16 @@
             <p class="section-title">14. Menyediakan fasilitas peralatan tanggap darurat seperti APAR dan lain sebagainya</p>
             <table class="answer-table">
                 <tr>
-                    <td>Ya <span class="apd-box">[{{ $hsePlan->tanggap_darurat ? 'X' : ' ' }}]</span></td>
-                    <td>Tidak <span class="apd-box">[{{ $hsePlan->tanggap_darurat ? ' ' : 'X' }}]</span></td>
+                    <td>Ya <span class="answer-box">[{!! $hsePlan->tanggap_darurat ? '&#10003;' : '&nbsp;' !!}]</span></td>
+                    <td>Tidak <span class="answer-box">[{!! $hsePlan->tanggap_darurat ? '&nbsp;' : '&#10007;' !!}]</span></td>
                 </tr>
             </table>
 
             <p class="section-title">15. Memiliki struktur organisasi proyek</p>
             <table class="answer-table">
                 <tr>
-                    <td>Ya <span class="apd-box">[{{ $hsePlan->struktur_organisasi ? 'X' : ' ' }}]</span></td>
-                    <td>Tidak <span class="apd-box">[{{ $hsePlan->struktur_organisasi ? ' ' : 'X' }}]</span></td>
+                    <td>Ya <span class="answer-box">[{!! $hsePlan->struktur_organisasi ? '&#10003;' : '&nbsp;' !!}]</span></td>
+                    <td>Tidak <span class="answer-box">[{!! $hsePlan->struktur_organisasi ? '&nbsp;' : '&#10007;' !!}]</span></td>
                 </tr>
             </table>
             <p class="answer-note">Jika &ldquo;Ya&rdquo; maka wajib melampirkan struktur organisasi proyek</p>

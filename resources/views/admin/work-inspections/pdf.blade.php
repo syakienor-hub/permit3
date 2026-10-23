@@ -23,6 +23,7 @@
         .q-table th { text-align: center; background: #f0f0f0; font-size: 8.5px; }
         .q-num { width: 5%; text-align: center; }
         .q-choice { width: 8%; text-align: center; font-weight: bold; }
+        .mark { font-family: "DejaVu Sans", sans-serif; font-size: 10px; font-weight: bold; }
         .q-note { padding-left: 14px !important; font-style: italic; border-top: none !important; }
         .loto-note { margin: 8px 0 3px; }
         .sig-table { margin-top: 10px; }
@@ -129,8 +130,8 @@
                     <tr>
                         <td class="q-num">{{ $index + 1 }}</td>
                         <td>{{ \App\Models\WorkInspection::ANSWER_LABELS[$key] }}</td>
-                        <td class="q-choice">{!! $value === true ? 'X' : '&nbsp;' !!}</td>
-                        <td class="q-choice">{!! $value === false ? 'X' : '&nbsp;' !!}</td>
+                        <td class="q-choice">{!! $value === true ? '<span class="mark">&#10003;</span>' : '&nbsp;' !!}</td>
+                        <td class="q-choice">{!! $value === false ? '<span class="mark">&#10007;</span>' : '&nbsp;' !!}</td>
                     </tr>
                     @if($key === 'izin_lain' && !empty($inspection->answers['izin_lain_ket']))
                         <tr>
@@ -158,8 +159,8 @@
                     <tr>
                         <td class="q-num">{{ $index + 11 }}</td>
                         <td>{{ \App\Models\WorkInspection::ANSWER_LABELS[$key] }}</td>
-                        <td class="q-choice">{!! $value === true ? 'X' : '&nbsp;' !!}</td>
-                        <td class="q-choice">{!! $value === false ? 'X' : '&nbsp;' !!}</td>
+                        <td class="q-choice">{!! $value === true ? '<span class="mark">&#10003;</span>' : '&nbsp;' !!}</td>
+                        <td class="q-choice">{!! $value === false ? '<span class="mark">&#10007;</span>' : '&nbsp;' !!}</td>
                     </tr>
                     @if($key === 'apd_khusus' && !empty($inspection->answers['apd_khusus_ket']))
                         <tr>
