@@ -13,7 +13,7 @@
         .form-input:focus { outline: none; border-color: #111d33; box-shadow: 0 0 0 3px rgba(17,29,51,0.08); }
     </style>
 </head>
-<body class="bg-slate-50 min-h-screen px-4 py-8">
+<body class="bg-slate-50 min-h-screen flex flex-col items-center px-4 py-8">
     @php
         $statusMap = [
             \App\Models\WorkInspection::STATUS_PENDING => ['label' => 'Menunggu Verifikasi Staff HSE', 'class' => 'bg-orange-100 text-orange-700'],
@@ -23,10 +23,13 @@
         $status = isset($inspection) ? ($statusMap[$inspection->status] ?? ['label' => $inspection->status, 'class' => 'bg-gray-100 text-gray-600']) : null;
     @endphp
 
+    <div class="w-full max-w-2xl mb-3">
+        <a href="/" class="text-sm text-gray-500 hover:text-inka-navy">&larr; Kembali ke Beranda</a>
+    </div>
+
     <div class="bg-white rounded-2xl border border-gray-100 shadow-sm max-w-2xl w-full mx-auto p-6 sm:p-8">
         <div class="mb-5">
-            <a href="/" class="text-sm text-gray-500 hover:text-inka-navy">&larr; Kembali ke Beranda</a>
-            <h1 class="text-xl sm:text-2xl font-extrabold text-gray-800 mt-2">Cek Status Daftar Periksa</h1>
+            <h1 class="text-xl sm:text-2xl font-extrabold text-gray-800">Cek Status Daftar Periksa</h1>
             <p class="text-sm text-gray-500 mt-1">Masukkan nomor daftar periksa dan nomor telepon yang Anda isi saat mengajukan.</p>
         </div>
 

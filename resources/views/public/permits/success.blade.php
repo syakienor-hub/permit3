@@ -9,7 +9,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>body { font-family: 'Inter', sans-serif; }</style>
 </head>
-<body class="bg-slate-50 min-h-screen flex items-center justify-center px-4 py-8">
+<body class="bg-slate-50 min-h-screen flex flex-col items-center justify-center px-4 py-8">
+    <div class="w-full max-w-md mb-3">
+        <a href="/" class="text-sm text-gray-500 hover:text-inka-navy">&larr; Kembali ke Beranda</a>
+    </div>
+
     <div class="bg-white rounded-2xl border border-gray-100 shadow-sm max-w-md w-full p-6 sm:p-8 text-center">
         @if(session('success'))
             <div class="mb-4 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700 text-left">{{ session('success') }}</div>
@@ -50,7 +54,6 @@
         @endif
 
         <div class="mt-6 flex flex-col sm:flex-row gap-2.5 sm:gap-3 justify-center">
-            <a href="/" class="px-5 py-2.5 rounded-xl bg-inka-navy text-white text-sm font-semibold hover:opacity-90">Kembali ke Beranda</a>
             @if(!in_array($permit->status, ['Closed', 'Cancelled']))
                 <a href="{{ $cancelUrl }}" class="px-5 py-2.5 rounded-xl border border-red-200 text-sm font-semibold text-red-600 hover:bg-red-50 transition-colors">Batalkan Permit</a>
             @else
