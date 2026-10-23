@@ -186,6 +186,8 @@ Route::middleware(['auth', 'prevent-back-history', 'role:staff,manager'])->group
     Route::get('/admin/work-inspections', [\App\Http\Controllers\Admin\WorkInspectionApprovalController::class, 'index']);
     Route::get('/admin/work-inspections/history', [\App\Http\Controllers\Admin\WorkInspectionApprovalController::class, 'history']);
     Route::get('/admin/work-inspections/{id}', [\App\Http\Controllers\Admin\WorkInspectionApprovalController::class, 'show']);
+    Route::get('/admin/work-inspections/{id}/pdf', [\App\Http\Controllers\Admin\WorkInspectionApprovalController::class, 'viewPdf']);
+    Route::get('/admin/work-inspections/{id}/pdf/download', [\App\Http\Controllers\Admin\WorkInspectionApprovalController::class, 'downloadPdf']);
 });
 
 // ===== PERSETUJUAN DAFTAR PERIKSA (role:staff) =====

@@ -147,6 +147,51 @@ class WorkInspectionTest extends TestCase
             ->assertNotFound();
     }
 
+    public function test_staff_can_view_and_download_daftar_periksa_pdf(): void
+    {
+        $staff = User::factory()->create(['role' => 'staff', 'site' => 'Madiun']);
+        $inspection = $this->makeInspection(WorkInspection::STATUS_APPROVED, $staff->id);
+        $inspection->update([
+            'safety_officer_nama' => 'Staff HSE Madiun',
+            'staff_signature' => $this->fakeSignature(),
+        ]);
+
+        $this->actingAs($staff)
+            ->get('/admin/work-inspections/' . $inspection->id . '/pdf')
+            ->assertOk()
+            ->assertHeader('content-type', 'application/pdf');
+
+        $this->actingAs($staff)
+            ->get('/admin/work-inspections/' . $inspection->id . '/pdf/download')
+            ->assertOk()
+            ->assertDownload('Daftar-Periksa-001-DPIKBT-INKA-2026.pdf');
+    }
+
+    public function test_staff_from_another_site_cannot_access_daftar_periksa_pdf(): void
+    {
+        $staff = User::factory()->create(['role' => 'staff', 'site' => 'Banyuwangi']);
+        $inspection = $this->makeInspection();
+
+        $this->actingAs($staff)
+            ->get('/admin/work-inspections/' . $inspection->id . '/pdf')
+            ->assertNotFound();
+
+        $this->actingAs($staff)
+            ->get('/admin/work-inspections/' . $inspection->id . '/pdf/download')
+            ->assertNotFound();
+    }
+
+    public function test_manager_can_access_daftar_periksa_pdf(): void
+    {
+        $manager = User::factory()->create(['role' => 'manager']);
+        $inspection = $this->makeInspection();
+
+        $this->actingAs($manager)
+            ->get('/admin/work-inspections/' . $inspection->id . '/pdf')
+            ->assertOk()
+            ->assertHeader('content-type', 'application/pdf');
+    }
+
     public function test_permit_form_lists_approved_daftar_periksa(): void
     {
         $inspection = $this->makeInspection(WorkInspection::STATUS_APPROVED);
@@ -263,6 +308,11 @@ class WorkInspectionTest extends TestCase
         ], $overrides);
     }
 
+    private function fakeSignature(): string
+    {
+        return 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
+    }
+
     private function makeInspection(
         string $status = WorkInspection::STATUS_PENDING,
         ?int $reviewedBy = null,
@@ -283,7 +333,7 @@ class WorkInspectionTest extends TestCase
             'loto_nama' => 'Budi',
             'loto_tanggal' => '2026-10-25',
             'loto_jam' => '08:00',
-            'tanda_tangan' => 'data:image/png;base64,abc',
+            'tanda_tangan' => $this->fakeSignature(),
             'status' => $status,
             'submitted_at' => now(),
             'reviewed_by' => $reviewedBy,

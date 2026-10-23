@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\WorkInspection;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -97,6 +98,40 @@ class WorkInspectionApprovalController extends Controller
             ->findOrFail($id);
 
         return view('admin.work-inspections.show', compact('inspection'));
+    }
+
+    public function viewPdf($id)
+    {
+        $inspection = $this->pdfInspection($id);
+
+        return $this->inspectionPdf($inspection)->stream($this->inspectionPdfName($inspection));
+    }
+
+    public function downloadPdf($id)
+    {
+        $inspection = $this->pdfInspection($id);
+
+        return $this->inspectionPdf($inspection)->download($this->inspectionPdfName($inspection));
+    }
+
+    private function pdfInspection($id): WorkInspection
+    {
+        return WorkInspection::query()
+            ->visibleTo(Auth::user())
+            ->with(['reviewer', 'permit'])
+            ->findOrFail($id);
+    }
+
+    private function inspectionPdf(WorkInspection $inspection)
+    {
+        return Pdf::loadView('admin.work-inspections.pdf', compact('inspection'))
+            ->setPaper('A4', 'portrait')
+            ->setOptions(['defaultFont' => 'sans-serif']);
+    }
+
+    private function inspectionPdfName(WorkInspection $inspection): string
+    {
+        return 'Daftar-Periksa-' . str_replace('/', '-', $inspection->no_periksa) . '.pdf';
     }
 
     public function approve(Request $request, $id)

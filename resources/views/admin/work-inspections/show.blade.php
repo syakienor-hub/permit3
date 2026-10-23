@@ -33,13 +33,27 @@
         </div>
     @endif
 
-    <div class="mb-5">
-        <a href="/admin/work-inspections" class="text-sm text-gray-500 hover:text-inka-navy">&larr; Kembali ke Daftar Periksa</a>
-        <div class="flex flex-wrap items-center gap-3 mt-2">
-            <h1 class="text-xl sm:text-2xl font-bold text-gray-800 font-mono">{{ $inspection->no_periksa }}</h1>
-            <span class="text-xs font-bold px-3 py-1 rounded-full {{ $badge }}">{{ $label }}</span>
+    <div class="mb-5 flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+        <div>
+            <a href="/admin/work-inspections" class="text-sm text-gray-500 hover:text-inka-navy">&larr; Kembali ke Daftar Periksa</a>
+            <div class="flex flex-wrap items-center gap-3 mt-2">
+                <h1 class="text-xl sm:text-2xl font-bold text-gray-800 font-mono">{{ $inspection->no_periksa }}</h1>
+                <span class="text-xs font-bold px-3 py-1 rounded-full {{ $badge }}">{{ $label }}</span>
+            </div>
+            <p class="text-sm text-gray-500 mt-1">Form K3LH IV-01.013 — Daftar Periksa Izin Pekerjaan Berisiko Tinggi</p>
         </div>
-        <p class="text-sm text-gray-500 mt-1">Form K3LH IV-01.013 — Daftar Periksa Izin Pekerjaan Berisiko Tinggi</p>
+        <div class="flex flex-wrap items-center gap-2 self-start">
+            <a href="/admin/work-inspections/{{ $inspection->id }}/pdf" target="_blank"
+               class="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-semibold text-gray-600 bg-white border border-gray-200 rounded-xl hover:border-gray-300 transition-colors">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                Lihat PDF
+            </a>
+            <a href="/admin/work-inspections/{{ $inspection->id }}/pdf/download"
+               class="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-semibold text-red-600 bg-red-50 border border-red-200 rounded-xl hover:bg-red-100 transition-colors">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                Unduh PDF
+            </a>
+        </div>
     </div>
 
     @if($inspection->status === \App\Models\WorkInspection::STATUS_REJECTED && $inspection->rejection_reason)
