@@ -4,34 +4,32 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <title>Daftar Periksa {{ $inspection->no_periksa }}</title>
     <style>
-        @page { margin: 26px 30px 24px 30px; }
-        body { font-family: Helvetica, Arial, sans-serif; font-size: 9.5px; line-height: 1.35; color: #000; }
+        @page { margin: 22px 28px 20px 28px; }
+        body { font-family: Helvetica, Arial, sans-serif; font-size: 9.6px; line-height: 1.35; color: #000; }
         table { border-collapse: collapse; width: 100%; }
         td, th { vertical-align: top; }
-        .page { page-break-after: always; }
-        .page:last-child { page-break-after: auto; }
-        .header td { border: 1px solid #000; padding: 6px 8px; vertical-align: middle; }
+        .header td { border: 1px solid #000; padding: 5px 7px; vertical-align: middle; }
         .header-logo { width: 22%; text-align: center; }
-        .header-title { width: 48%; text-align: center; font-size: 14px; font-weight: bold; letter-spacing: .3px; }
-        .header-title span { display: block; font-size: 9px; font-weight: normal; margin-top: 3px; }
-        .header-meta { width: 30%; font-size: 8.8px; }
-        .header-meta table td { border: none; padding: 1px 0; }
-        .logo { width: 92px; height: auto; }
-        .section-title { background: #e8e8e8; border: 1px solid #000; border-bottom: none; padding: 4px 7px; font-weight: bold; font-size: 9.8px; margin-top: 10px; }
-        .data-table td { border: 1px solid #000; padding: 4px 6px; }
+        .header-title { width: 48%; text-align: center; font-size: 13px; font-weight: bold; letter-spacing: .3px; }
+        .header-title span { display: block; font-size: 8.5px; font-weight: normal; margin-top: 2px; }
+        .header-meta { width: 30%; font-size: 8.3px; }
+        .header-meta table td { border: none; padding: 0; }
+        .logo { width: 80px; height: auto; }
+        .section-title { background: #e8e8e8; border: 1px solid #000; border-bottom: none; padding: 3px 6px; font-weight: bold; font-size: 9.2px; margin-top: 8px; }
+        .data-table td { border: 1px solid #000; padding: 3px 5px; }
         .data-label { width: 22%; background: #f7f7f7; }
         .data-value { width: 28%; }
-        .q-table th, .q-table td { border: 1px solid #000; padding: 3px 5px; }
-        .q-table th { text-align: center; background: #f0f0f0; font-size: 9px; }
+        .q-table th, .q-table td { border: 1px solid #000; padding: 2px 4px; }
+        .q-table th { text-align: center; background: #f0f0f0; font-size: 8.5px; }
         .q-num { width: 5%; text-align: center; }
         .q-choice { width: 8%; text-align: center; font-weight: bold; }
-        .q-note { padding-left: 16px !important; font-style: italic; border-top: none !important; }
-        .loto-note { margin: 10px 0 4px; }
-        .sig-table { margin-top: 14px; }
-        .sig-table td { border: 1px solid #000; padding: 4px 6px; }
+        .q-note { padding-left: 14px !important; font-style: italic; border-top: none !important; }
+        .loto-note { margin: 8px 0 3px; }
+        .sig-table { margin-top: 10px; }
+        .sig-table td { border: 1px solid #000; padding: 3px 5px; }
         .sig-title { text-align: center; font-weight: bold; background: #f0f0f0; }
-        .sig-space { height: 52px; text-align: center; vertical-align: middle; }
-        .sig-img { max-height: 46px; max-width: 180px; }
+        .sig-space { height: 40px; text-align: center; vertical-align: middle; }
+        .sig-img { max-height: 36px; max-width: 160px; }
         .sig-name { text-align: center; }
         .status-line { margin: 8px 0 0; font-size: 9px; }
         .rejected { margin-top: 6px; border: 1px solid #b91c1c; color: #b91c1c; padding: 5px 7px; }
@@ -71,7 +69,7 @@
                     <table>
                         <tr><td style="width: 26%;">No</td><td>: {{ $inspection->no_periksa }}</td></tr>
                         <tr><td>Tgl</td><td>: {{ $tanggal?->format('d/m/Y') ?? '-' }}</td></tr>
-                        <tr><td>Halaman</td><td>: 01 dari 02</td></tr>
+                        <tr><td>Halaman</td><td>: 01 dari 01</td></tr>
                     </table>
                 </td>
             </tr>
@@ -142,33 +140,6 @@
                     @endif
                 @endforeach
             </tbody>
-        </table>
-
-        <div class="footer">Dicetak dari SIMONIKA &middot; {{ now()->format('d/m/Y H:i') }}</div>
-    </div>
-
-    <div class="page">
-        <table class="header">
-            <tr>
-                <td class="header-logo">
-                    @if(file_exists($logoPath))
-                        <img src="data:image/svg+xml;base64,{{ base64_encode(file_get_contents($logoPath)) }}" class="logo" alt="Logo INKA">
-                    @else
-                        <strong style="font-size: 16px;">INKA</strong>
-                    @endif
-                </td>
-                <td class="header-title">
-                    DAFTAR PERIKSA IZIN PEKERJAAN BERISIKO TINGGI
-                    <span>Form K3LH IV-01.013 Rev. 0</span>
-                </td>
-                <td class="header-meta">
-                    <table>
-                        <tr><td style="width: 26%;">No</td><td>: {{ $inspection->no_periksa }}</td></tr>
-                        <tr><td>Tgl</td><td>: {{ $tanggal?->format('d/m/Y') ?? '-' }}</td></tr>
-                        <tr><td>Halaman</td><td>: 02 dari 02</td></tr>
-                    </table>
-                </td>
-            </tr>
         </table>
 
         <div class="section-title">3. PEMERIKSAAN LANJUTAN</div>
