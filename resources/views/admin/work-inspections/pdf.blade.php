@@ -25,13 +25,15 @@
         .q-choice { width: 8%; text-align: center; font-weight: bold; }
         .mark { font-family: "DejaVu Sans", sans-serif; font-size: 10px; font-weight: bold; }
         .q-note { padding-left: 14px !important; font-style: italic; border-top: none !important; }
-        .loto-note { margin: 8px 0 3px; }
-        .sig-table { margin-top: 10px; }
-        .sig-table td { border: 1px solid #000; padding: 3px 5px; }
-        .sig-title { text-align: center; font-weight: bold; background: #f0f0f0; }
-        .sig-space { height: 40px; text-align: center; vertical-align: middle; }
+        .loto-table { border-collapse: collapse; width: 100%; margin-top: 8px; }
+        .loto-table td { border: 1px solid #000; padding: 3px 5px; vertical-align: top; }
+        .loto-title { background: #e8e8e8; font-weight: bold; font-size: 9.2px; padding: 3px 6px !important; }
+        .loto-text { padding: 6px !important; }
+        .loto-label { background: #f7f7f7; }
+        .loto-sig-title { text-align: center; font-weight: bold; background: #f0f0f0; }
+        .loto-sig-space { height: 40px; text-align: center; vertical-align: middle; }
+        .loto-sig-name { text-align: center; }
         .sig-img { max-height: 36px; max-width: 160px; }
-        .sig-name { text-align: center; }
         .status-line { margin: 8px 0 0; font-size: 9px; }
         .rejected { margin-top: 6px; border: 1px solid #b91c1c; color: #b91c1c; padding: 5px 7px; }
         .footer { margin-top: 10px; font-size: 8px; color: #555; text-align: right; }
@@ -172,44 +174,44 @@
             </tbody>
         </table>
 
-        <div class="section-title">4. LOTO &amp; TANDA TANGAN</div>
-        <p class="loto-note">"LOTO (Lock Out &amp; Tag Out)" telah diisi/dipasang dengan sebenarnya oleh:</p>
-
-        <table class="data-table">
+        <table class="loto-table">
             <tr>
-                <td class="data-label">Nama Pelaksana LOTO</td>
-                <td class="data-value">{{ $inspection->loto_nama }}</td>
-                <td class="data-label">Tanggal / Jam</td>
-                <td class="data-value">
+                <td colspan="12" class="loto-title">4. LOTO &amp; TANDA TANGAN</td>
+            </tr>
+            <tr>
+                <td colspan="12" class="loto-text">"LOTO (Lock Out &amp; Tag Out)" telah diisi/dipasang dengan sebenarnya oleh:</td>
+            </tr>
+            <tr>
+                <td colspan="3" class="loto-label">Nama Pelaksana LOTO</td>
+                <td colspan="3">{{ $inspection->loto_nama }}</td>
+                <td colspan="3" class="loto-label">Tanggal / Jam</td>
+                <td colspan="3">
                     {{ $inspection->loto_tanggal?->format('d/m/Y') ?? '-' }}
                     {{ $inspection->loto_jam ? '/ ' . $inspection->loto_jam : '' }}
                 </td>
             </tr>
             <tr>
-                <td class="data-label">Supervisor</td>
-                <td class="data-value">{{ $inspection->supervisor_nama ?: '-' }}</td>
-                <td class="data-label">Tanggal / Jam</td>
-                <td class="data-value">
+                <td colspan="3" class="loto-label">Supervisor</td>
+                <td colspan="3">{{ $inspection->supervisor_nama ?: '-' }}</td>
+                <td colspan="3" class="loto-label">Tanggal / Jam</td>
+                <td colspan="3">
                     {{ $inspection->supervisor_tanggal?->format('d/m/Y') ?? '-' }}
                     {{ $inspection->supervisor_jam ? '/ ' . $inspection->supervisor_jam : '' }}
                 </td>
             </tr>
-        </table>
-
-        <table class="sig-table">
             <tr>
-                <td class="sig-title" style="width: 33.33%;">Pelaksana LOTO</td>
-                <td class="sig-title" style="width: 33.33%;">Diperiksa Supervisor</td>
-                <td class="sig-title" style="width: 33.33%;">Safety Officer</td>
+                <td colspan="4" class="loto-sig-title">Pelaksana LOTO</td>
+                <td colspan="4" class="loto-sig-title">Diperiksa Supervisor</td>
+                <td colspan="4" class="loto-sig-title">Safety Officer</td>
             </tr>
             <tr>
-                <td class="sig-space">
+                <td colspan="4" class="loto-sig-space">
                     @if($inspection->tanda_tangan)
                         <img src="{{ $inspection->tanda_tangan }}" class="sig-img" alt="Tanda tangan pelaksana">
                     @endif
                 </td>
-                <td class="sig-space"></td>
-                <td class="sig-space">
+                <td colspan="4" class="loto-sig-space"></td>
+                <td colspan="4" class="loto-sig-space">
                     @if($inspection->staff_signature)
                         <img src="{{ $inspection->staff_signature }}" class="sig-img" alt="Tanda tangan Safety Officer">
                     @else
@@ -218,15 +220,15 @@
                 </td>
             </tr>
             <tr>
-                <td class="sig-name">
+                <td colspan="4" class="loto-sig-name">
                     <strong>{{ $inspection->loto_nama }}</strong><br>
                     {{ $inspection->loto_tanggal?->format('d/m/Y') ?? '-' }}{{ $inspection->loto_jam ? ' / ' . $inspection->loto_jam : '' }}
                 </td>
-                <td class="sig-name">
+                <td colspan="4" class="loto-sig-name">
                     <strong>{{ $inspection->supervisor_nama ?: '..........................' }}</strong><br>
                     {{ $inspection->supervisor_tanggal?->format('d/m/Y') ?? '..........................' }}{{ $inspection->supervisor_jam ? ' / ' . $inspection->supervisor_jam : '' }}
                 </td>
-                <td class="sig-name">
+                <td colspan="4" class="loto-sig-name">
                     <strong>{{ $inspection->safety_officer_nama ?: '..........................' }}</strong><br>
                     {{ $inspection->reviewed_at?->format('d/m/Y') ?? '..........................' }}
                 </td>
