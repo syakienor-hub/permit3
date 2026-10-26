@@ -241,7 +241,17 @@
                     <h2 class="text-base font-semibold text-gray-800">Tanda Tangan Kontraktor</h2>
                 </div>
                 <div class="px-4 md:px-6 py-4">
-                    <img src="{{ $hsePlan->tanda_tangan }}" alt="Tanda tangan kontraktor" class="w-full max-w-[260px] mx-auto border border-gray-100 rounded-xl bg-white">
+                    @if(filled($hsePlan->tanda_tangan))
+                        <img src="{{ $hsePlan->tanda_tangan }}" alt="Tanda tangan kontraktor" class="w-full max-w-[260px] mx-auto border border-gray-100 rounded-xl bg-white">
+                    @else
+                        <div class="flex flex-col items-center justify-center rounded-xl border border-dashed border-gray-200 bg-gray-50 px-4 py-8 text-center">
+                            <svg class="w-8 h-8 text-gray-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 17c2.5-3 4-6 4-6s1.5 4 3.5 4S14 9 14 9s1.5 4 3.5 4S21 9 21 9M4 21h16"/>
+                            </svg>
+                            <p class="text-sm font-medium text-gray-500">Tanda tangan kontraktor tidak tersedia.</p>
+                            <p class="text-xs text-gray-400 mt-1">Data HSE Plan ini tidak menyertakan tanda tangan.</p>
+                        </div>
+                    @endif
                 </div>
             </section>
 
