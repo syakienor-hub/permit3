@@ -199,12 +199,11 @@
         .btn-lg { padding: 13px 24px; font-size: 14.5px; }
 
         .btn-outline-light {
-            background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.22); color: #fff;
+            background: rgba(255,255,255,.06); border-color: rgba(255,255,255,.35); color: #fff;
             backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
         }
         .btn-outline-light:hover {
-            background: rgba(255,255,255,.22); border-color: rgba(255,255,255,.5);
-            transform: translateY(-1px);
+            background: rgba(255,255,255,.12); border-color: rgba(255,255,255,.55);
         }
 
         /* Scroll Animations */
@@ -387,7 +386,7 @@
                     </svg>
                     Ajukan Safety Permit
                 </a>
-                <a href="/daftar-periksa" class="btn btn-amber btn-lg w-full sm:w-auto">
+                <a href="/daftar-periksa" class="btn btn-outline-light btn-lg w-full sm:w-auto">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
                     </svg>
@@ -395,7 +394,7 @@
                 </a>
             </div>
 
-            <div class="mt-4 flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5 text-[13px] font-medium text-white/70">
+            <div class="mt-5 flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5 text-[12.5px] font-medium text-white/60">
                 <a href="/cek-status" class="hover:text-white transition-colors">Cek Status</a>
                 <span class="text-white/25">&bull;</span>
                 <a href="/data-kontraktor" class="hover:text-white transition-colors">Ajukan Data Kontraktor</a>
