@@ -528,8 +528,16 @@
                         <p class="text-xs text-gray-500">Menampilkan 5 permit terbaru dengan update berkala</p>
                     </div>
                 </div>
-                <div class="text-xs font-semibold text-gray-500 bg-white px-3 py-1.5 rounded-lg border border-gray-200">
-                    Total: <span class="text-inka-navy font-bold">{{ $permits->total() }}</span> Permit Terdaftar
+                <div class="flex flex-wrap items-center gap-2">
+                    <div class="text-xs font-semibold text-gray-500 bg-white px-3 py-1.5 rounded-lg border border-gray-200">
+                        Total: <span class="text-inka-navy font-bold">{{ $permits->total() }}</span> Permit Terdaftar
+                    </div>
+                    <a href="/ajukan-permit" class="inline-flex items-center gap-1.5 whitespace-nowrap rounded-lg bg-inka-navy px-3.5 py-1.5 text-xs font-semibold text-white shadow-sm hover:opacity-90 transition-opacity">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                        </svg>
+                        Tambah Permit
+                    </a>
                 </div>
             </div>
             <form method="GET" action="{{ url('/') }}#monitoring" class="px-4 md:px-6 py-3 border-b border-gray-100 bg-white flex flex-wrap items-center gap-x-3 gap-y-2">
@@ -900,8 +908,16 @@
                         <p class="text-xs text-gray-500">Menampilkan 5 kontraktor terbaru beserta status HSE Plan</p>
                     </div>
                 </div>
-                <div class="text-xs font-semibold text-gray-500 bg-white px-3 py-1.5 rounded-lg border border-gray-200">
-                    Total: <span class="text-inka-navy font-bold">{{ $contractors->total() }}</span> Kontraktor Terdaftar
+                <div class="flex flex-wrap items-center gap-2">
+                    <div class="text-xs font-semibold text-gray-500 bg-white px-3 py-1.5 rounded-lg border border-gray-200">
+                        Total: <span class="text-inka-navy font-bold">{{ $contractors->total() }}</span> Kontraktor Terdaftar
+                    </div>
+                    <a href="/data-kontraktor" class="inline-flex items-center gap-1.5 whitespace-nowrap rounded-lg bg-inka-navy px-3.5 py-1.5 text-xs font-semibold text-white shadow-sm hover:opacity-90 transition-opacity">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                        </svg>
+                        Tambah Kontraktor
+                    </a>
                 </div>
             </div>
 
