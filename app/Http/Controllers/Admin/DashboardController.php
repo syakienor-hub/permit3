@@ -5,33 +5,60 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\HsePlan;
 use App\Models\Permit;
+use App\Models\WorkInspection;
 use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
 {
     public function index()
     {
-        $role = Auth::user()->role;
+        $user = Auth::user();
+        $role = $user->role;
         $today = now()->startOfDay();
 
         $counts = [
             'permit_pending' => 0,
             'permit_today' => 0,
+            'permit_active' => 0,
+            'inspection_pending' => 0,
             'hse_review' => 0,
             'hse_approved' => 0,
             'hse_rejected' => 0,
         ];
         $permits = collect();
+        $inspections = collect();
         $hsePlans = collect();
 
         if ($role === 'staff') {
-            $permitQuery = Permit::visibleTo(Auth::user())->where('status', 'Review Staff');
+            $permitQuery = Permit::visibleTo($user);
+            $inspectionQuery = WorkInspection::query()->visibleTo($user);
 
-            $counts['permit_pending'] = (clone $permitQuery)->count();
-            $counts['permit_today'] = (clone $permitQuery)->whereDate('updated_at', $today)->count();
-            $permits = $permitQuery->with(['user', 'classifications'])
+            $counts['permit_pending'] = (clone $permitQuery)->where('status', 'Review Staff')->count();
+            $counts['permit_today'] = (clone $permitQuery)
+                ->where('status', 'Review Staff')
+                ->whereDate('updated_at', $today)
+                ->count();
+            $counts['permit_active'] = (clone $permitQuery)->where('status', 'Active')->count();
+            $counts['inspection_pending'] = (clone $inspectionQuery)
+                ->where('status', WorkInspection::STATUS_PENDING)
+                ->count();
+            $counts['hse_review'] = HsePlan::query()
+                ->visibleTo($user)
+                ->where('status', HsePlan::STATUS_REVIEW)
+                ->count();
+
+            $permits = (clone $permitQuery)
+                ->where('status', 'Review Staff')
+                ->with(['user', 'classifications'])
                 ->orderBy('submitted_at', 'asc')
-                ->take(6)
+                ->take(5)
+                ->get();
+
+            $inspections = (clone $inspectionQuery)
+                ->where('status', WorkInspection::STATUS_PENDING)
+                ->with('reviewer')
+                ->orderByRaw('COALESCE(submitted_at, created_at) ASC')
+                ->take(5)
                 ->get();
         } elseif ($role === 'manager') {
             $permitQuery = Permit::where('status', 'Review Manager');
@@ -53,6 +80,23 @@ class DashboardController extends Controller
                 ->get();
         }
 
-        return view('admin.dashboard', compact('counts', 'permits', 'hsePlans', 'role'));
+        $hour = (int) now('Asia/Jakarta')->format('H');
+        $greeting = match (true) {
+            $hour < 11 => 'Selamat pagi',
+            $hour < 15 => 'Selamat siang',
+            $hour < 18 => 'Selamat sore',
+            default => 'Selamat malam',
+        };
+
+        return view('admin.dashboard', [
+            'counts' => $counts,
+            'permits' => $permits,
+            'inspections' => $inspections,
+            'hsePlans' => $hsePlans,
+            'role' => $role,
+            'site' => $user->site,
+            'greeting' => $greeting,
+            'todayLabel' => now('Asia/Jakarta')->locale('id')->translatedFormat('l, d F Y'),
+        ]);
     }
 }
