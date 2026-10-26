@@ -387,7 +387,10 @@
                     </svg>
                     Ajukan Safety Permit
                 </a>
-                <a href="/daftar-periksa" class="btn btn-outline-light btn-lg w-full sm:w-auto">
+                <a href="/daftar-periksa" class="btn btn-amber btn-lg w-full sm:w-auto">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+                    </svg>
                     Daftar Periksa Izin
                 </a>
             </div>
