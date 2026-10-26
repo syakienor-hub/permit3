@@ -47,7 +47,7 @@
             background: linear-gradient(180deg, rgba(13,21,38,.5), rgba(18,32,64,.6)), url('{{ asset('assets/images/bg-landingpage.jpeg') }}');
             background-size: cover;
             background-position: center 58%;
-            color: #fff; overflow: hidden; padding: 60px 0;
+            color: #fff; overflow: hidden; padding: 60px 0; text-align: center;
         }
 
         /* HP saja: pakai hero versi ringan (~87KB WebP vs 1.7MB JPEG).
@@ -124,39 +124,28 @@
             z-index: 0; 
         }
 
-        .flow-step {
-            text-align: left;
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 22px;
-            transition: box-shadow .3s ease, border-color .3s ease;
-        }
-
-        .flow-step:hover {
-            box-shadow: 0 12px 32px rgba(13,21,38,.08);
-            border-color: #d8deea;
-        }
+        .flow-step { text-align: center; }
 
         .flow-step .sn {
-            width: 40px; height: 40px; border-radius: 12px; background: var(--navy-900); color: #fff;
-            display: flex; align-items: center; justify-content: center; margin: 0 0 14px;
-            font-weight: 700; font-size: 14px;
+            width: 48px; height: 48px; border-radius: 50%; background: var(--navy-900); color: #fff;
+            display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;
+            font-weight: 700; font-size: 16px;
+            border: 4px solid var(--paper);
             transition: transform .3s cubic-bezier(.16,1,.3,1), background .3s ease;
         }
 
         .flow-step:hover .sn {
-            transform: scale(1.06);
+            transform: scale(1.1);
         }
 
         .flow-step:last-child .sn { background: var(--amber-500); color: var(--navy-950); }
 
-        .flow-step h4 { font-size: 14px; font-weight: 700; margin-bottom: 7px; color: var(--navy-950); }
-        .flow-step p { font-size: 12.5px; color: var(--ink-600); line-height: 1.6; }
+        .flow-step h4 { font-size: 13.5px; font-weight: 700; margin-bottom: 7px; color: var(--navy-950); }
+        .flow-step p { font-size: 12px; color: var(--ink-600); line-height: 1.5; }
 
         .flow-step .flow-link {
-            display: inline-flex; align-items: center; gap: 4px; margin-top: 10px;
-            font-size: 12px; font-weight: 700; color: var(--amber-600);
+            display: inline-flex; align-items: center; gap: 4px; margin-top: 8px;
+            font-size: 11.5px; font-weight: 700; color: var(--amber-600);
             transition: color .2s ease;
         }
         .flow-step .flow-link:hover { color: var(--amber-500); text-decoration: underline; }
@@ -210,12 +199,11 @@
         .btn-lg { padding: 13px 24px; font-size: 14.5px; }
 
         .btn-outline-light {
-            background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.22); color: #fff;
+            background: rgba(255,255,255,.06); border-color: rgba(255,255,255,.35); color: #fff;
             backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
         }
         .btn-outline-light:hover {
-            background: rgba(255,255,255,.22); border-color: rgba(255,255,255,.5);
-            transform: translateY(-1px);
+            background: rgba(255,255,255,.12); border-color: rgba(255,255,255,.55);
         }
 
         /* Scroll Animations */
@@ -374,161 +362,115 @@
 
 <!-- ================= HERO ================= -->
 <section class="hero">
-    <div class="max-w-6xl mx-auto px-4 md:px-6 hero-inner">
-        <div class="grid grid-cols-1 lg:grid-cols-[1.15fr_0.85fr] gap-10 lg:gap-16 items-center text-center lg:text-left">
-            <div>
-                <div class="inline-flex flex-wrap items-center justify-center lg:justify-start gap-x-3 gap-y-1.5 rounded-full border border-white/25 bg-white/10 px-4 py-2 mb-5 hero-animate backdrop-blur-md">
-                    <span class="eyebrow" id="hero-eyebrow"><span class="dot"></span> SISTEM ONLINE · MONITORING REALTIME</span>
-                    <span class="hidden sm:block h-4 w-px bg-white/25"></span>
-                    <span id="hero-realtime" class="inline-flex items-center gap-2 whitespace-nowrap text-[11px] sm:text-xs font-medium text-white/90">
-                        <span id="hero-realtime-date">Memuat tanggal…</span>
-                        <span class="text-white/40">•</span>
-                        <span id="hero-realtime-time" class="tabular-nums font-semibold text-white">--:--:--</span>
-                        <span class="text-[10px] font-semibold text-white/60">WIB</span>
-                    </span>
-                </div>
-                <h1 class="text-[36px] sm:text-[46px] md:text-[56px] leading-[1.05] font-extrabold tracking-[-.02em] mb-3 hero-animate" id="hero-title">
-                    SIMONIKA
-                </h1>
-                <p class="text-base sm:text-lg font-semibold text-white/90 hero-animate">
-                    Izin Kerja Digital PT INKA (Persero)
-                </p>
-                <p class="mt-2 max-w-xl mx-auto lg:mx-0 text-sm sm:text-[15px] text-white/70 leading-relaxed mb-7 hero-animate" id="hero-sub">
-                    Satu alur digital untuk mengajukan, memverifikasi, dan memantau izin kerja risiko tinggi di lingkungan PT INKA (Persero).
-                </p>
-                <div class="hero-animate" id="hero-actions">
-                    <div class="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start items-stretch sm:items-center">
-                        <a href="/ajukan-permit" class="btn btn-amber btn-lg w-full sm:w-auto">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                            </svg>
-                            Ajukan Safety Permit
-                        </a>
-                        <a href="/daftar-periksa" class="btn btn-amber btn-lg w-full sm:w-auto">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
-                            </svg>
-                            Daftar Periksa Izin
-                        </a>
-                    </div>
-
-                    <div class="mt-4 flex flex-wrap items-center justify-center lg:justify-start gap-x-4 gap-y-1.5 text-[13px] font-medium text-white/70">
-                        <a href="/cek-status" class="hover:text-white transition-colors">Cek Status</a>
-                        <span class="text-white/25">&bull;</span>
-                        <a href="/data-kontraktor" class="hover:text-white transition-colors">Ajukan Data Kontraktor</a>
-                        @auth
-                            <span class="text-white/25">&bull;</span>
-                            <a href="{{ route('dashboard') }}" class="hover:text-white transition-colors">Ke Dashboard</a>
-                        @endauth
-                    </div>
-                </div>
-                <p class="text-xs text-white/70 mt-6 hero-animate" id="hero-note">
-                    Tanpa akun. Isi form pengajuan langsung — permit otomatis masuk verifikasi Staff HSE.
-                </p>
+    <div class="max-w-[660px] mx-auto px-4 md:px-6 hero-inner">
+        <div class="inline-flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5 rounded-full border border-white/25 bg-white/10 px-4 py-2 mb-5 hero-animate backdrop-blur-md">
+            <span class="eyebrow" id="hero-eyebrow"><span class="dot"></span> SISTEM ONLINE · MONITORING REALTIME</span>
+            <span class="hidden sm:block h-4 w-px bg-white/25"></span>
+            <span id="hero-realtime" class="inline-flex items-center gap-2 whitespace-nowrap text-[11px] sm:text-xs font-medium text-white/90">
+                <span id="hero-realtime-date">Memuat tanggal…</span>
+                <span class="text-white/40">•</span>
+                <span id="hero-realtime-time" class="tabular-nums font-semibold text-white">--:--:--</span>
+                <span class="text-[10px] font-semibold text-white/60">WIB</span>
+            </span>
+        </div>
+        <h1 class="text-[30px] sm:text-[38px] md:text-[50px] leading-[1.2] font-extrabold tracking-[-.01em] mb-4 hero-animate" id="hero-title">
+            SIMONIKA  <span class="text-[var(--amber-500)]"> </span>
+        </h1>
+        <p class="text-sm sm:text-[15.5px] text-white/100 mb-6 md:mb-8 hero-animate px-1" id="hero-sub">
+        Sistem Informasi Monitoring dan Izin Kerja PT INKA (Persero)        </p>
+        <div class="hero-animate px-2 sm:px-0" id="hero-actions">
+            <div class="flex flex-col sm:flex-row gap-3 justify-center items-stretch sm:items-center">
+                <a href="/ajukan-permit" class="btn btn-amber btn-lg w-full sm:w-auto">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                    </svg>
+                    Ajukan Safety Permit
+                </a>
+                <a href="/daftar-periksa" class="btn btn-outline-light btn-lg w-full sm:w-auto">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+                    </svg>
+                    Daftar Periksa Izin
+                </a>
             </div>
 
-            <aside class="hidden lg:block hero-animate">
-                <div class="rounded-2xl border border-white/15 bg-white/10 p-5 backdrop-blur-md shadow-2xl shadow-black/10">
-                    <div class="flex items-center justify-between">
-                        <p class="text-[11px] font-semibold uppercase tracking-[.14em] text-white/60">Data Terdaftar</p>
-                        <span class="inline-flex items-center gap-1.5 text-[11px] font-semibold text-emerald-300">
-                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Live
-                        </span>
-                    </div>
-                    <div class="mt-4 grid grid-cols-3 gap-3 text-center">
-                        <div class="rounded-xl bg-white/5 px-2 py-3">
-                            <p class="text-2xl font-bold tabular-nums">{{ $permits->total() }}</p>
-                            <p class="text-[11px] text-white/60">Permit</p>
-                        </div>
-                        <div class="rounded-xl bg-white/5 px-2 py-3">
-                            <p class="text-2xl font-bold tabular-nums">{{ $contractors->total() }}</p>
-                            <p class="text-[11px] text-white/60">Kontraktor</p>
-                        </div>
-                        <div class="rounded-xl bg-white/5 px-2 py-3">
-                            <p class="text-2xl font-bold tabular-nums">{{ count(\App\Models\Permit::SITES) }}</p>
-                            <p class="text-[11px] text-white/60">Site</p>
-                        </div>
-                    </div>
-                    <div class="mt-4 flex items-start gap-2.5 rounded-xl bg-white/5 px-3.5 py-3">
-                        <svg class="w-4 h-4 text-[var(--amber-500)] shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                        <p class="text-[12px] leading-relaxed text-white/65">
-                            Semua status pengajuan dapat dicek kapan saja melalui halaman Cek Status.
-                        </p>
-                    </div>
-                </div>
-            </aside>
+            <div class="mt-5 flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5 text-[12.5px] font-medium text-white/60">
+                <a href="/cek-status" class="hover:text-white transition-colors">Cek Status</a>
+                <span class="text-white/25">&bull;</span>
+                <a href="/data-kontraktor" class="hover:text-white transition-colors">Ajukan Data Kontraktor</a>
+                @auth
+                    <span class="text-white/25">&bull;</span>
+                    <a href="{{ route('dashboard') }}" class="hover:text-white transition-colors">Ke Dashboard</a>
+                @endauth
+            </div>
         </div>
+        <p class="text-xs text-white/100 mt-6 md:mt-[36px] hero-animate px-2" id="hero-note">
+            Tanpa akun. Isi form pengajuan langsung — permit otomatis masuk verifikasi Staff HSE.
+        </p>
     </div>
 </section>
 
-<section class="pt-10 pb-12 md:pt-14 md:pb-16 bg-gray-50 border-y border-[var(--border)]">
+<section class="pt-6 pb-12 md:pt-8 md:pb-16 bg-gray-50">
     <div class="max-w-6xl mx-auto px-4 md:px-6">
-        <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-7 md:mb-9 reveal">
-            <div>
-                <div class="sec-tag">Galeri K3</div>
-                <h2 class="text-[22px] sm:text-[26px] font-extrabold tracking-[-.01em] text-[var(--navy-950)]">Budaya Keselamatan di Lapangan</h2>
-            </div>
-            <p class="max-w-md text-sm text-[var(--ink-600)] leading-relaxed">
-                Pastikan setiap pekerjaan dimulai dengan izin yang tervalidasi demi lingkungan kerja yang aman dan tertib.
-            </p>
-        </div>
+        <p class="text-center italic text-black-500 mb-8 md:mb-10 text-sm md:text-base px-2">
+            Pastikan setiap pekerjaan dimulai dengan izin yang tervalidasi demi lingkungan kerja yang aman dan tertib.
+        </p>
 
-        <div class="grid grid-cols-2 lg:grid-cols-3 auto-rows-[10rem] sm:auto-rows-[12rem] lg:auto-rows-[13rem] gap-3 md:gap-4">
-            <figure class="group relative col-span-2 row-span-2 overflow-hidden rounded-2xl bg-gray-200 reveal">
-                <picture>
-                    <source media="(max-width: 767px)" srcset="{{ asset('assets/images/brief1-mobile.webp') }}" type="image/webp">
-                    <img src="{{ asset('assets/images/brief1.jpeg') }}" alt="Galeri 1" loading="lazy" decoding="async" class="absolute inset-0 h-full w-full object-cover object-[100%_80%] transition-transform duration-500 group-hover:scale-105">
-                </picture>
-                <figcaption class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 via-black/25 to-transparent p-4 pt-12">
-                    <span class="text-[10px] font-semibold uppercase tracking-[.14em] text-white/70">Dokumentasi</span>
-                    <p class="text-sm sm:text-base font-bold text-white">Safety Briefing</p>
-                </figcaption>
-            </figure>
-            <figure class="group relative overflow-hidden rounded-2xl bg-gray-200 reveal">
-                <picture>
-                    <source media="(max-width: 767px)" srcset="{{ asset('assets/images/brief2-mobile.webp') }}" type="image/webp">
-                    <img src="{{ asset('assets/images/brief2.jpeg') }}" alt="Galeri 2" loading="lazy" decoding="async" class="absolute inset-0 h-full w-full object-cover object-[70%_20%] transition-transform duration-500 group-hover:scale-105">
-                </picture>
-                <figcaption class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 via-black/25 to-transparent p-3 pt-10">
-                    <p class="text-xs sm:text-sm font-bold text-white">Safety Induction</p>
-                </figcaption>
-            </figure>
-            <figure class="group relative overflow-hidden rounded-2xl bg-gray-200 reveal">
-                <picture>
-                    <source media="(max-width: 767px)" srcset="{{ asset('assets/images/brief3-mobile.webp') }}" type="image/webp">
-                    <img src="{{ asset('assets/images/brief3.jpeg') }}" alt="Galeri 3" loading="lazy" decoding="async" class="absolute inset-0 h-full w-full object-cover object-[center_80%] transition-transform duration-500 group-hover:scale-105">
-                </picture>
-                <figcaption class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 via-black/25 to-transparent p-3 pt-10">
-                    <p class="text-xs sm:text-sm font-bold text-white">Audit Eksternal</p>
-                </figcaption>
-            </figure>
-            <figure class="group relative overflow-hidden rounded-2xl bg-gray-200 reveal">
-                <picture>
-                    <source media="(max-width: 767px)" srcset="{{ asset('assets/images/brief4-mobile.webp') }}" type="image/webp">
-                    <img src="{{ asset('assets/images/brief4.jpeg') }}" alt="Galeri 4" loading="lazy" decoding="async" class="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105">
-                </picture>
-                <figcaption class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 via-black/25 to-transparent p-3 pt-10">
-                    <p class="text-xs sm:text-sm font-bold text-white">Lean Manufacturing</p>
-                </figcaption>
-            </figure>
-            <figure class="group relative overflow-hidden rounded-2xl bg-gray-200 reveal">
-                <picture>
-                    <source media="(max-width: 767px)" srcset="{{ asset('assets/images/brief5-mobile.webp') }}" type="image/webp">
-                    <img src="{{ asset('assets/images/brief5.jpeg') }}" alt="Galeri 5" loading="lazy" decoding="async" class="absolute inset-0 h-full w-full object-cover object-[100%_80%] transition-transform duration-500 group-hover:scale-105">
-                </picture>
-                <figcaption class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 via-black/25 to-transparent p-3 pt-10">
-                    <p class="text-xs sm:text-sm font-bold text-white">Safety Patrol</p>
-                </figcaption>
-            </figure>
-            <figure class="group relative col-span-2 lg:col-span-1 overflow-hidden rounded-2xl bg-gray-200 reveal">
-                <picture>
-                    <source media="(max-width: 767px)" srcset="{{ asset('assets/images/brief6-mobile.webp') }}" type="image/webp">
-                    <img src="{{ asset('assets/images/brief6.jpeg') }}" alt="Galeri 6" loading="lazy" decoding="async" class="absolute inset-0 h-full w-full object-cover object-[38%_100%] transition-transform duration-500 group-hover:scale-105">
-                </picture>
-                <figcaption class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 via-black/25 to-transparent p-3 pt-10">
-                    <p class="text-xs sm:text-sm font-bold text-white">Patroli 5R</p>
-                </figcaption>
-            </figure>
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 md:gap-6">
+            <div>
+                <div class="overflow-hidden rounded-lg shadow-sm">
+                    <picture>
+                        <source media="(max-width: 767px)" srcset="{{ asset('assets/images/brief1-mobile.webp') }}" type="image/webp">
+                        <img src="{{ asset('assets/images/brief1.jpeg') }}" alt="Galeri 1" loading="lazy" decoding="async" class="w-full h-32 sm:h-40 object-cover [object-position:100%_80%] md:scale-110 md:hover:scale-125 md:transition-transform md:duration-300">
+                    </picture>
+                </div>
+                <p class="text-center text-sm font-medium text-gray-700 mt-3">Safety Briefing</p>
+            </div>
+            <div>
+                <div class="overflow-hidden rounded-lg shadow-sm">
+                    <picture>
+                        <source media="(max-width: 767px)" srcset="{{ asset('assets/images/brief2-mobile.webp') }}" type="image/webp">
+                        <img src="{{ asset('assets/images/brief2.jpeg') }}" alt="Galeri 2" loading="lazy" decoding="async" class="w-full h-32 sm:h-40 object-cover [object-position:70 10%_20%] md:scale-110 md:hover:scale-125 md:transition-transform md:duration-300">
+                    </picture>
+                </div>
+                <p class="text-center text-sm font-medium text-gray-700 mt-3"> Safety Induction </p>
+            </div>
+            <div>
+                <div class="overflow-hidden rounded-lg shadow-sm">
+                    <picture>
+                        <source media="(max-width: 767px)" srcset="{{ asset('assets/images/brief3-mobile.webp') }}" type="image/webp">
+                        <img src="{{ asset('assets/images/brief3.jpeg') }}" alt="Galeri 3" loading="lazy" decoding="async" class="w-full h-32 sm:h-40 object-cover [object-position:center_80%] md:scale-110 md:hover:scale-125 md:transition-transform md:duration-300">
+                    </picture>
+                </div>
+                <p class="text-center text-sm font-medium text-gray-700 mt-3">Audit Eksternal</p>
+            </div>
+            <div>
+                <div class="overflow-hidden rounded-lg shadow-sm">
+                    <picture>
+                        <source media="(max-width: 767px)" srcset="{{ asset('assets/images/brief4-mobile.webp') }}" type="image/webp">
+                        <img src="{{ asset('assets/images/brief4.jpeg') }}" alt="Galeri 4" loading="lazy" decoding="async" class="w-full h-32 sm:h-40 object-cover md:scale-110 md:hover:scale-125 md:transition-transform md:duration-300">
+                    </picture>
+                </div>
+                <p class="text-center text-sm font-medium text-gray-700 mt-3">Lean Manufacturing</p>
+            </div>
+            <div>
+                <div class="overflow-hidden rounded-lg shadow-sm">
+                    <picture>
+                        <source media="(max-width: 767px)" srcset="{{ asset('assets/images/brief5-mobile.webp') }}" type="image/webp">
+                        <img src="{{ asset('assets/images/brief5.jpeg') }}" alt="Galeri 5" loading="lazy" decoding="async" class="w-full h-32 sm:h-40 object-cover [object-position:100%_80%] md:scale-110 md:hover:scale-125 md:transition-transform md:duration-300">
+                    </picture>
+                </div>
+                <p class="text-center text-sm font-medium text-gray-700 mt-3">Safety Patrol</p>
+            </div>
+            <div>
+                <div class="overflow-hidden rounded-lg shadow-sm">
+                    <picture>
+                        <source media="(max-width: 767px)" srcset="{{ asset('assets/images/brief6-mobile.webp') }}" type="image/webp">
+                        <img src="{{ asset('assets/images/brief6.jpeg') }}" alt="Galeri 6" loading="lazy" decoding="async" class="w-full h-32 sm:h-40 object-cover [object-position:38%_100%] md:scale-110 md:hover:scale-125 md:transition-transform md:duration-300">
+                    </picture>
+                </div>
+                <p class="text-center text-sm font-medium text-gray-700 mt-3">Patroli 5R</p>
+            </div>
         </div>
     </div>
 </section>
@@ -561,23 +503,17 @@
     }
 }">
     <div class="max-w-[1140px] mx-auto">
-        <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-8 md:mb-10 reveal">
-            <div class="max-w-2xl">
-                <div class="sec-tag inline-flex items-center gap-2">
-                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                    Monitoring Real-Time
-                </div>
-                <h2 class="text-[22px] sm:text-[28px] font-extrabold tracking-[-.01em] mb-2 text-[var(--navy-950)]">
-                    Monitoring Izin Kerja (Safety Permit)
-                </h2>
-                <p class="text-[14.5px] text-[var(--ink-600)]">
-                    Pantau daftar izin kerja risiko tinggi di lingkungan PT INKA (Persero) secara transparan dan mudah.
-                </p>
+        <div class="max-w-[640px] mx-auto text-center mb-10 reveal">
+            <div class="sec-tag inline-flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                Monitoring Real-Time
             </div>
-            <span class="inline-flex items-center gap-2 self-start md:self-auto rounded-full border border-[var(--border)] bg-white px-4 py-2 text-xs font-semibold text-[var(--ink-600)] shadow-sm">
-                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                {{ $permits->total() }} permit terdaftar
-            </span>
+            <h2 class="text-[22px] sm:text-[28px] font-extrabold tracking-[-.01em] mb-3 text-[var(--navy-950)]">
+                Monitoring Izin Kerja (Safety Permit)
+            </h2>
+            <p class="text-[14.5px] text-[var(--ink-600)]">
+                Pantau daftar izin kerja risiko tinggi di lingkungan PT INKA (Persero) secara transparan dan mudah.
+            </p>
         </div>
 
         <!-- Table Card -->
@@ -592,8 +528,16 @@
                         <p class="text-xs text-gray-500">Menampilkan 5 permit terbaru dengan update berkala</p>
                     </div>
                 </div>
-                <div class="text-xs font-semibold text-gray-500 bg-white px-3 py-1.5 rounded-lg border border-gray-200">
-                    Total: <span class="text-inka-navy font-bold">{{ $permits->total() }}</span> Permit Terdaftar
+                <div class="flex flex-wrap items-center gap-2">
+                    <div class="text-xs font-semibold text-gray-500 bg-white px-3 py-1.5 rounded-lg border border-gray-200">
+                        Total: <span class="text-inka-navy font-bold">{{ $permits->total() }}</span> Permit Terdaftar
+                    </div>
+                    <a href="/ajukan-permit" class="inline-flex items-center gap-2 whitespace-nowrap rounded-lg bg-inka-navy px-5 py-2 text-[13px] font-semibold text-white shadow-sm hover:opacity-90 transition-opacity">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                        </svg>
+                        Tambah Permit
+                    </a>
                 </div>
             </div>
             <form method="GET" action="{{ url('/') }}#monitoring" class="px-4 md:px-6 py-3 border-b border-gray-100 bg-white flex flex-wrap items-center gap-x-3 gap-y-2">
@@ -940,23 +884,17 @@
     }
 }">
     <div class="max-w-[1140px] mx-auto">
-        <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-8 md:mb-10 reveal">
-            <div class="max-w-2xl">
-                <div class="sec-tag inline-flex items-center gap-2">
-                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                    Monitoring Kontraktor
-                </div>
-                <h2 class="text-[22px] sm:text-[28px] font-extrabold tracking-[-.01em] mb-2 text-[var(--navy-950)]">
-                    Monitoring Data Kontraktor
-                </h2>
-                <p class="text-[14.5px] text-[var(--ink-600)]">
-                    Pantau status HSE Plan dan kesiapan dokumen kontraktor sebelum pekerjaan dimulai di lingkungan PT INKA (Persero).
-                </p>
+        <div class="max-w-[640px] mx-auto text-center mb-10 reveal">
+            <div class="sec-tag inline-flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                Monitoring Kontraktor
             </div>
-            <span class="inline-flex items-center gap-2 self-start md:self-auto rounded-full border border-[var(--border)] bg-white px-4 py-2 text-xs font-semibold text-[var(--ink-600)] shadow-sm">
-                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                {{ $contractors->total() }} kontraktor terdaftar
-            </span>
+            <h2 class="text-[22px] sm:text-[28px] font-extrabold tracking-[-.01em] mb-3 text-[var(--navy-950)]">
+                Monitoring Data Kontraktor
+            </h2>
+            <p class="text-[14.5px] text-[var(--ink-600)]">
+                Pantau status HSE Plan dan kesiapan dokumen kontraktor sebelum pekerjaan dimulai di lingkungan PT INKA (Persero).
+            </p>
         </div>
 
         <div class="table-card reveal">
@@ -970,8 +908,16 @@
                         <p class="text-xs text-gray-500">Menampilkan 5 kontraktor terbaru beserta status HSE Plan</p>
                     </div>
                 </div>
-                <div class="text-xs font-semibold text-gray-500 bg-white px-3 py-1.5 rounded-lg border border-gray-200">
-                    Total: <span class="text-inka-navy font-bold">{{ $contractors->total() }}</span> Kontraktor Terdaftar
+                <div class="flex flex-wrap items-center gap-2">
+                    <div class="text-xs font-semibold text-gray-500 bg-white px-3 py-1.5 rounded-lg border border-gray-200">
+                        Total: <span class="text-inka-navy font-bold">{{ $contractors->total() }}</span> Kontraktor Terdaftar
+                    </div>
+                    <a href="/data-kontraktor" class="inline-flex items-center gap-2 whitespace-nowrap rounded-lg bg-inka-navy px-5 py-2 text-[13px] font-semibold text-white shadow-sm hover:opacity-90 transition-opacity">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                        </svg>
+                        Tambah Kontraktor
+                    </a>
                 </div>
             </div>
 
@@ -1354,14 +1300,15 @@ $mStatusBadge = $mStatusMap[$mApprovalStatus]
 <!-- ================= ALUR PENGAJUAN ================= -->
 <section class="py-12 md:py-20 px-4 md:px-6" id="alur">
     <div class="max-w-[1080px] mx-auto">
-        <div class="max-w-2xl mb-8 md:mb-10 reveal">
+        <div class="max-w-[560px] mx-auto text-center mb-8 md:mb-[46px] reveal">
             <div class="sec-tag">Alur Pengajuan</div>
-            <h2 class="text-[22px] sm:text-[28px] font-extrabold tracking-[-.01em] mb-2 text-[var(--navy-950)]">Bagaimana Cara Mengajukan Izin Kerja</h2>
+            <h2 class="text-[22px] sm:text-[28px] font-extrabold tracking-[-.01em] mb-3 text-[var(--navy-950)]">Bagaimana Cara Mengajukan Izin Kerja</h2>
             <p class="text-[14.5px] text-[var(--ink-600)]">Satu alur terpadu — dari data kontraktor, HSE Plan, daftar periksa, sampai Safety Permit dan monitoring.</p>
         </div>
 
         <div class="flow">
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 relative z-10">
+            <div class="flow-line"></div>
+            <div class="flow-grid grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4 relative z-10">
                 <div class="flow-step reveal" style="transition-delay:0ms">
                     <div class="sn">1</div>
                     <h4>Data Kontraktor</h4>
@@ -1415,7 +1362,7 @@ $mStatusBadge = $mStatusMap[$mApprovalStatus]
             <h2 class="text-[22px] sm:text-[26px] font-extrabold tracking-[-.01em] mb-[14px] text-[var(--navy-950)]">Dibangun untuk Tim HSE yang Ingin Bekerja Lebih Cepat dan Aman</h2>
             <p class="text-sm text-[var(--ink-600)] mb-3.5 leading-relaxed">Safety Permit PT INKA (Persero) adalah sistem monitoring keselamatan kerja kontraktor yang menggantikan proses manual berbasis kertas dengan alur digital yang lebih rapi dan mudah diaudit.</p>
             <p class="text-sm text-[var(--ink-600)] mb-3.5 leading-relaxed">Kami percaya keselamatan kerja seharusnya tidak menghambat kecepatan operasional. Karena itu Safety Permit PT INKA (Persero) dirancang agar divisi bisa mengelola data kontraktor dan mengajukan izin kerja dengan cepat, sementara tim HSE tetap punya kendali penuh atas setiap persetujuan.</p>
-            <a href="#alur" class="btn btn-solid" style="margin-top:8px;">Pelajari Alur Pengajuan</a>
+            <a href="#" class="btn btn-solid" style="margin-top:8px;">Pelajari Lebih Lanjut</a>
         </div>
         <div class="about-visual reveal-right">
             <div class="about-stats grid grid-cols-2 gap-4 relative">
