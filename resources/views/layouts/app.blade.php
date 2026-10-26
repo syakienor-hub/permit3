@@ -180,9 +180,8 @@
                 </div>
                 <div class="flex items-center gap-2 sm:gap-4">
                     {{-- Jam & tanggal realtime --}}
-                    <div class="flex flex-col items-end leading-tight text-right" title="Waktu Indonesia Barat (WIB)">
-                        <span id="realtime-time" class="text-sm font-bold text-gray-800 tabular-nums">--:--:--</span>
-                        <span id="realtime-date" class="hidden sm:block text-[10px] font-medium text-gray-400">Memuat tanggal…</span>
+                    <div class="flex items-center leading-tight text-right" title="Waktu Indonesia Barat (WIB)">
+                        <span id="realtime-time" class="text-lg sm:text-xl font-bold text-gray-800 tabular-nums">--:--:--</span>
                     </div>
 
                     {{-- Notification Bell --}}
