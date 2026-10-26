@@ -311,6 +311,7 @@
                     </div>
                 </div>
             </div>
+            <a href="/ajukan-permit" class="hover:text-[var(--navy-950)] transition-colors whitespace-nowrap">Ajukan Permit</a>
             <a href="/daftar-periksa" class="hover:text-[var(--navy-950)] transition-colors whitespace-nowrap">Daftar Periksa</a>
             <a href="/data-kontraktor" class="hover:text-[var(--navy-950)] transition-colors whitespace-nowrap">Data Kontraktor</a>
             <a href="#alur" @click="activeNav = 'alur'" class="hover:text-[var(--navy-950)] transition-colors whitespace-nowrap"
@@ -319,7 +320,6 @@
                 :class="activeNav === 'tentang' ? 'text-inka-navy font-bold' : ''">Tentang Kami</a>
         </div>
         <div class="hidden sm:flex items-center gap-2.5 shrink-0">
-            <a href="/ajukan-permit" class="text-[13.5px] font-semibold text-[var(--navy-950)] hover:text-[var(--amber-600)] transition-colors whitespace-nowrap">Ajukan Permit</a>
             @auth
                 <a href="{{ route('dashboard') }}" class="btn btn-solid lg:translate-x-2">Dashboard</a>
             @else
@@ -343,6 +343,7 @@
                 <span x-show="activeNav === 'monitoring-kontraktor'" class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                 Monitoring Kontraktor
             </a>
+            <a href="/ajukan-permit" @click="mobileOpen = false" class="py-3 border-b border-gray-100">Ajukan Permit</a>
             <a href="/daftar-periksa" @click="mobileOpen = false" class="py-3 border-b border-gray-100">Daftar Periksa Izin</a>
             <a href="/data-kontraktor" @click="mobileOpen = false" class="py-3 border-b border-gray-100">Ajukan Data Kontraktor</a>
             <a href="#alur" @click="activeNav = 'alur'; mobileOpen = false" class="py-3 border-b border-gray-100"
@@ -351,7 +352,6 @@
                 :class="activeNav === 'tentang' ? 'text-inka-navy font-bold' : ''">Tentang Kami</a>
         </nav>
         <div class="flex flex-col gap-2.5 mt-3 sm:hidden">
-            <a href="/ajukan-permit" class="text-sm font-semibold text-[var(--navy-950)] text-center py-2">Ajukan Permit</a>
             @auth
                 <a href="{{ route('dashboard') }}" class="btn btn-solid btn-lg w-full">Dashboard</a>
             @else
