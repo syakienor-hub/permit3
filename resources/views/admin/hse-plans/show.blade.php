@@ -54,31 +54,59 @@
         </div>
     @endif
 
-    <div class="mb-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div>
-            <a href="/admin/hse-plans" class="text-sm font-semibold text-gray-500 hover:text-inka-navy">&larr; Kembali ke Daftar HSE Plan</a>
-            <h1 class="text-xl sm:text-2xl font-extrabold text-gray-800 mt-1 font-mono">{{ $hsePlan->no_hse_plan }}</h1>
-            <p class="text-sm text-gray-500 mt-0.5">{{ $hsePlan->nama_kontraktor }} &middot; {{ $hsePlan->site }}</p>
-        </div>
-        <div class="flex flex-wrap items-center gap-2 self-start">
-            <a href="/admin/hse-plans/{{ $hsePlan->id }}/edit"
-               class="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-inka-navy rounded-xl hover:opacity-90 transition-opacity">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-                Edit HSE Plan
-            </a>
-            <a href="/admin/hse-plans/{{ $hsePlan->id }}/pdf" target="_blank"
-               class="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-semibold text-gray-600 bg-white border border-gray-200 rounded-xl hover:border-gray-300 transition-colors">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                Lihat PDF
-            </a>
-            <a href="/admin/hse-plans/{{ $hsePlan->id }}/pdf/download"
-               class="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-semibold text-red-600 bg-red-50 border border-red-200 rounded-xl hover:bg-red-100 transition-colors">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                Unduh PDF
-            </a>
-            <span class="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-semibold {{ $statusBadge }}">{{ $statusLabel }}</span>
+    
+{{-- HEADER DETAIL HSE PLAN --}}
+<div class="mb-6 flex flex-col xl:flex-row xl:items-end justify-between gap-4">
+    <div class="min-w-0">
+        <a href="/admin/hse-plans"
+           class="inline-flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-inka-navy transition-colors">
+            <span>&larr;</span>
+            Kembali ke Review HSE
+        </a>
+
+        <h1 class="text-xl sm:text-2xl font-bold text-gray-900 mt-3 font-mono">
+            {{ $hsePlan->no_hse_plan }}
+        </h1>
+
+        <div class="flex flex-wrap items-center gap-2 mt-2">
+            <span class="text-sm text-gray-500">
+                {{ $hsePlan->nama_kontraktor }} &middot; {{ $hsePlan->site }}
+            </span>
+
+            <span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold {{ $statusBadge }}">
+                {{ $statusLabel }}
+            </span>
         </div>
     </div>
+
+    <div class="flex flex-wrap items-center gap-2">
+        <a href="/admin/hse-plans/{{ $hsePlan->id }}/edit"
+           class="inline-flex items-center justify-center gap-2 rounded-lg bg-inka-navy px-3.5 py-2.5 text-xs sm:text-sm font-semibold text-white hover:opacity-90 transition">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+            </svg>
+            Edit HSE Plan
+        </a>
+
+        <a href="/admin/hse-plans/{{ $hsePlan->id }}/pdf"
+           target="_blank"
+           rel="noopener"
+           class="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-200 bg-white px-3.5 py-2.5 text-xs sm:text-sm font-semibold text-gray-700 hover:bg-gray-50 transition">
+            Lihat PDF
+        </a>
+
+        <a href="/admin/hse-plans/{{ $hsePlan->id }}/pdf/download"
+           class="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-200 bg-white px-3.5 py-2.5 text-xs sm:text-sm font-semibold text-gray-700 hover:bg-gray-50 transition">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+            </svg>
+            Unduh PDF
+        </a>
+    </div>
+</div>
+
 
     @if($hsePlan->status === \App\Models\HsePlan::STATUS_REJECTED && $hsePlan->rejection_reason)
         <div class="mb-5 rounded-2xl border border-red-200 bg-red-50 px-5 py-4">

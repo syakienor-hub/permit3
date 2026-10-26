@@ -988,12 +988,20 @@
                         <option value="{{ $s }}" {{ request('k_site') === $s ? 'selected' : '' }}>{{ $s }}</option>
                     @endforeach
                 </select>
-                <label class="text-xs font-semibold text-gray-500">Status HSE Plan:</label>
+                <label class="text-xs font-semibold text-gray-500">Status Kontraktor:</label>
                 <select name="k_status" onchange="this.form.submit()" class="text-xs font-semibold border border-gray-200 rounded-lg px-3 py-1.5 text-gray-700 focus:outline-none focus:border-inka-navy">
                     <option value="">Semua Status</option>
-                    @foreach($contractorStatuses as $status)
-                        <option value="{{ $status }}" {{ request('k_status') === $status ? 'selected' : '' }}>{{ $status }}</option>
-                    @endforeach
+                    
+<option value="pending" @selected(request('k_status') === 'pending')>
+    On Hold
+</option>
+<option value="approved" @selected(request('k_status') === 'approved')>
+    Approved
+</option>
+<option value="inactive" @selected(request('k_status') === 'inactive')>
+    Nonaktif
+</option>
+
                 </select>
                 @if(request('k_site') || request('k_status') || request('k_search'))
                     <a href="{{ url('/') }}#monitoring-kontraktor" class="text-xs text-gray-400 hover:text-gray-600">Reset</a>
@@ -1168,13 +1176,28 @@ $approvalLabels = [
                         $mPeriode = ($mMulai && $mSelesai)
                             ? (($mMulai === $mSelesai) ? $mMulai : "$mMulai – $mSelesai")
                             : ($mMulai ?? $mSelesai ?? '—');
-                        $mStatusMap = [
-                            'Menunggu HSE Plan' => 'bg-amber-50 text-amber-700 border-amber-200/70',
-                            'Review Manager' => 'bg-orange-50 text-orange-700 border-orange-200/70',
-                            'HSE Plan Diajukan' => 'bg-blue-50 text-blue-700 border-blue-200/70',
-                            'HSE Plan Final' => 'bg-emerald-50 text-emerald-700 border-emerald-200/70',
-                        ];
-                        $mStatusBadge = $mStatusMap[$contractor->status] ?? 'bg-gray-100 text-gray-600 border-gray-200';
+                        
+$mApprovalStatus = $contractor->approval_status ?? 'pending';
+
+$mApprovalLabels = [
+    'pending' => 'On Hold',
+    'on_hold' => 'On Hold',
+    'approved' => 'Approved',
+    'inactive' => 'Nonaktif',
+];
+
+$mStatusMap = [
+    'pending' => 'bg-amber-50 text-amber-700 border-amber-200/70',
+    'on_hold' => 'bg-amber-50 text-amber-700 border-amber-200/70',
+    'approved' => 'bg-green-50 text-green-700 border-green-200/70',
+    'inactive' => 'bg-gray-100 text-gray-600 border-gray-200',
+];
+
+$mStatusLabel = $mApprovalLabels[$mApprovalStatus] ?? 'On Hold';
+
+$mStatusBadge = $mStatusMap[$mApprovalStatus]
+    ?? 'bg-gray-100 text-gray-600 border-gray-200';
+
                         $mPayload = [
                             'vendor' => $contractor->vendor,
                             'pic' => $contractor->pic,
@@ -1184,7 +1207,7 @@ $approvalLabels = [
                             'lokasi' => $contractor->lokasi ?? '—',
                             'periode' => $mPeriode,
                             'jumlah' => $contractor->jumlah_pekerja,
-                            'status' => $contractor->status,
+                            'status' => $mStatusLabel,
                             'status_badge' => $mStatusBadge,
                             'dokumen' => $contractor->documents_count,
                         ];
@@ -1192,7 +1215,7 @@ $approvalLabels = [
                     <button type="button" @click="openContractorModal({{ json_encode($mPayload, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES) }})" class="block w-full text-left px-4 py-4 active:bg-emerald-50/50">
                         <div class="flex items-center justify-between gap-2 mb-1">
                             <span class="font-bold text-inka-navy text-sm">{{ $contractor->vendor }}</span>
-                            <span class="badge {{ $mStatusBadge }} shrink-0">{{ $contractor->status }}</span>
+                            <span class="badge {{ $mStatusBadge }} shrink-0">{{ $mStatusLabel }}</span>
                         </div>
                         <p class="text-sm text-gray-800 font-medium leading-snug">{{ $contractor->nama_pekerjaan }}</p>
                         <p class="text-xs text-gray-400 mt-0.5 truncate">{{ $contractor->pic }} &middot; {{ $contractor->lokasi ?? '—' }} &middot; {{ $mPeriode }}</p>
@@ -1289,7 +1312,7 @@ $approvalLabels = [
                     </div>
                 </div>
 
-                <template x-if="activeContractor.status === 'HSE Plan Final'">
+                <template x-if="activeContractor.status === 'Approved'">
                     <div class="bg-emerald-50 border border-emerald-200/70 rounded-xl p-3.5 flex items-start gap-3">
                         <svg class="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                         <p class="text-xs text-emerald-800 leading-relaxed">
@@ -1298,13 +1321,13 @@ $approvalLabels = [
                     </div>
                 </template>
 
-                <template x-if="activeContractor.status !== 'HSE Plan Final'">
-                    <div class="bg-amber-50 border border-amber-200/70 rounded-xl p-3.5 flex items-start gap-3">
+                <!-- <template x-if="activeContractor.status !== 'Approved'"> -->
+                    <!-- <div class="bg-amber-50 border border-amber-200/70 rounded-xl p-3.5 flex items-start gap-3">
                         <svg class="w-5 h-5 text-amber-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                         <p class="text-xs text-amber-800 leading-relaxed">
                             HSE Plan kontraktor ini belum final. Kontraktor perlu melengkapi dokumen dan mengajukan HSE Plan sebelum pekerjaan dimulai.
                         </p>
-                    </div>
+                    </div> -->
                 </template>
 
                 <div class="bg-blue-50 border border-blue-200/70 rounded-xl p-3.5 flex items-start gap-3">
@@ -1319,10 +1342,10 @@ $approvalLabels = [
                 <button type="button" @click="closeContractorModal()" class="px-4 py-2 rounded-xl text-sm font-semibold text-gray-600 hover:bg-gray-200/60 transition-colors">
                     Tutup
                 </button>
-                <a href="{{ route('login') }}" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold bg-inka-navy text-white hover:opacity-90 transition-opacity">
+                <!-- <a href="{{ route('login') }}" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold bg-inka-navy text-white hover:opacity-90 transition-opacity">
                     <span>Login Sistem</span>
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-                </a>
+                </a> -->
             </div>
         </div>
     </div>

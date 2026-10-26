@@ -31,11 +31,11 @@ class HsePlanApprovalController extends Controller
             $query->forSite($request->site);
         }
 
-        if ($request->filled('status') && $request->status !== 'Semua') {
-            $query->where('status', $request->status);
-        } elseif (! $request->filled('status') && Auth::user()->role === 'manager') {
-            $query->where('status', HsePlan::STATUS_REVIEW);
-        }
+     
+if (Auth::user()->role === 'manager') {
+    $query->where('status', HsePlan::STATUS_REVIEW);
+}
+
 
         if ($request->filled('search')) {
             $term = '%' . trim((string) $request->search) . '%';
@@ -54,9 +54,17 @@ class HsePlanApprovalController extends Controller
         $visible = HsePlan::query()->visibleTo(Auth::user());
 
         $counts = [
-            'review' => (clone $visible)->where('status', HsePlan::STATUS_REVIEW)->count(),
-            'approved' => (clone $visible)->where('status', HsePlan::STATUS_APPROVED)->count(),
-            'rejected' => (clone $visible)->where('status', HsePlan::STATUS_REJECTED)->count(),
+            'review' => (clone $visible)
+                ->where('status', HsePlan::STATUS_REVIEW)
+                ->count(),
+        
+            'approved' => (clone $visible)
+                ->where('status', HsePlan::STATUS_APPROVED)
+                ->count(),
+        
+            'active' => Contractor::query()
+                ->where('approval_status', Contractor::APPROVAL_APPROVED)
+                ->count(),
         ];
 
         return view('admin.hse-plans.index', compact('hsePlans', 'counts'));

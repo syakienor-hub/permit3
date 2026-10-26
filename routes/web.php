@@ -24,19 +24,34 @@ Route::get('/', function () {
         ->withQueryString()
         ->fragment('monitoring');
 
-    $contractorStatuses = [
-        \App\Models\Contractor::STATUS_WAITING,
-        \App\Models\Contractor::STATUS_REVIEW,
-        \App\Models\Contractor::STATUS_FORM_SUBMITTED,
-        \App\Models\Contractor::STATUS_FINAL,
-    ];
+    
+$contractorStatuses = [
+    'pending'  => 'On Hold',
+    'on_hold'  => 'On Hold',
+    'approved' => 'Approved',
+    'inactive' => 'Nonaktif',
+];
+
 
     $contractors = \App\Models\Contractor::query()
         ->withCount('documents')
         ->when(request()->filled('k_site') && in_array(request('k_site'), \App\Models\HsePlan::SITES, true),
             fn ($q) => $q->where('site', request('k_site')))
-        ->when(request()->filled('k_status') && in_array(request('k_status'), $contractorStatuses, true),
-            fn ($q) => $q->where('status', request('k_status')))
+       
+->when(
+    request()->filled('k_status') &&
+    in_array(request('k_status'), ['pending', 'approved', 'inactive'], true),
+    function ($q) {
+        $status = request('k_status');
+
+        if ($status === 'pending') {
+            $q->whereIn('approval_status', ['pending', 'on_hold']);
+        } else {
+            $q->where('approval_status', $status);
+        }
+    }
+)
+
         ->when(request()->filled('k_search'), function ($q) {
             $term = '%' . trim((string) request('k_search')) . '%';
 
@@ -46,10 +61,13 @@ Route::get('/', function () {
                 ->orWhere('nama_pekerjaan', 'like', $term)
                 ->orWhere('lokasi', 'like', $term));
         })
-        ->orderByRaw('COALESCE(tanggal_mulai, created_at) DESC')
-        ->paginate(5, ['*'], 'kontraktor_page')
-        ->withQueryString()
-        ->fragment('monitoring-kontraktor');
+       
+->orderByDesc('created_at')
+->orderByDesc('id')
+->paginate(5, ['*'], 'kontraktor_page')
+->withQueryString()
+->fragment('monitoring-kontraktor');
+
 
     $classifications = \App\Models\Classification::pluck('name', 'code');
 

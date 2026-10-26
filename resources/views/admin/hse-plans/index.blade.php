@@ -29,8 +29,8 @@
         </a>
         <a href="/admin/hse-plans?status={{ \App\Models\HsePlan::STATUS_REJECTED }}"
            class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 hover:shadow-md hover:border-red-200 transition-all">
-            <p class="text-sm font-semibold text-gray-400 uppercase tracking-wide">Ditolak</p>
-            <p class="text-3xl font-bold text-red-500 mt-2">{{ $counts['rejected'] }}</p>
+            <p class="text-sm font-semibold text-gray-400 uppercase tracking-wide">Kontraktor Aktif</p>
+            <p class="text-3xl font-bold text-red-500 mt-2">{{ $counts['active'] }}</p>
         </a>
     </div>
 
@@ -44,13 +44,13 @@
                 class="w-full pl-9 pr-4 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-inka-navy/20 focus:border-inka-navy">
         </div>
 
-        <select name="status" class="border border-gray-200 rounded-xl text-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-inka-navy/20 focus:border-inka-navy text-gray-600">
+        <!-- <select name="status" class="border border-gray-200 rounded-xl text-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-inka-navy/20 focus:border-inka-navy text-gray-600">
             <option value="">Status: Menunggu Review</option>
             <option value="Semua" @selected(request('status') === 'Semua')>Semua Status</option>
             @foreach([\App\Models\HsePlan::STATUS_REVIEW, \App\Models\HsePlan::STATUS_APPROVED, \App\Models\HsePlan::STATUS_REJECTED] as $status)
                 <option value="{{ $status }}" @selected(request('status') === $status)>{{ $status }}</option>
             @endforeach
-        </select>
+        </select> -->
 
         <select name="site" class="border border-gray-200 rounded-xl text-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-inka-navy/20 focus:border-inka-navy text-gray-600">
             <option value="">Site: Semua</option>
