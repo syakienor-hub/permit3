@@ -398,7 +398,7 @@
             <a href="/data-kontraktor" class="btn btn-outline-light btn-lg w-full sm:w-auto">
                 Ajukan Data Kontraktor
             </a>
-            <a href="/cek-permit" class="btn btn-outline-light btn-lg w-full sm:w-auto">
+            <a href="/cek-status" class="btn btn-outline-light btn-lg w-full sm:w-auto">
                 Cek Status
             </a>
         </div>

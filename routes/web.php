@@ -63,6 +63,13 @@ Route::post('/cek-permit', [\App\Http\Controllers\Public\PermitStatusController:
     ->middleware('throttle:10,1')
     ->name('public.permits.status');
 
+// ===== CEK STATUS TERPADU PUBLIK (permit, HSE Plan, daftar periksa) =====
+Route::get('/cek-status', [\App\Http\Controllers\Public\StatusCheckController::class, 'create'])
+    ->name('public.status-check.form');
+Route::post('/cek-status', [\App\Http\Controllers\Public\StatusCheckController::class, 'show'])
+    ->middleware('throttle:10,1')
+    ->name('public.status-check');
+
 // ===== DATA KONTRAKTOR PUBLIK (tanpa login) =====
 Route::get('/data-kontraktor', [\App\Http\Controllers\Public\ContractorController::class, 'create'])
     ->middleware('throttle:10,1');
