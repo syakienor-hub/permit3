@@ -200,23 +200,36 @@
         </div>
     @else
         {{-- ===== MANAGER ===== --}}
-        <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-6">
-            <div>
-                <p class="text-[11px] font-bold uppercase tracking-[0.14em] text-gray-400">Dashboard {{ $roleName }}</p>
-                <h1 class="text-xl font-bold text-gray-800 mt-1">Ringkasan HSE Hari Ini</h1>
-                <p class="text-sm text-gray-400 mt-1">Pantau antrean Safety Permit dan HSE Plan dalam satu tampilan.</p>
+        <section class="relative overflow-hidden rounded-2xl bg-inka-navy p-6 sm:p-7 mb-6 text-white shadow-sm">
+            <div class="pointer-events-none absolute -right-16 -top-20 h-56 w-56 rounded-full bg-white/5"></div>
+            <div class="pointer-events-none absolute -right-4 bottom-[-70px] h-44 w-44 rounded-full bg-blue-400/20 blur-xl"></div>
+            <div class="relative flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+                <div class="min-w-0">
+                    <span class="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-white/90">
+                        <span class="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                        Manager HSE &middot; Semua Site
+                    </span>
+                    <h1 class="mt-3 text-2xl sm:text-[28px] font-bold leading-tight">{{ $greeting }}, {{ auth()->user()->name }}</h1>
+                    <p class="mt-1 text-sm text-white/60">{{ $todayLabel }} &mdash; pantau antrean Safety Permit dan HSE Plan seluruh site.</p>
+                </div>
+                <div class="flex flex-wrap gap-2 shrink-0">
+                    <a href="/admin/approvals"
+                       class="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-inka-navy hover:bg-white/90 transition-colors">
+                        Review Permit
+                        @if($counts['permit_pending'] > 0)
+                            <span class="inline-flex min-w-[20px] items-center justify-center rounded-full bg-accent-orange px-1.5 py-0.5 text-[11px] font-bold text-white">{{ $counts['permit_pending'] }}</span>
+                        @endif
+                    </a>
+                    <a href="/admin/hse-plans"
+                       class="inline-flex items-center gap-2 rounded-xl border border-white/20 bg-white/5 px-4 py-2.5 text-sm font-semibold text-white hover:bg-white/10 transition-colors">
+                        Review HSE
+                        @if($counts['hse_review'] > 0)
+                            <span class="inline-flex min-w-[20px] items-center justify-center rounded-full bg-white/20 px-1.5 py-0.5 text-[11px] font-bold text-white">{{ $counts['hse_review'] }}</span>
+                        @endif
+                    </a>
+                </div>
             </div>
-            <div class="flex flex-wrap gap-2">
-                <a href="/admin/approvals"
-                   class="inline-flex items-center justify-center gap-2 bg-inka-navy text-white text-sm font-semibold px-4 py-2.5 rounded-xl hover:opacity-90 transition-opacity">
-                    Review Permit
-                </a>
-                <a href="/admin/hse-plans"
-                   class="inline-flex items-center justify-center gap-2 bg-white border border-gray-200 text-gray-700 text-sm font-semibold px-4 py-2.5 rounded-xl hover:border-inka-navy hover:text-inka-navy transition-colors">
-                    Review HSE
-                </a>
-            </div>
-        </div>
+        </section>
 
         <div class="grid grid-cols-2 xl:grid-cols-5 gap-4 mb-6">
             <a href="/admin/approvals"
