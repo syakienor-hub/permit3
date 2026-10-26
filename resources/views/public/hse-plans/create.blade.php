@@ -357,37 +357,80 @@
             </section>
 
             {{-- PENGESAHAN / TANDA TANGAN --}}
-            <section class="bg-white rounded-2xl border border-gray-100 shadow-sm">
-                <div class="px-4 md:px-6 py-4 border-b border-gray-100 flex items-center justify-between gap-3">
-                    <div>
-                        <h2 class="text-base font-semibold text-gray-800">Pengesahan</h2>
-                        <p class="text-sm text-gray-400 mt-0.5">Dibuat oleh Kontraktor dan disetujui oleh Manager HSE.</p>
-                    </div>
-                    <button type="button" onclick="clearSignature()" class="text-sm font-semibold text-gray-400 hover:text-red-500 border border-gray-200 hover:border-red-300 px-3 py-1.5 rounded-lg transition-colors">Hapus</button>
-                </div>
-                <div class="px-4 md:px-6 py-5">
-                    <p class="text-sm text-gray-600 mb-5"><span id="pengesahan-kota">{{ old('site', $prefill?->site) === 'Banyuwangi' ? 'Banyuwangi' : 'Madiun' }}</span>, ................................</p>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <p class="text-sm font-semibold text-gray-700">Dibuat oleh,<br>Kontraktor</p>
-                            <div id="signature-container" class="relative mt-3 border-2 border-dashed border-gray-300 rounded-xl overflow-hidden bg-white hover:border-inka-navy/40 transition-colors cursor-crosshair w-full aspect-[2/1]">
-                                <canvas id="signature-canvas" class="block w-full h-full" style="touch-action: none;"></canvas>
-                                <span id="signature-placeholder" class="absolute inset-0 flex items-center justify-center text-sm text-gray-300 pointer-events-none select-none">Tanda tangan di sini</span>
-                            </div>
-                            <input type="hidden" name="tanda_tangan" id="tanda-tangan-input">
-                            <p id="signature-error" class="text-sm text-red-500 mt-1.5 hidden">Tanda tangan wajib diisi sebelum mengirim.</p>
-                            <p class="mt-2 text-sm font-semibold text-gray-700">({{ old('nama_pimpinan_proyek', $prefill?->pic) ?: 'Pimpinan Proyek' }})</p>
-                        </div>
-                        <div>
-                            <p class="text-sm font-semibold text-gray-700">Disetujui oleh,<br>Manager HSE</p>
-                            <div class="mt-3 w-full aspect-[2/1] rounded-xl border border-dashed border-gray-200 bg-gray-50 flex items-center justify-center px-4 text-center">
-                                <p class="text-xs text-gray-400">Diisi oleh Manager HSE setelah HSE Plan direview.</p>
-                            </div>
-                            <p class="mt-2 text-sm font-semibold text-gray-400">(..............................)</p>
-                        </div>
-                    </div>
-                </div>
-            </section>
+           
+{{-- PENGESAHAN / TANDA TANGAN KONTRAKTOR --}}
+<section class="bg-white rounded-2xl border border-gray-100 shadow-sm">
+    <div class="px-4 md:px-6 py-4 border-b border-gray-100 flex items-center justify-between gap-3">
+        <div>
+            <h2 class="text-base font-semibold text-gray-800">
+                Pengesahan
+            </h2>
+            <p class="text-sm text-gray-400 mt-0.5">
+                Diisi dan ditandatangani oleh Kontraktor sebagai bagian dari pengajuan HSE Plan.
+            </p>
+        </div>
+
+        <button
+            type="button"
+            onclick="clearSignature()"
+            class="text-sm font-semibold text-gray-400 hover:text-red-500 border border-gray-200 hover:border-red-300 px-3 py-1.5 rounded-lg transition-colors"
+        >
+            Hapus
+        </button>
+    </div>
+
+    <div class="px-4 md:px-6 py-5">
+        <p class="text-sm text-gray-600 mb-5">
+            <span id="pengesahan-kota">
+                {{ old('site', $prefill?->site) === 'Banyuwangi' ? 'Banyuwangi' : 'Madiun' }}
+            </span>,
+            ................................
+        </p>
+
+        <div class="w-full max-w-[500px]">
+            <p class="text-sm font-semibold text-gray-700">
+                Dibuat oleh,<br>
+                Kontraktor
+            </p>
+
+            <div
+                id="signature-container"
+                class="relative mt-3 border-2 border-dashed border-gray-300 rounded-xl overflow-hidden bg-white hover:border-inka-navy/40 transition-colors cursor-crosshair w-full aspect-[2/1]"
+            >
+                <canvas
+                    id="signature-canvas"
+                    class="block w-full h-full"
+                    style="touch-action: none;"
+                ></canvas>
+
+                <span
+                    id="signature-placeholder"
+                    class="absolute inset-0 flex items-center justify-center text-sm text-gray-300 pointer-events-none select-none"
+                >
+                    Tanda tangan di sini
+                </span>
+            </div>
+
+            <input
+                type="hidden"
+                name="tanda_tangan"
+                id="tanda-tangan-input"
+            >
+
+            <p
+                id="signature-error"
+                class="text-sm text-red-500 mt-1.5 hidden"
+            >
+                Tanda tangan wajib diisi sebelum mengirim.
+            </p>
+
+            <p class="mt-2 text-sm font-semibold text-gray-700">
+                ({{ old('nama_pimpinan_proyek', $prefill?->pic) ?: 'Pimpinan Proyek' }})
+            </p>
+        </div>
+    </div>
+</section>
+
 
             <div class="flex flex-col sm:flex-row gap-3 sm:justify-end pb-8">
                 <a href="/" class="px-5 py-2.5 rounded-xl border border-gray-200 text-sm font-semibold text-gray-600 text-center hover:bg-gray-50 transition-colors">Batal</a>

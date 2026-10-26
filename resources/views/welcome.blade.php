@@ -1041,12 +1041,14 @@
     @php
         $approvalStatus = $contractor->approval_status ?? 'pending';
 
-        $approvalLabels = [
-            'pending' => 'Menunggu Approval',
-            'approved' => 'Approved',
-            'on_hold' => 'On Hold',
-            'inactive' => 'Nonaktif',
-        ];
+       
+$approvalLabels = [
+    'pending' => 'On Hold',
+    'approved' => 'Approved',
+    'on_hold' => 'On Hold',
+    'inactive' => 'Nonaktif',
+];
+
 
         $approvalColors = [
             'pending' => 'bg-amber-50 text-amber-700 border-amber-200/70',
