@@ -941,23 +941,25 @@
                 {{-- Desktop/laptop --}}
                 <div class="overflow-x-auto -mx-4 md:mx-0 px-4 md:px-0 hidden md:block">
                     <table class="data-table min-w-[1320px]">
-                        <thead>
-                            <tr>
-                                <th class="text-center">No</th>
-                                <th>Status</th>
-                                <th>Vendor</th>
-                                <th>Jenis Pekerjaan</th>
-                                <th>Pekerjaan</th>
-                                <th>Lokasi</th>
-                                <th>PIC</th>
-                                <th>No. Telepon</th>
-                                <th>Tgl Mulai</th>
-                                <th>Tgl Selesai</th>
-                                <th>Lama Kerja</th>
-                                <th>Jumlah Pekerja</th>
-                                <th class="text-right">Aksi</th>
-                            </tr>
-                        </thead>
+                        
+<thead>
+    <tr>
+        <th class="text-center">No</th>
+        <th>Vendor</th>
+        <th>Jenis Pekerjaan</th>
+        <th>Pekerjaan</th>
+        <th>Lokasi</th>
+        <th>PIC</th>
+        <th>No. Telepon</th>
+        <th>Tgl Mulai</th>
+        <th>Tgl Selesai</th>
+        <th>Lama Kerja</th>
+        <th>Jumlah Pekerja</th>
+<th>Status</th>
+<th class="text-right">Aksi</th>
+    </tr>
+</thead>
+
                         <tbody>
                             @foreach($contractors as $contractor)
                             @php
@@ -1000,11 +1002,14 @@
                                 ];
                             @endphp
                             <tr class="transition-colors">
-                                <td class="text-center text-gray-500">{{ ($contractors->currentPage() - 1) * $contractors->perPage() + $loop->iteration }}</td>
-                                <td class="whitespace-nowrap">
-                                    <span class="badge {{ $contractorStatusBadge }}">{{ $contractor->status }}</span>
-                                </td>
-                                <td class="font-semibold text-inka-navy whitespace-nowrap">{{ $contractor->vendor }}</td>
+    <td class="text-center text-gray-500">
+        {{ ($contractors->currentPage() - 1) * $contractors->perPage() + $loop->iteration }}
+    </td>
+
+    <td class="font-semibold text-inka-navy whitespace-nowrap">
+        {{ $contractor->vendor }}
+    </td>
+                                <!-- <td class="font-semibold text-inka-navy whitespace-nowrap">{{ $contractor->vendor }}</td> -->
                                 <td class="whitespace-nowrap">
                                     <span class="badge bg-blue-50 text-blue-700 border-blue-200/70">{{ $jenisLabel }}</span>
                                 </td>
@@ -1016,14 +1021,49 @@
                                 <td class="whitespace-nowrap text-gray-600">{{ $selesai ?? '—' }}</td>
                                 <td class="whitespace-nowrap text-gray-600">{{ $lamaKerja ? $lamaKerja . ' hari' : '—' }}</td>
                                 <td class="whitespace-nowrap text-gray-600">{{ $contractor->jumlah_pekerja }} orang</td>
-                                <td class="text-right whitespace-nowrap">
-                                    <button type="button"
-                                            @click="openContractorModal({{ json_encode($contractorPayload, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES) }})"
-                                            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-inka-navy text-white hover:opacity-90 transition-all shadow-sm">
-                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                                        Lihat Detail
-                                    </button>
-                                </td>
+                                
+{{-- KOLOM STATUS --}}
+
+<td class="whitespace-nowrap">
+    @php
+        $approvalStatus = $contractor->approval_status ?? 'pending';
+
+        $approvalLabels = [
+            'pending' => 'Menunggu Approval',
+            'approved' => 'Approved',
+            'on_hold' => 'On Hold',
+            'inactive' => 'Nonaktif',
+        ];
+
+        $approvalColors = [
+            'pending' => 'bg-amber-50 text-amber-700 border-amber-200/70',
+            'approved' => 'bg-green-50 text-green-700 border-green-200/70',
+            'on_hold' => 'bg-orange-50 text-orange-700 border-orange-200/70',
+            'inactive' => 'bg-gray-100 text-gray-600 border-gray-200',
+        ];
+    @endphp
+
+    <span class="badge {{ $approvalColors[$approvalStatus] ?? 'bg-gray-100 text-gray-600 border-gray-200' }}">
+        {{ $approvalLabels[$approvalStatus] ?? $approvalStatus }}
+    </span>
+</td>
+
+
+{{-- KOLOM AKSI --}}
+<td class="text-right whitespace-nowrap">
+    <button type="button"
+            @click="openContractorModal({{ json_encode($contractorPayload, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES) }})"
+            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-inka-navy text-white hover:opacity-90 transition-all shadow-sm">
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+        </svg>
+        Lihat Detail
+    </button>
+</td>
+
                             </tr>
                             @endforeach
                         </tbody>

@@ -163,11 +163,32 @@ Route::middleware(['auth', 'prevent-back-history', 'role:staff,manager'])->group
         ->name('admin.hse-plans.documents.view');
 });
 
-// ===== PERSETUJUAN HSE PLAN (role:manager) =====
-Route::middleware(['auth', 'prevent-back-history', 'role:manager'])->group(function () {
-    Route::post('/admin/hse-plans/{id}/approve', [\App\Http\Controllers\Admin\HsePlanApprovalController::class, 'approve']);
-    Route::post('/admin/hse-plans/{id}/reject', [\App\Http\Controllers\Admin\HsePlanApprovalController::class, 'reject']);
-});
+
+    // ===== PERSETUJUAN HSE PLAN (role:manager) =====
+    Route::middleware(['auth', 'prevent-back-history', 'role:manager'])->group(function () {
+
+        // Route lama - tetap dipertahankan
+        Route::post('/admin/hse-plans/{id}/approve',
+            [\App\Http\Controllers\Admin\HsePlanApprovalController::class, 'approve']);
+
+        Route::post('/admin/hse-plans/{id}/reject',
+            [\App\Http\Controllers\Admin\HsePlanApprovalController::class, 'reject']);
+
+        // Route tambahan - On Hold
+        Route::post('/admin/hse-plans/{id}/hold',
+            [\App\Http\Controllers\Admin\HsePlanApprovalController::class, 'hold']);
+
+        // Route tambahan - Buka Kembali
+        Route::post('/admin/hse-plans/{id}/resume',
+            [\App\Http\Controllers\Admin\HsePlanApprovalController::class, 'resume']);
+        
+            Route::post('/admin/hse-plans/{id}/hold',
+            [\App\Http\Controllers\Admin\HsePlanApprovalController::class, 'hold']);
+        
+        Route::post('/admin/hse-plans/{id}/resume',
+            [\App\Http\Controllers\Admin\HsePlanApprovalController::class, 'resume']);
+    });
+
 
 // ===== ADMIN (role:staff, manager) =====
 Route::middleware(['auth', 'prevent-back-history', 'role:staff,manager'])->group(function () {
@@ -184,6 +205,7 @@ Route::middleware(['auth', 'prevent-back-history', 'role:staff,manager'])->group
     Route::post('/admin/cancellations/{id}', [\App\Http\Controllers\Admin\CancellationController::class, 'cancel']);
     Route::get('/admin/permits/{id}/pdf', [\App\Http\Controllers\Admin\ApprovalController::class, 'viewPdf']);
     Route::get('/admin/permits/{id}/pdf/download', [\App\Http\Controllers\Admin\ApprovalController::class, 'downloadPdf']);
+
 });
 
 Route::middleware('auth')->group(function () {

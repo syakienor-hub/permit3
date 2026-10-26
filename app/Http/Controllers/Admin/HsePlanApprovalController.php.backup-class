@@ -1,0 +1,155 @@
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+use App\Http\Controllers\Controller;
+$path = "app\Http\Controllers\Admin\HsePlanApprovalController.php"
+
+# Baca kode asli
+$fullPath = (Resolve-Path $path).Path
+$code = [System.IO.File]::ReadAllText($fullPath)
+
+# Perbaiki baris kosong sebelum tag pembuka PHP
+$code = $code.TrimStart(
+    [char[]]@([char]0xFEFF, [char]13, [char]10, [char]32, [char]9)
+)
+
+
+# Tambahkan validasi status pada fungsi Approve
+$oldCondition = @'
+            if ($hsePlan->status !== HsePlan::STATUS_REVIEW) {
+                return false;
+            }
+'@
+
+$newCondition = @'
+            if (
+                $hsePlan->status !== HsePlan::STATUS_REVIEW ||
+                (
+                    $hsePlan->contractor !== null &&
+                    $hsePlan->contractor->approval_status !== Contractor::APPROVAL_PENDING
+                )
+            ) {
+                return false;
+            }
+'@
+
+if ($code.Contains($oldCondition)) {
+    $code = $code.Replace($oldCondition, $newCondition)
+}
+
+# Fungsi baru, tanpa menghapus fungsi Reject
+$additionalCode = @'
+    // Menunda persetujuan Data Kontraktor
+    public function hold(Request $request, $id)
+    {
+        abort_unless(Auth::user()?->role === 'manager', 403);
+
+        $validated = $request->validate([
+            'hold_reason' => 'required|string|max:1000',
+        ]);
+
+        $held = DB::transaction(function () use ($id, $validated) {
+            $hsePlan = HsePlan::query()
+                ->with('contractor')
+                ->lockForUpdate()
+                ->findOrFail($id);
+
+            $contractor = $hsePlan->contractor;
+
+            if (
+                $hsePlan->status !== HsePlan::STATUS_REVIEW ||
+                $contractor === null ||
+                $contractor->approval_status !== Contractor::APPROVAL_PENDING
+            ) {
+                return false;
+            }
+
+            $hsePlan->forceFill([
+                'rejection_reason' => $validated['hold_reason'],
+                'reviewed_by' => Auth::id(),
+                'reviewed_at' => now(),
+                'manager_signature' => null,
+            ])->save();
+
+            $contractor->update([
+                'approval_status' => Contractor::APPROVAL_ON_HOLD,
+            ]);
+
+            return true;
+        });
+
+        return redirect('/admin/hse-plans/' . $id)
+            ->with(
+                $held ? 'success' : 'error',
+                $held
+                    ? 'Pengajuan kontraktor berhasil di-On Hold.'
+                    : 'Pengajuan tidak dapat di-On Hold.'
+            );
+    }
+
+    // Membuka kembali pengajuan On Hold
+    public function resume(Request $request, $id)
+    {
+        abort_unless(Auth::user()?->role === 'manager', 403);
+
+        $resumed = DB::transaction(function () use ($id) {
+            $hsePlan = HsePlan::query()
+                ->with('contractor')
+                ->lockForUpdate()
+                ->findOrFail($id);
+
+            $contractor = $hsePlan->contractor;
+
+            if (
+                $hsePlan->status !== HsePlan::STATUS_REVIEW ||
+                $contractor === null ||
+                $contractor->approval_status !== Contractor::APPROVAL_ON_HOLD
+            ) {
+                return false;
+            }
+
+            $contractor->update([
+                'approval_status' => Contractor::APPROVAL_PENDING,
+            ]);
+
+            $hsePlan->forceFill([
+                'rejection_reason' => null,
+                'reviewed_by' => null,
+                'reviewed_at' => null,
+                'manager_signature' => null,
+            ])->save();
+
+            return true;
+        });
+
+        return redirect('/admin/hse-plans/' . $id)
+            ->with(
+                $resumed ? 'success' : 'error',
+                $resumed
+                    ? 'Pengajuan kembali menunggu review Manager.'
+                    : 'Pengajuan tidak sedang On Hold.'
+            );
+    }
+
+'@
+
+$marker = "    // Penolakan HSE Plan (fungsi lama tetap dipertahankan)"
+
+if (
+    !$code.Contains("public function hold(") -and
+    !$code.Contains("public function resume(") -and
+    $code.Contains($marker)
+) {
+    $code = $code.Replace($marker, $additionalCode + $marker)
+}
+
+# Buat cadangan agar kode asli tetap aman
+Copy-Item $path "$path.sebelum-perbaikan.bak" -Force
+
+# Simpan UTF-8 tanpa BOM
+$utf8 = New-Object System.Text.UTF8Encoding($false)
+[System.IO.File]::WriteAllText($fullPath, $code, $utf8)
+
+# Pemeriksaan sintaks
+php -l $path

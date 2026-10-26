@@ -87,11 +87,14 @@
                     <div>
                         <label class="form-label">Jenis Pekerjaan <span class="text-red-500">*</span></label>
                         <select name="jenis_pekerjaan" class="form-input" required>
-                            <option value="">Pilih Jenis Pekerjaan</option>
-                            @foreach($classifications as $classification)
-                                <option value="{{ $classification->code }}" @selected(old('jenis_pekerjaan') === $classification->code)>{{ $classification->name }}</option>
-                            @endforeach
-                        </select>
+    <option value="">Pilih Jenis Pekerjaan</option>
+    <option value="umum" @selected(old('jenis_pekerjaan') === 'umum')>
+        Pekerjaan Umum
+    </option>
+    <option value="risiko_tinggi" @selected(old('jenis_pekerjaan') === 'risiko_tinggi')>
+        Pekerjaan Risiko Tinggi
+    </option>
+</select>
                     </div>
                     <div>
                         <label class="form-label">No. Telepon <span class="text-red-500">*</span></label>

@@ -117,12 +117,53 @@
                 @php $contractor = $hsePlan->contractor; @endphp
                 <section class="bg-white rounded-2xl border border-gray-100 shadow-sm">
                     <div class="px-4 md:px-6 py-4 border-b border-gray-100">
-                        <h2 class="text-base font-semibold text-gray-800">Data Kontraktor</h2>
+                      
+<div class="flex flex-wrap items-center justify-between gap-3">
+    <h2 class="text-base font-semibold text-gray-800">
+        Data Kontraktor
+    </h2>
+
+    @php
+        $approvalStatus = $hsePlan->contractor->approval_status ?? 'pending';
+
+        $approvalLabels = [
+            'pending' => 'Menunggu Approval',
+            'approved' => 'Approved',
+            'on_hold' => 'On Hold',
+            'inactive' => 'Nonaktif',
+        ];
+
+        $approvalColors = [
+            'pending' => 'bg-amber-100 text-amber-700',
+            'approved' => 'bg-green-100 text-green-700',
+            'on_hold' => 'bg-orange-100 text-orange-700',
+            'inactive' => 'bg-gray-100 text-gray-600',
+        ];
+    @endphp
+
+    <span class="inline-flex items-center rounded-full px-3 py-1.5 text-xs font-semibold {{ $approvalColors[$approvalStatus] ?? 'bg-gray-100 text-gray-600' }}">
+        {{ $approvalLabels[$approvalStatus] ?? $approvalStatus }}
+    </span>
+</div>
+
                     </div>
                     <div class="px-4 md:px-6 py-5 grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                         <div><p class="text-gray-400">Vendor / Perusahaan</p><p class="font-semibold text-gray-700">{{ $contractor->vendor }}</p></div>
                         <div><p class="text-gray-400">PIC</p><p class="font-semibold text-gray-700">{{ $contractor->pic }}</p></div>
-                        <div><p class="text-gray-400">Jenis Pekerjaan</p><p class="font-semibold text-gray-700">{{ \App\Models\Classification::where('code', $contractor->jenis_pekerjaan)->value('name') ?? $contractor->jenis_pekerjaan }}</p></div>
+
+                        <div>
+    <p class="text-gray-400">Jenis Pekerjaan</p>
+    <p class="font-semibold text-gray-700">
+        @if($contractor->jenis_pekerjaan === 'umum')
+            Pekerjaan Umum
+        @elseif($contractor->jenis_pekerjaan === 'risiko_tinggi')
+            Pekerjaan Risiko Tinggi
+        @else
+            {{ \App\Models\Classification::where('code', $contractor->jenis_pekerjaan)->value('name') ?? $contractor->jenis_pekerjaan }}
+        @endif
+    </p>
+</div>
+
                         <div><p class="text-gray-400">No. Telepon</p><p class="font-semibold text-gray-700">{{ $contractor->telepon }}</p></div>
                         <div><p class="text-gray-400">Jumlah Pekerja</p><p class="font-semibold text-gray-700">{{ $contractor->jumlah_pekerja }}</p></div>
                         <div><p class="text-gray-400">Lokasi</p><p class="font-semibold text-gray-700">{{ $contractor->lokasi }}</p></div>
@@ -272,9 +313,74 @@
                             <label class="block text-sm font-semibold text-gray-600 mb-1.5">Alasan penolakan</label>
                             <textarea name="rejection_reason" rows="3" required class="form-input !text-sm" placeholder="Tuliskan alasan agar kontraktor dapat memperbaiki...">{{ old('rejection_reason') }}</textarea>
                             <button type="submit" class="mt-2.5 w-full px-4 py-2.5 rounded-xl border border-red-200 text-red-600 text-sm font-semibold hover:bg-red-50 transition-colors">Tolak HSE Plan</button>
+                            
+@if($hsePlan->contractor &&
+    $hsePlan->contractor->approval_status === \App\Models\Contractor::APPROVAL_PENDING)
+
+    <form
+        method="POST"
+        action="/admin/hse-plans/{{ $hsePlan->id }}/hold"
+        class="border-t border-gray-100 pt-4"
+    >
+        @csrf
+
+        <label class="block text-sm font-semibold text-gray-700 mb-2">
+            Alasan On Hold
+        </label>
+
+        <textarea
+            name="hold_reason"
+            rows="3"
+            required
+            maxlength="1000"
+            class="form-input w-full !text-sm"
+            placeholder="Tuliskan alasan penundaan atau dokumen yang perlu dilengkapi..."
+        >{{ old('hold_reason') }}</textarea>
+
+        <button
+            type="submit"
+            class="mt-3 w-full rounded-xl bg-amber-500 px-4 py-2.5 text-sm font-semibold text-white hover:bg-amber-600"
+        >
+            On Hold Pengajuan Kontraktor
+        </button>
+    </form>
+@endif
+
                         </form>
                     </div>
                 </section>
+                
+@elseif(
+    auth()->user()->role === 'manager' &&
+    $hsePlan->contractor?->approval_status === \App\Models\Contractor::APPROVAL_ON_HOLD
+)
+    <section class="bg-white rounded-2xl border border-amber-200 shadow-sm">
+        <div class="px-5 py-4">
+            <h2 class="font-semibold text-amber-800">
+                Pengajuan Kontraktor On Hold
+            </h2>
+
+            <p class="text-sm text-gray-600 mt-2">
+                {{ $hsePlan->rejection_reason ?: 'Belum ada alasan penundaan.' }}
+            </p>
+
+            <form
+                method="POST"
+                action="/admin/hse-plans/{{ $hsePlan->id }}/resume"
+                class="mt-4"
+            >
+                @csrf
+
+                <button
+                    type="submit"
+                    class="w-full rounded-xl bg-inka-navy px-4 py-2.5 text-sm font-semibold text-white"
+                >
+                    Buka Kembali Pengajuan
+                </button>
+            </form>
+        </div>
+    </section>
+
             @elseif($hsePlan->status !== \App\Models\HsePlan::STATUS_REVIEW)
                 <section class="bg-white rounded-2xl border border-gray-100 shadow-sm">
                     <div class="px-4 md:px-6 py-4 border-b border-gray-100">

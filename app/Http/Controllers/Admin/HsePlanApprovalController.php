@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\DB;
 
 class HsePlanApprovalController extends Controller
 {
@@ -257,29 +258,164 @@ class HsePlanApprovalController extends Controller
         return $this->pdfService->make($hsePlan)->download($this->pdfService->filename($hsePlan));
     }
 
-    public function approve(Request $request, $id)
-    {
-        $hsePlan = HsePlan::findOrFail($id);
+    
+public function approve(Request $request, $id)
+{
+    abort_unless(Auth::user()?->role === 'manager', 403);
+
+    $validated = $request->validate([
+        'tanda_tangan' => 'required|string',
+    ]);
+
+    $result = DB::transaction(function () use ($id, $validated) {
+        $hsePlan = HsePlan::query()
+            ->lockForUpdate()
+            ->findOrFail($id);
 
         if ($hsePlan->status !== HsePlan::STATUS_REVIEW) {
-            return redirect('/admin/hse-plans/' . $hsePlan->id)
-                ->with('error', 'HSE Plan ini sudah diproses.');
+            return 'processed';
         }
 
-        $request->validate([
-            'tanda_tangan' => 'required|string',
-        ]);
+        $contractor = Contractor::query()
+            ->where('hse_plan_id', $hsePlan->id)
+            ->lockForUpdate()
+            ->first();
 
+        if ($contractor &&
+            $contractor->approval_status === Contractor::APPROVAL_ON_HOLD) {
+            return 'on_hold';
+        }
+
+        if ($contractor &&
+            $contractor->approval_status !== Contractor::APPROVAL_PENDING) {
+            return 'processed';
+        }
+
+        // Menyetujui HSE Plan seperti fungsi sebelumnya
         $hsePlan->forceFill([
             'status' => HsePlan::STATUS_APPROVED,
-            'manager_signature' => $request->tanda_tangan,
+            'manager_signature' => $validated['tanda_tangan'],
             'reviewed_by' => Auth::id(),
             'reviewed_at' => now(),
             'rejection_reason' => null,
         ])->save();
 
-        return redirect('/admin/hse-plans/' . $hsePlan->id)
-            ->with('success', 'HSE Plan berhasil disetujui.');
+        // Sinkronisasi status Data Kontraktor
+        if ($contractor) {
+            $contractor->update([
+                'approval_status' => Contractor::APPROVAL_APPROVED,
+            ]);
+        }
+
+        return 'approved';
+    });
+
+    if ($result === 'on_hold') {
+        return redirect('/admin/hse-plans/' . $id)
+            ->with('error', 'Pengajuan sedang On Hold. Buka kembali pengajuan sebelum menyetujui.');
+    }
+
+    if ($result !== 'approved') {
+        return redirect('/admin/hse-plans/' . $id)
+            ->with('error', 'HSE Plan ini sudah diproses.');
+    }
+
+    return redirect('/admin/hse-plans/' . $id)
+        ->with('success', 'HSE Plan dan Data Kontraktor berhasil disetujui.');
+}
+
+
+    
+    // Menunda pengajuan kontraktor oleh Manager HSE
+    public function hold(Request $request, $id)
+    {
+        abort_unless(Auth::user()?->role === 'manager', 403);
+
+        $validated = $request->validate([
+            'hold_reason' => 'required|string|max:1000',
+        ]);
+
+        $held = DB::transaction(function () use ($id, $validated) {
+            $hsePlan = HsePlan::query()
+                ->with('contractor')
+                ->lockForUpdate()
+                ->findOrFail($id);
+
+            $contractor = $hsePlan->contractor;
+
+            if (
+                $hsePlan->status !== HsePlan::STATUS_REVIEW ||
+                $contractor === null ||
+                $contractor->approval_status !== Contractor::APPROVAL_PENDING
+            ) {
+                return false;
+            }
+
+            $hsePlan->forceFill([
+                'rejection_reason' => $validated['hold_reason'],
+                'reviewed_by' => Auth::id(),
+                'reviewed_at' => now(),
+                'manager_signature' => null,
+            ])->save();
+
+            $contractor->update([
+                'approval_status' => Contractor::APPROVAL_ON_HOLD,
+            ]);
+
+            return true;
+        });
+
+        return redirect('/admin/hse-plans/' . $id)
+            ->with(
+                $held ? 'success' : 'error',
+                $held
+                    ? 'Pengajuan berhasil di-On Hold.'
+                    : 'Pengajuan tidak dapat di-On Hold.'
+            );
+    }
+
+    // Membuka kembali pengajuan yang sedang On Hold
+    public function resume(Request $request, $id)
+    {
+        abort_unless(Auth::user()?->role === 'manager', 403);
+
+        $resumed = DB::transaction(function () use ($id) {
+            $hsePlan = HsePlan::query()
+                ->with('contractor')
+                ->lockForUpdate()
+                ->findOrFail($id);
+
+            $contractor = $hsePlan->contractor;
+
+            if (
+                $hsePlan->status !== HsePlan::STATUS_REVIEW ||
+                $contractor === null ||
+                $contractor->approval_status !== Contractor::APPROVAL_ON_HOLD
+            ) {
+                return false;
+            }
+
+            $contractor->update([
+                'approval_status' => Contractor::APPROVAL_PENDING,
+            ]);
+
+            $hsePlan->forceFill([
+                'rejection_reason' => null,
+                'reviewed_by' => null,
+                'reviewed_at' => null,
+                'manager_signature' => null,
+            ])->save();
+
+            return true;
+        });
+
+        return redirect('/admin/hse-plans/' . $id)
+            ->with(
+                $resumed ? 'success' : 'error',
+                $resumed
+                    ? 'Pengajuan kembali menunggu persetujuan Manager.'
+                    : 'Pengajuan tidak sedang On Hold.'
+            );
     }
 
     public function reject(Request $request, $id)

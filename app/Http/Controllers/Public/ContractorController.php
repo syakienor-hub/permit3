@@ -20,18 +20,20 @@ class ContractorController extends Controller
     private const FILE_RULES = 'file|max:10240|mimes:pdf,doc,docx,xls,xlsx,jpg,jpeg,png';
 
     public function create()
-    {
-        return view('public.contractors.create', [
-            'classifications' => Classification::orderBy('name')->get(),
-        ]);
-    }
+{
+    return view('public.contractors.create');
+}
 
     public function store(Request $request)
     {
         $request->validate([
             'vendor' => 'required|string|max:255',
             'pic' => 'required|string|max:255',
-            'jenis_pekerjaan' => ['required', 'string', Rule::exists('classifications', 'code')],
+            'jenis_pekerjaan' => [
+                'required',
+                'string',
+                Rule::in(['umum', 'risiko_tinggi']),
+            ],
             'telepon' => 'required|string|max:50',
             'nama_pekerjaan' => 'required|string|max:2000',
             'tanggal_mulai' => 'required|date',
@@ -59,6 +61,7 @@ class ContractorController extends Controller
                 'lokasi' => $request->lokasi,
                 'site' => $request->site,
                 'status' => Contractor::STATUS_WAITING,
+                'approval_status' => Contractor::APPROVAL_PENDING,
             ]);
 
             $this->uploadDocuments($request, $contractor, 'hse_plan_file', 'hse_plan_existing');
