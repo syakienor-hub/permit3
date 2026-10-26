@@ -532,8 +532,8 @@
                     <div class="text-xs font-semibold text-gray-500 bg-white px-3 py-1.5 rounded-lg border border-gray-200">
                         Total: <span class="text-inka-navy font-bold">{{ $permits->total() }}</span> Permit Terdaftar
                     </div>
-                    <a href="/ajukan-permit" class="inline-flex items-center gap-1.5 whitespace-nowrap rounded-lg bg-inka-navy px-3.5 py-1.5 text-xs font-semibold text-white shadow-sm hover:opacity-90 transition-opacity">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <a href="/ajukan-permit" class="inline-flex items-center gap-2 whitespace-nowrap rounded-lg bg-inka-navy px-5 py-2 text-[13px] font-semibold text-white shadow-sm hover:opacity-90 transition-opacity">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                         </svg>
                         Tambah Permit
@@ -912,8 +912,8 @@
                     <div class="text-xs font-semibold text-gray-500 bg-white px-3 py-1.5 rounded-lg border border-gray-200">
                         Total: <span class="text-inka-navy font-bold">{{ $contractors->total() }}</span> Kontraktor Terdaftar
                     </div>
-                    <a href="/data-kontraktor" class="inline-flex items-center gap-1.5 whitespace-nowrap rounded-lg bg-inka-navy px-3.5 py-1.5 text-xs font-semibold text-white shadow-sm hover:opacity-90 transition-opacity">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <a href="/data-kontraktor" class="inline-flex items-center gap-2 whitespace-nowrap rounded-lg bg-inka-navy px-5 py-2 text-[13px] font-semibold text-white shadow-sm hover:opacity-90 transition-opacity">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                         </svg>
                         Tambah Kontraktor
