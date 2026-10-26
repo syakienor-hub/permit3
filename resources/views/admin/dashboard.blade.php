@@ -22,7 +22,15 @@
                         Staff HSE &middot; {{ $siteLabel }}
                     </span>
                     <h1 class="mt-3 text-2xl sm:text-[28px] font-bold leading-tight">{{ $greeting }}, {{ auth()->user()->name }}</h1>
-                    <p class="mt-1 text-sm text-white/60">{{ $todayLabel }} &mdash; semua antrean site {{ $siteLabel }} dalam satu tampilan.</p>
+                    <p class="mt-1 text-sm text-white/60">
+                        {{ $todayLabel }} &mdash;
+                        @if($counts['permit_pending'] + $counts['inspection_pending'] > 0)
+                            <span class="font-semibold text-white">{{ $counts['permit_pending'] }} permit</span> dan
+                            <span class="font-semibold text-white">{{ $counts['inspection_pending'] }} daftar periksa</span> menunggu tindakan Anda.
+                        @else
+                            Semua antrean sudah tertangani. Kerja bagus, tetap utamakan keselamatan!
+                        @endif
+                    </p>
                 </div>
                 <div class="flex flex-wrap gap-2 shrink-0">
                     <a href="/admin/approvals"
@@ -210,7 +218,15 @@
                         Manager HSE &middot; Semua Site
                     </span>
                     <h1 class="mt-3 text-2xl sm:text-[28px] font-bold leading-tight">{{ $greeting }}, {{ auth()->user()->name }}</h1>
-                    <p class="mt-1 text-sm text-white/60">{{ $todayLabel }} &mdash; pantau antrean Safety Permit dan HSE Plan seluruh site.</p>
+                    <p class="mt-1 text-sm text-white/60">
+                        {{ $todayLabel }} &mdash;
+                        @if($counts['permit_pending'] + $counts['hse_review'] > 0)
+                            <span class="font-semibold text-white">{{ $counts['permit_pending'] }} permit</span> dan
+                            <span class="font-semibold text-white">{{ $counts['hse_review'] }} HSE Plan</span> menunggu persetujuan Anda.
+                        @else
+                            Semua antrean sudah tertangani. Kerja bagus, tetap utamakan keselamatan!
+                        @endif
+                    </p>
                 </div>
                 <div class="flex flex-wrap gap-2 shrink-0">
                     <a href="/admin/approvals"
