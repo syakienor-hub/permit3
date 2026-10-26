@@ -379,28 +379,28 @@
         </h1>
         <p class="text-sm sm:text-[15.5px] text-white/100 mb-6 md:mb-8 hero-animate px-1" id="hero-sub">
         Sistem Informasi Monitoring dan Izin Kerja PT INKA (Persero)        </p>
-        <div class="flex flex-col sm:flex-row gap-3 justify-center items-stretch sm:items-center sm:flex-wrap hero-animate px-2 sm:px-0" id="hero-actions">
-            <a href="/daftar-periksa" class="btn btn-outline-light btn-lg w-full sm:w-auto">
-                Daftar Periksa Izin
-            </a>
-            <a href="/ajukan-permit" class="btn btn-outline-light btn-lg w-full sm:w-auto">
-                Ajukan Safety Permit
-            </a>
-            @auth
-                <a href="{{ route('dashboard') }}" class="btn btn-outline-light btn-lg w-full sm:w-auto">
-                    Ke Dashboard
+        <div class="hero-animate px-2 sm:px-0" id="hero-actions">
+            <div class="flex flex-col sm:flex-row gap-3 justify-center items-stretch sm:items-center">
+                <a href="/ajukan-permit" class="btn btn-amber btn-lg w-full sm:w-auto">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                    </svg>
+                    Ajukan Safety Permit
                 </a>
-            @else
-                <a href="{{ route('login') }}" class="btn btn-outline-light btn-lg w-full sm:w-auto">
-                    Masuk Petugas
+                <a href="/daftar-periksa" class="btn btn-outline-light btn-lg w-full sm:w-auto">
+                    Daftar Periksa Izin
                 </a>
-            @endauth
-            <a href="/data-kontraktor" class="btn btn-outline-light btn-lg w-full sm:w-auto">
-                Ajukan Data Kontraktor
-            </a>
-            <a href="/cek-status" class="btn btn-outline-light btn-lg w-full sm:w-auto">
-                Cek Status
-            </a>
+            </div>
+
+            <div class="mt-4 flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5 text-[13px] font-medium text-white/70">
+                <a href="/cek-status" class="hover:text-white transition-colors">Cek Status</a>
+                <span class="text-white/25">&bull;</span>
+                <a href="/data-kontraktor" class="hover:text-white transition-colors">Ajukan Data Kontraktor</a>
+                @auth
+                    <span class="text-white/25">&bull;</span>
+                    <a href="{{ route('dashboard') }}" class="hover:text-white transition-colors">Ke Dashboard</a>
+                @endauth
+            </div>
         </div>
         <p class="text-xs text-white/100 mt-6 md:mt-[36px] hero-animate px-2" id="hero-note">
             Tanpa akun. Isi form pengajuan langsung — permit otomatis masuk verifikasi Staff HSE.
