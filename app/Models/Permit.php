@@ -15,6 +15,7 @@ class Permit extends Model
     protected $fillable = [
         'no_permit',
         'user_id',
+        'work_inspection_id',
         'divisi_pengaju',
         'tipe',
         'site',
@@ -60,6 +61,12 @@ class Permit extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    /** Relasi ke Daftar Periksa Izin Pekerjaan Berisiko Tinggi */
+    public function workInspection()
+    {
+        return $this->belongsTo(WorkInspection::class);
     }
 
     /** Relasi ke dokumen pendukung */

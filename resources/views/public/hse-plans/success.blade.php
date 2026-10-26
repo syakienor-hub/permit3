@@ -9,7 +9,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>body { font-family: 'Inter', sans-serif; }</style>
 </head>
-<body class="bg-slate-50 min-h-screen flex items-center justify-center px-4 py-8">
+<body class="bg-slate-50 min-h-screen flex flex-col items-center justify-center px-4 py-8">
+    <div class="w-full max-w-xl mb-3">
+        <a href="/" class="text-sm text-gray-500 hover:text-inka-navy">&larr; Kembali ke Beranda</a>
+    </div>
+
     <div class="bg-white rounded-2xl border border-gray-100 shadow-sm max-w-xl w-full p-6 sm:p-8 text-center">
         <div class="w-14 h-14 rounded-2xl bg-green-50 border border-green-100 flex items-center justify-center mx-auto mb-4">
             <svg class="w-7 h-7 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -33,7 +37,6 @@
 
         <div class="flex flex-col sm:flex-row gap-2.5 mt-6">
             <a href="{{ $statusUrl }}" class="flex-1 px-5 py-2.5 rounded-xl bg-inka-navy text-white text-sm font-semibold hover:opacity-90 transition-opacity">Cek Status HSE Plan</a>
-            <a href="/" class="flex-1 px-5 py-2.5 rounded-xl border border-gray-200 text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-colors">Kembali ke Beranda</a>
         </div>
     </div>
 </body>

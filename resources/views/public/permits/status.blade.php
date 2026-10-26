@@ -9,7 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>body { font-family: 'Inter', sans-serif; }</style>
 </head>
-<body class="bg-slate-50 min-h-screen flex items-center justify-center px-4 py-8">
+<body class="bg-slate-50 min-h-screen flex flex-col items-center px-4 py-8">
     @php
         $statusMap = [
             'Draft'          => ['label' => 'Draft', 'class' => 'bg-gray-100 text-gray-600'],
@@ -25,10 +25,13 @@
         $status = isset($permit) ? ($statusMap[$permit->status] ?? ['label' => $permit->status, 'class' => 'bg-gray-100 text-gray-600']) : null;
     @endphp
 
+    <div class="w-full max-w-2xl mb-3">
+        <a href="/" class="text-sm text-gray-500 hover:text-inka-navy">← Kembali ke Beranda</a>
+    </div>
+
     <div class="bg-white rounded-2xl border border-gray-100 shadow-sm max-w-2xl w-full p-6 sm:p-8">
         <div class="mb-5">
-            <a href="/" class="text-sm text-gray-500 hover:text-inka-navy">← Kembali ke Beranda</a>
-            <h1 class="text-xl sm:text-2xl font-extrabold text-gray-800 mt-2">Cek Status Permit</h1>
+            <h1 class="text-xl sm:text-2xl font-extrabold text-gray-800">Cek Status Permit</h1>
             <p class="text-sm text-gray-500 mt-1">Masukkan nomor permit dan nomor telepon yang Anda isi saat mengajukan.</p>
         </div>
 

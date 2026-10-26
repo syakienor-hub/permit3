@@ -149,6 +149,42 @@
                     </div>
                     <input type="hidden" name="tipe" id="tipe-input" value="Internal">
                 </div>
+
+                <div class="bg-white rounded-2xl border border-gray-100 shadow-sm">
+                    <div class="px-4 md:px-6 py-4 border-b border-gray-100">
+                        <h3 class="text-base font-semibold text-gray-800">Daftar Periksa Izin Kerja <span class="text-red-500">*</span></h3>
+                        <p class="text-sm text-gray-400 mt-0.5">Pilih daftar periksa berisiko tinggi yang sudah disetujui Staff HSE</p>
+                    </div>
+                    <div class="px-4 md:px-6 py-5">
+                        @if($inspections->isEmpty())
+                            <div class="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+                                <p class="font-semibold">Belum ada daftar periksa yang disetujui.</p>
+                                <p class="mt-1">Isi dan setujui <a href="/daftar-periksa" class="font-bold underline">Daftar Periksa Izin Kerja</a> terlebih dahulu sebelum mengajukan Safety Permit.</p>
+                            </div>
+                        @else
+                            <select name="work_inspection_id" id="work-inspection-select" class="form-input" required onchange="applyInspection(this)">
+                                <option value="">— Pilih Daftar Periksa —</option>
+                                @foreach($inspections as $inspection)
+                                    <option value="{{ $inspection->id }}"
+                                        data-site="{{ $inspection->site }}"
+                                        data-tipe="{{ $inspection->tipe }}"
+                                        data-divisi="{{ $inspection->divisi_pengaju }}"
+                                        data-pekerjaan="{{ $inspection->nama_pekerjaan }}"
+                                        data-kontraktor="{{ $inspection->kontraktor }}"
+                                        data-lokasi="{{ $inspection->lokasi }}"
+                                        data-tanggal="{{ $inspection->tanggal_mulai?->format('Y-m-d') }}"
+                                        @selected((string) old('work_inspection_id') === (string) $inspection->id)>
+                                        {{ $inspection->no_periksa }} — {{ $inspection->nama_pekerjaan }} ({{ $inspection->site }})
+                                    </option>
+                                @endforeach
+                            </select>
+                            <p class="text-xs text-gray-400 mt-2">
+                                Data site, tipe, divisi, pekerjaan, kontraktor, dan lokasi akan terisi otomatis.
+                                <a href="/cek-daftar-periksa" class="font-semibold text-inka-navy hover:underline">Cek status daftar periksa</a>.
+                            </p>
+                        @endif
+                    </div>
+                </div>
             </div>
 
             {{-- STEP 4 — DOKUMEN --}}
@@ -470,6 +506,7 @@
     <script>
         let currentStep = 0;
         const totalSteps = 7;
+        const hasApprovedInspection = {{ $inspections->isNotEmpty() ? 'true' : 'false' }};
         let selectedTipe = 'Internal';
 
         function selectTipe(tipe) {
@@ -499,9 +536,32 @@
         }
         selectSite(selectedSite);
 
+        function applyInspection(select) {
+            const option = select.options[select.selectedIndex];
+            if (!option || !option.value) return;
+
+            if (option.dataset.site) selectSite(option.dataset.site);
+            if (option.dataset.tipe) selectTipe(option.dataset.tipe);
+
+            const setValue = function (name, value) {
+                const input = document.querySelector('[name="' + name + '"]');
+                if (input && value !== undefined) input.value = value;
+            };
+
+            setValue('divisi_pengaju', option.dataset.divisi || '');
+            setValue('nama_pekerjaan', option.dataset.pekerjaan || '');
+            setValue('kontraktor', option.dataset.kontraktor || '');
+            setValue('lokasi', option.dataset.lokasi || '');
+            setValue('tanggal_mulai', option.dataset.tanggal || '');
+        }
+
         function changeStep(direction) {
             let nextStep = currentStep + direction;
             if (nextStep < 0 || nextStep >= totalSteps) return;
+            if (direction > 0 && currentStep === 0 && !hasApprovedInspection) {
+                alert('Belum ada Daftar Periksa Izin Kerja yang disetujui Staff HSE. Silakan isi dan tunggu persetujuan terlebih dahulu.');
+                return;
+            }
             if (direction > 0) {
                 const stepEl = document.getElementById('step-' + currentStep);
                 const inputs = stepEl.querySelectorAll('input[required], select[required], textarea[required]');

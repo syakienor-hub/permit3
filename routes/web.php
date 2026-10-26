@@ -20,7 +20,7 @@ Route::get('/', function () {
                 ->orWhere('lokasi', 'like', $term));
         })
         ->orderByRaw('COALESCE(submitted_at, created_at) DESC')
-        ->paginate(10)
+        ->paginate(5)
         ->withQueryString()
         ->fragment('monitoring');
 
@@ -47,7 +47,7 @@ Route::get('/', function () {
                 ->orWhere('lokasi', 'like', $term));
         })
         ->orderByRaw('COALESCE(tanggal_mulai, created_at) DESC')
-        ->paginate(10, ['*'], 'kontraktor_page')
+        ->paginate(5, ['*'], 'kontraktor_page')
         ->withQueryString()
         ->fragment('monitoring-kontraktor');
 
@@ -88,6 +88,18 @@ Route::get('/cek-hse-plan', [\App\Http\Controllers\Public\HsePlanController::cla
 Route::post('/cek-hse-plan', [\App\Http\Controllers\Public\HsePlanController::class, 'statusShow'])
     ->middleware('throttle:10,1')
     ->name('public.hse-plans.status');
+
+// ===== DAFTAR PERIKSA IZIN PEKERJAAN BERISIKO TINGGI (publik, tanpa login) =====
+Route::get('/daftar-periksa', [\App\Http\Controllers\Public\WorkInspectionController::class, 'create']);
+Route::post('/daftar-periksa', [\App\Http\Controllers\Public\WorkInspectionController::class, 'store'])
+    ->middleware('throttle:10,1');
+Route::get('/daftar-periksa/sukses/{workInspection}', [\App\Http\Controllers\Public\WorkInspectionController::class, 'success'])
+    ->name('public.work-inspections.success');
+Route::get('/cek-daftar-periksa', [\App\Http\Controllers\Public\WorkInspectionController::class, 'statusForm'])
+    ->name('public.work-inspections.status.form');
+Route::post('/cek-daftar-periksa', [\App\Http\Controllers\Public\WorkInspectionController::class, 'statusShow'])
+    ->middleware('throttle:10,1')
+    ->name('public.work-inspections.status');
 
 // ===== PENGAJUAN PUBLIK (tanpa login) =====
 Route::middleware(['throttle:10,1'])->group(function () {
@@ -189,6 +201,21 @@ Route::middleware(['auth', 'prevent-back-history', 'role:staff,manager'])->group
             [\App\Http\Controllers\Admin\HsePlanApprovalController::class, 'resume']);
     });
 
+
+// ===== DAFTAR PERIKSA IZIN PEKERJAAN (role:staff, manager) =====
+Route::middleware(['auth', 'prevent-back-history', 'role:staff,manager'])->group(function () {
+    Route::get('/admin/work-inspections', [\App\Http\Controllers\Admin\WorkInspectionApprovalController::class, 'index']);
+    Route::get('/admin/work-inspections/history', [\App\Http\Controllers\Admin\WorkInspectionApprovalController::class, 'history']);
+    Route::get('/admin/work-inspections/{id}', [\App\Http\Controllers\Admin\WorkInspectionApprovalController::class, 'show']);
+    Route::get('/admin/work-inspections/{id}/pdf', [\App\Http\Controllers\Admin\WorkInspectionApprovalController::class, 'viewPdf']);
+    Route::get('/admin/work-inspections/{id}/pdf/download', [\App\Http\Controllers\Admin\WorkInspectionApprovalController::class, 'downloadPdf']);
+});
+
+// ===== PERSETUJUAN DAFTAR PERIKSA (role:staff) =====
+Route::middleware(['auth', 'prevent-back-history', 'role:staff'])->group(function () {
+    Route::post('/admin/work-inspections/{id}/approve', [\App\Http\Controllers\Admin\WorkInspectionApprovalController::class, 'approve']);
+    Route::post('/admin/work-inspections/{id}/reject', [\App\Http\Controllers\Admin\WorkInspectionApprovalController::class, 'reject']);
+});
 
 // ===== ADMIN (role:staff, manager) =====
 Route::middleware(['auth', 'prevent-back-history', 'role:staff,manager'])->group(function () {

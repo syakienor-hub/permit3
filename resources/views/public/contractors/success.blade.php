@@ -73,11 +73,13 @@
                     class="inline-flex items-center justify-center rounded-xl bg-inka-navy px-5 py-2.5 text-sm font-semibold text-white hover:opacity-90 transition-opacity">
                     Isi Form HSE Plan
                 </a>
-                <a href="/"
-                    class="inline-flex items-center justify-center rounded-xl border border-gray-200 bg-white px-5 py-2.5 text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-colors">
-                    Kembali ke Beranda
-                </a>
             </div>
+        </div>
+
+        <div class="mt-5">
+            <a href="/" class="inline-flex items-center gap-1 text-sm font-semibold text-gray-500 hover:text-inka-navy">
+                &larr; Kembali ke Beranda
+            </a>
         </div>
     </main>
 </body>
