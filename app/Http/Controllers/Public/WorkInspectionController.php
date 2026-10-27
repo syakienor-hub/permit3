@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Public;
 use App\Http\Controllers\Controller;
 use App\Models\Permit;
 use App\Models\WorkInspection;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\URL;
@@ -185,5 +186,18 @@ class WorkInspectionController extends Controller
         }
 
         return view('public.work-inspections.status', compact('inspection'));
+    }
+
+    /** Unduh PDF daftar periksa (hanya bila sudah disetujui). Route bertanda tangan (signed). */
+    public function downloadPdf(WorkInspection $workInspection)
+    {
+        if ($workInspection->status !== WorkInspection::STATUS_APPROVED) {
+            abort(403, 'Daftar periksa belum disetujui, PDF belum dapat diunduh.');
+        }
+
+        return Pdf::loadView('admin.work-inspections.pdf', ['inspection' => $workInspection])
+            ->setPaper('A4', 'portrait')
+            ->setOptions(['defaultFont' => 'sans-serif'])
+            ->download('Daftar-Periksa-' . str_replace('/', '-', $workInspection->no_periksa) . '.pdf');
     }
 }

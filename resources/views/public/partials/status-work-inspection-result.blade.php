@@ -33,6 +33,13 @@
             <p class="font-semibold">Disetujui oleh {{ $inspection->safety_officer_nama ?? 'Staff HSE' }}</p>
             <p class="mt-1">Nomor ini sudah dapat dipakai pada form <a href="/ajukan-permit" class="font-bold underline">Safety Permit</a>.</p>
         </div>
+        <a href="{{ URL::signedRoute('public.work-inspections.pdf', ['workInspection' => $inspection->id]) }}"
+           class="mt-3 w-full inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-inka-navy text-white text-sm font-bold hover:opacity-90 transition-opacity">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+            </svg>
+            Unduh PDF Daftar Periksa
+        </a>
     @endif
 
     <details class="mt-5 rounded-xl border border-gray-100 bg-gray-50/60 px-4 py-3">

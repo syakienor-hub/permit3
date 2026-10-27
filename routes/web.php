@@ -126,6 +126,9 @@ Route::post('/daftar-periksa/untuk-permit/{permit}', [\App\Http\Controllers\Publ
     ->name('public.work-inspections.store-for-permit');
 Route::get('/daftar-periksa/sukses/{workInspection}', [\App\Http\Controllers\Public\WorkInspectionController::class, 'success'])
     ->name('public.work-inspections.success');
+Route::get('/daftar-periksa/{workInspection}/pdf', [\App\Http\Controllers\Public\WorkInspectionController::class, 'downloadPdf'])
+    ->middleware(['signed', 'throttle:10,1'])
+    ->name('public.work-inspections.pdf');
 Route::get('/cek-daftar-periksa', [\App\Http\Controllers\Public\WorkInspectionController::class, 'statusForm'])
     ->name('public.work-inspections.status.form');
 Route::post('/cek-daftar-periksa', [\App\Http\Controllers\Public\WorkInspectionController::class, 'statusShow'])

@@ -257,7 +257,6 @@
             .about-stats { grid-template-columns: 1fr 1fr; gap: 12px; }
             .flow-note { margin-top: 28px; padding: 14px 16px; font-size: 12.5px; }
             .about-visual { padding: 20px; }
-            .btn-lg { width: 100%; }
         }
 
         /* Staggered animation delays for flow steps */
@@ -379,28 +378,38 @@
         <p class="text-sm sm:text-[15.5px] text-white/100 mb-6 md:mb-8 hero-animate px-1" id="hero-sub">
         Sistem Informasi Monitoring dan Izin Kerja PT INKA (Persero)        </p>
         <div class="hero-animate px-2 sm:px-0" id="hero-actions">
-            <div class="flex flex-col sm:flex-row gap-3 justify-center items-stretch sm:items-center">
-                <a href="/ajukan-permit" class="btn btn-amber btn-lg w-full sm:w-auto">
+            <div class="flex flex-wrap justify-center gap-2.5">
+                <a href="/ajukan-permit" class="btn btn-outline-light btn-lg">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                     </svg>
                     Ajukan Safety Permit
                 </a>
-                <a href="/daftar-periksa" class="btn btn-outline-light btn-lg w-full sm:w-auto">
+                <a href="/daftar-periksa" class="btn btn-outline-light btn-lg">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
                     </svg>
                     Daftar Periksa Izin
                 </a>
-            </div>
-
-            <div class="mt-5 flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5 text-[12.5px] font-medium text-white/60">
-                <a href="/cek-status" class="hover:text-white transition-colors">Cek Status</a>
-                <span class="text-white/25">&bull;</span>
-                <a href="/data-kontraktor" class="hover:text-white transition-colors">Ajukan Data Kontraktor</a>
+                <a href="/cek-status" class="btn btn-outline-light btn-lg">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4m7 14l4-4m0 0l-4-4m4 4H9"/>
+                    </svg>
+                    Cek Status
+                </a>
+                <a href="/data-kontraktor" class="btn btn-outline-light btn-lg">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                    </svg>
+                    Ajukan Data Kontraktor
+                </a>
                 @auth
-                    <span class="text-white/25">&bull;</span>
-                    <a href="{{ route('dashboard') }}" class="hover:text-white transition-colors">Ke Dashboard</a>
+                <a href="{{ route('dashboard') }}" class="btn btn-outline-light btn-lg">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                    </svg>
+                    Ke Dashboard
+                </a>
                 @endauth
             </div>
         </div>
