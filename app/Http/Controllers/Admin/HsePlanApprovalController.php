@@ -47,9 +47,22 @@ if (Auth::user()->role === 'manager') {
             });
         }
 
-        $hsePlans = $query->orderByRaw('COALESCE(submitted_at, created_at) ASC')
-            ->paginate(15)
-            ->withQueryString();
+        
+
+       
+$perPage = (int) $request->input('per_page', 5);
+
+if (!in_array($perPage, [5, 10, 25, 50], true)) {
+    $perPage = 5;
+}
+
+$hsePlans = $query
+    ->orderByRaw('COALESCE(submitted_at, created_at) DESC')
+    ->orderByDesc('id')
+    ->paginate($perPage)
+    ->withQueryString();
+
+    
 
         $visible = HsePlan::query()->visibleTo(Auth::user());
 
@@ -75,15 +88,28 @@ if (Auth::user()->role === 'manager') {
         $query = HsePlan::query()
             ->visibleTo(Auth::user())
             ->with('reviewer')
-            ->whereIn('status', [HsePlan::STATUS_APPROVED, HsePlan::STATUS_REJECTED]);
+            ->whereIn('status', [
+                HsePlan::STATUS_APPROVED,
+                HsePlan::STATUS_REJECTED,
+                HsePlan::STATUS_REVISION,
+            ]);
 
         if ($request->filled('site')) {
             $query->forSite($request->site);
         }
 
-        if ($request->filled('status') && in_array($request->status, [HsePlan::STATUS_APPROVED, HsePlan::STATUS_REJECTED], true)) {
-            $query->where('status', $request->status);
-        }
+        
+if (
+    $request->filled('status')
+    && in_array($request->status, [
+        HsePlan::STATUS_APPROVED,
+        HsePlan::STATUS_REJECTED,
+        HsePlan::STATUS_REVISION,
+    ], true)
+) {
+    $query->where('status', $request->status);
+}
+
 
         if ($request->filled('search')) {
             $term = '%' . trim((string) $request->search) . '%';
@@ -95,10 +121,20 @@ if (Auth::user()->role === 'manager') {
             });
         }
 
-        $hsePlans = $query
-            ->orderByRaw('COALESCE(reviewed_at, updated_at) DESC')
-            ->paginate(15)
-            ->withQueryString();
+        
+$perPage = (int) $request->input('per_page', 5);
+
+if (!in_array($perPage, [5, 10, 25, 50], true)) {
+    $perPage = 5;
+}
+
+$hsePlans = $query
+    ->orderByRaw('COALESCE(reviewed_at, updated_at) DESC')
+    ->orderByDesc('id')
+    ->paginate($perPage)
+    ->withQueryString();
+
+
 
         $visible = HsePlan::query()->visibleTo(Auth::user());
 
@@ -181,8 +217,15 @@ if (Auth::user()->role === 'manager') {
             'struktur_file' => 'nullable|' . self::FILE_RULES,
         ]);
 
-        $resetApproval = Auth::user()->role === 'staff'
-            && $hsePlan->status !== HsePlan::STATUS_REVIEW;
+        
+$resetApproval = (
+    Auth::user()->role === 'staff'
+    && $hsePlan->status !== HsePlan::STATUS_REVIEW
+) || (
+    Auth::user()->role === 'manager'
+    && $hsePlan->status === HsePlan::STATUS_REVISION
+);
+
 
         $attributes = [
             'no_po' => $validated['no_po'] ?? null,
@@ -289,15 +332,23 @@ public function approve(Request $request, $id)
             ->lockForUpdate()
             ->first();
 
-        if ($contractor &&
-            $contractor->approval_status === Contractor::APPROVAL_ON_HOLD) {
-            return 'on_hold';
-        }
+        // if ($contractor &&
+        //     $contractor->approval_status === Contractor::APPROVAL_ON_HOLD) {
+        //     return 'on_hold';
+        // }
 
-        if ($contractor &&
-            $contractor->approval_status !== Contractor::APPROVAL_PENDING) {
-            return 'processed';
-        }
+        
+if ($contractor && ! in_array(
+    $contractor->approval_status,
+    [
+        Contractor::APPROVAL_PENDING,
+        Contractor::APPROVAL_ON_HOLD,
+    ],
+    true
+)) {
+    return 'processed';
+}
+
 
         // Menyetujui HSE Plan seperti fungsi sebelumnya
         $hsePlan->forceFill([
@@ -424,6 +475,46 @@ public function approve(Request $request, $id)
                     ? 'Pengajuan kembali menunggu persetujuan Manager.'
                     : 'Pengajuan tidak sedang On Hold.'
             );
+    }
+
+    
+    // Manager HSE memberikan catatan revisi
+    public function requestRevision(Request $request, $id)
+    {
+        abort_unless(Auth::user()?->role === 'manager', 403);
+
+        $validated = $request->validate([
+            'rejection_reason' => 'required|string|max:1000',
+        ]);
+
+        $result = DB::transaction(function () use ($id, $validated) {
+            $hsePlan = HsePlan::query()
+                ->visibleTo(Auth::user())
+                ->lockForUpdate()
+                ->findOrFail($id);
+
+            if ($hsePlan->status !== HsePlan::STATUS_REVIEW) {
+                return false;
+            }
+
+            $hsePlan->forceFill([
+                'status' => HsePlan::STATUS_REVISION,
+                'rejection_reason' => $validated['rejection_reason'],
+                'reviewed_by' => Auth::id(),
+                'reviewed_at' => now(),
+                'manager_signature' => null,
+            ])->save();
+
+            return true;
+        });
+
+        if (! $result) {
+            return redirect('/admin/hse-plans/' . $id)
+                ->with('error', 'HSE Plan ini sudah diproses.');
+        }
+
+        return redirect('/admin/hse-plans/' . $id)
+            ->with('success', 'Catatan revisi berhasil dikirim.');
     }
 
     public function reject(Request $request, $id)

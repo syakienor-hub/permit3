@@ -67,6 +67,19 @@ class HsePlanController extends Controller
             'struktur_file' => [Rule::requiredIf($request->boolean('struktur_organisasi')), self::FILE_RULES],
             'contractor_ref' => 'nullable|string|max:40',
         ]);
+        
+        // Validasi hanya berlaku jika tombol "Simpan Data"
+        // pada form Data Kontraktor benar-benar ditekan.
+        if (
+            $request->input('action') === 'simpan'
+            && ! $request->hasFile('hse_plan_file')
+        ) {
+            return back()
+                ->withInput()
+                ->withErrors([
+                    'hse_plan_file' => 'Silakan unggah dokumen HSE Plan atau pilih Isi Form HSE Plan.',
+                ]);
+        }
 
         $contractor = $request->filled('contractor_ref')
             ? Contractor::where('token', $request->contractor_ref)->first()

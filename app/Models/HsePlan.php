@@ -7,8 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 class HsePlan extends Model
 {
     public const STATUS_REVIEW = 'Review Manager';
-    public const STATUS_APPROVED = 'Approved';
-    public const STATUS_REJECTED = 'Rejected';
+public const STATUS_APPROVED = 'Approved';
+public const STATUS_REJECTED = 'Rejected';
+public const STATUS_REVISION = 'Perlu Revisi';
 
     public const SITES = ['Madiun', 'Banyuwangi'];
 

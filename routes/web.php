@@ -220,7 +220,10 @@ Route::middleware(['auth', 'prevent-back-history', 'role:staff,manager'])->group
         Route::post('/admin/hse-plans/{id}/reject',
             [\App\Http\Controllers\Admin\HsePlanApprovalController::class, 'reject']);
 
-        // Route tambahan - On Hold
+        Route::post('/admin/hse-plans/{id}/revision',
+    [\App\Http\Controllers\Admin\HsePlanApprovalController::class, 'requestRevision']);
+       
+    // Route tambahan - On Hold
         Route::post('/admin/hse-plans/{id}/hold',
             [\App\Http\Controllers\Admin\HsePlanApprovalController::class, 'hold']);
 

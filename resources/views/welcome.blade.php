@@ -29,6 +29,11 @@
         }
 
         html { scroll-behavior: smooth; }
+        
+#monitoring-kontraktor {
+    scroll-margin-top: 80px;
+}
+
 
         [x-cloak] { display: none !important; }
 
@@ -311,7 +316,14 @@
             </div>
             <a href="/ajukan-permit" class="hover:text-[var(--navy-950)] transition-colors whitespace-nowrap">Ajukan Permit</a>
             <a href="/daftar-periksa" class="hover:text-[var(--navy-950)] transition-colors whitespace-nowrap">Daftar Periksa</a>
-            <a href="/data-kontraktor" class="hover:text-[var(--navy-950)] transition-colors whitespace-nowrap">Data Kontraktor</a>
+            
+<a href="#monitoring-kontraktor"
+   @click="activeNav = 'monitoring-kontraktor'"
+   class="hover:text-[var(--navy-950)] transition-colors whitespace-nowrap"
+   :class="activeNav === 'monitoring-kontraktor' ? 'text-inka-navy font-bold' : ''">
+    Data Kontraktor
+</a>
+
             <a href="#alur" @click="activeNav = 'alur'" class="hover:text-[var(--navy-950)] transition-colors whitespace-nowrap"
                 :class="activeNav === 'alur' ? 'text-inka-navy font-bold' : ''">Alur Pengajuan</a>
             <a href="#tentang" @click="activeNav = 'tentang'" class="hover:text-[var(--navy-950)] transition-colors whitespace-nowrap"
@@ -343,7 +355,14 @@
             </a>
             <a href="/ajukan-permit" @click="mobileOpen = false" class="py-3 border-b border-gray-100">Ajukan Permit</a>
             <a href="/daftar-periksa" @click="mobileOpen = false" class="py-3 border-b border-gray-100">Daftar Periksa Izin</a>
-            <a href="/data-kontraktor" @click="mobileOpen = false" class="py-3 border-b border-gray-100">Ajukan Data Kontraktor</a>
+           
+<a href="#monitoring-kontraktor"
+   @click="activeNav = 'monitoring-kontraktor'; mobileOpen = false"
+   class="py-3 border-b border-gray-100"
+   :class="activeNav === 'monitoring-kontraktor' ? 'text-inka-navy font-bold' : ''">
+    Data Kontraktor
+</a>
+
             <a href="#alur" @click="activeNav = 'alur'; mobileOpen = false" class="py-3 border-b border-gray-100"
                 :class="activeNav === 'alur' ? 'text-inka-navy font-bold' : ''">Alur Pengajuan</a>
             <a href="#tentang" @click="activeNav = 'tentang'; mobileOpen = false" class="py-3 border-b border-gray-100"

@@ -65,6 +65,43 @@
             </div>
             <a href="/admin/hse-plans" class="text-sm font-semibold text-inka-navy hover:underline">Review HSE</a>
         </div>
+    
+{{-- DROPDOWN JUMLAH DATA HISTORY --}}
+<div class="px-4 md:px-6 py-3 border-b border-gray-100 bg-white">
+    <form method="GET"
+          action="{{ url('/admin/hse-plans/history') }}"
+          class="flex flex-wrap items-center gap-2">
+
+        @foreach(['search', 'status', 'site'] as $filter)
+            @if(request()->filled($filter))
+                <input type="hidden"
+                       name="{{ $filter }}"
+                       value="{{ request($filter) }}">
+            @endif
+        @endforeach
+
+        <label for="hse-per-page" class="text-xs sm:text-sm text-gray-600">
+            Tampilkan
+        </label>
+
+        <select id="hse-per-page"
+                name="per_page"
+                onchange="this.form.submit()"
+                class="rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs sm:text-sm font-semibold text-gray-700 focus:border-inka-navy focus:outline-none">
+
+            @foreach([5, 10, 25, 50] as $jumlah)
+                <option value="{{ $jumlah }}"
+                        @selected((int) request('per_page', 5) === $jumlah)>
+                    {{ $jumlah }}
+                </option>
+            @endforeach
+        </select>
+
+        <span class="text-xs sm:text-sm text-gray-600">
+            data per halaman
+        </span>
+    </form>
+</div>
 
         @if($hsePlans->isEmpty())
             <div class="flex flex-col items-center justify-center py-16 px-6 text-center">
@@ -137,3 +174,4 @@
         @endif
     </div>
 </x-app-layout>
+

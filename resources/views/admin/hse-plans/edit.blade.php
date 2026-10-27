@@ -314,7 +314,7 @@
             </div>
         </section>
 
-        <section class="bg-white rounded-2xl border border-gray-100 shadow-sm">
+        <!-- <section class="bg-white rounded-2xl border border-gray-100 shadow-sm">
             <div class="px-4 md:px-6 py-4 border-b border-gray-100">
                 <h2 class="text-base font-semibold text-gray-800">Pengesahan</h2>
                 <p class="text-sm text-gray-400 mt-0.5">Tanda tangan Manager HSE diisi saat persetujuan.</p>
@@ -341,6 +341,48 @@
                         @endif
                     </div>
                     <p class="mt-2 text-sm font-semibold {{ $hsePlan->reviewer ? 'text-gray-700' : 'text-gray-400' }}">({{ $hsePlan->reviewer?->name ?? '..............................' }})</p>
+                </div>
+            </div>
+        </section> -->
+        
+        {{-- TANDA TANGAN KONTRAKTOR - HANYA DITAMPILKAN --}}
+        <section class="bg-white rounded-2xl border border-gray-100 shadow-sm">
+            <div class="px-4 md:px-6 py-4 border-b border-gray-100">
+                <h2 class="text-base font-semibold text-gray-800">
+                    Tanda Tangan Kontraktor
+                </h2>
+                <p class="text-sm text-gray-400 mt-0.5">
+                    Tanda tangan diberikan oleh kontraktor saat pengajuan HSE Plan dan tidak dapat diubah pada halaman Edit.
+                </p>
+            </div>
+
+            <div class="px-4 md:px-6 py-5">
+                <div class="w-full md:max-w-md">
+                    <p class="text-sm font-semibold text-gray-700">
+                        Dibuat oleh, Kontraktor
+                    </p>
+
+                    <div class="mt-3 w-full aspect-[2/1] rounded-xl border border-gray-200 bg-white flex items-center justify-center px-4 text-center overflow-hidden">
+                        @if($hsePlan->tanda_tangan)
+                            <img
+                                src="{{ $hsePlan->tanda_tangan }}"
+                                alt="Tanda tangan kontraktor"
+                                class="max-h-full max-w-full object-contain"
+                            >
+                        @else
+                            <p class="text-xs text-gray-400">
+                                Tanda tangan kontraktor tidak tersedia.
+                            </p>
+                        @endif
+                    </div>
+
+                    <p class="mt-2 text-sm font-semibold text-gray-700">
+                        ({{ $hsePlan->nama_pimpinan_proyek ?: 'Pimpinan Proyek' }})
+                    </p>
+
+                    <p class="text-xs text-gray-400 mt-1">
+                        Tanda tangan hanya dapat dilihat, bukan diedit.
+                    </p>
                 </div>
             </div>
         </section>
