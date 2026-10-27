@@ -1,6 +1,7 @@
 @php
     $statusMap = [
         'Draft'          => ['label' => 'Draft', 'class' => 'bg-gray-100 text-gray-600'],
+        'Menunggu Daftar Periksa' => ['label' => 'Menunggu Daftar Periksa', 'class' => 'bg-amber-100 text-amber-700'],
         'Submitted'      => ['label' => 'Menunggu Review', 'class' => 'bg-orange-100 text-orange-700'],
         'Review Staff'   => ['label' => 'Menunggu Review Staff HSE', 'class' => 'bg-orange-100 text-orange-700'],
         'Review Manager' => ['label' => 'Menunggu Review Manager HSE', 'class' => 'bg-orange-100 text-orange-700'],
@@ -52,6 +53,12 @@
         <a href="{{ $successUrl }}" class="px-5 py-2.5 rounded-xl bg-inka-navy text-white text-sm font-semibold text-center hover:opacity-90 transition-opacity">
             Lihat Detail Permit
         </a>
+        @if($permit->needsWorkInspection())
+            <a href="{{ URL::signedRoute('public.work-inspections.create-for-permit', ['permit' => $permit->id]) }}"
+               class="px-5 py-2.5 rounded-xl border border-amber-300 bg-amber-50 text-sm font-semibold text-amber-700 text-center hover:bg-amber-100 transition-colors">
+                Lengkapi Daftar Periksa
+            </a>
+        @endif
         @if(!in_array($permit->status, ['Closed', 'Cancelled']))
             <a href="{{ $cancelUrl }}" class="px-5 py-2.5 rounded-xl border border-red-200 text-sm font-semibold text-red-600 text-center hover:bg-red-50 transition-colors">
                 Batalkan Permit

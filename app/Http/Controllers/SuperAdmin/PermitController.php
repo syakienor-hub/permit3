@@ -26,7 +26,7 @@ class PermitController extends Controller
     {
         $permit = Permit::findOrFail($id);
 
-        $allowedStatuses = ['Review Staff', 'Review Manager', 'Revision', 'Active', 'Closed', 'Cancelled'];
+        $allowedStatuses = [Permit::STATUS_WAITING_INSPECTION, 'Review Staff', 'Review Manager', 'Revision', 'Active', 'Closed', 'Cancelled'];
         if (!in_array($permit->status, $allowedStatuses)) {
             abort(403, 'Permit tidak tersedia untuk diakses.');
         }

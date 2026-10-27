@@ -118,6 +118,12 @@ Route::post('/cek-hse-plan', [\App\Http\Controllers\Public\HsePlanController::cl
 Route::get('/daftar-periksa', [\App\Http\Controllers\Public\WorkInspectionController::class, 'create']);
 Route::post('/daftar-periksa', [\App\Http\Controllers\Public\WorkInspectionController::class, 'store'])
     ->middleware('throttle:10,1');
+Route::get('/daftar-periksa/untuk-permit/{permit}', [\App\Http\Controllers\Public\WorkInspectionController::class, 'createForPermit'])
+    ->middleware(['signed', 'throttle:10,1'])
+    ->name('public.work-inspections.create-for-permit');
+Route::post('/daftar-periksa/untuk-permit/{permit}', [\App\Http\Controllers\Public\WorkInspectionController::class, 'storeForPermit'])
+    ->middleware(['signed', 'throttle:10,1'])
+    ->name('public.work-inspections.store-for-permit');
 Route::get('/daftar-periksa/sukses/{workInspection}', [\App\Http\Controllers\Public\WorkInspectionController::class, 'success'])
     ->name('public.work-inspections.success');
 Route::get('/cek-daftar-periksa', [\App\Http\Controllers\Public\WorkInspectionController::class, 'statusForm'])

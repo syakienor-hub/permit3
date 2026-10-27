@@ -30,10 +30,10 @@
         </a>
 
         {{-- Submitted --}}
-        <a href="/divisi/history?status=Review Staff"
+        <a href="/divisi/history"
            class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 hover:shadow-md hover:border-yellow-200 transition-all group">
             <div class="flex items-center justify-between mb-3">
-                <p class="text-sm font-semibold text-gray-400 uppercase tracking-wide">Submitted</p>
+                <p class="text-sm font-semibold text-gray-400 uppercase tracking-wide">Dalam Proses</p>
                 <div class="w-8 h-8 rounded-xl bg-yellow-50 flex items-center justify-center group-hover:bg-yellow-100 transition-colors">
                     <svg class="w-4 h-4 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
@@ -41,7 +41,7 @@
                 </div>
             </div>
             <p class="text-3xl sm:text-4xl font-bold text-yellow-500">{{ $counts['submitted'] }}</p>
-            <p class="text-xs text-gray-400 mt-1">Dalam proses review</p>
+            <p class="text-xs text-gray-400 mt-1">Menunggu daftar periksa / review</p>
         </a>
 
         {{-- Active --}}
@@ -141,12 +141,14 @@
                         @php
                             $statusMap = [
                                 'Draft'                    => 'bg-gray-100 text-gray-600',
+                                'Menunggu Daftar Periksa'  => 'bg-amber-100 text-amber-700',
                                 'Submitted'                => 'bg-blue-100 text-blue-700',
                                 'Review Staff'             => 'bg-orange-100 text-orange-700',
                                 'Review Manager'           => 'bg-orange-100 text-orange-700',
                                 'Revision'                 => 'bg-red-100 text-red-700',
                                 'Active'                   => 'bg-green-100 text-green-700',
                                 'Closed'                   => 'bg-slate-100 text-slate-600',
+                                'Cancelled'                => 'bg-red-600 text-white',
                             ];
                             $badge = $statusMap[$permit->status] ?? 'bg-gray-100 text-gray-600';
                             $canEdit = in_array($permit->status, ['Draft', 'Revision']);

@@ -31,7 +31,7 @@ class PermitController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'work_inspection_id' => 'required|integer|exists:work_inspections,id',
+            'work_inspection_id' => 'nullable|integer|exists:work_inspections,id',
             'divisi_pengaju'   => 'required|string|max:255',
             'tipe'             => 'required|in:Internal,Eksternal',
             'site'             => 'required|in:Madiun,Banyuwangi',
@@ -44,25 +44,28 @@ class PermitController extends Controller
             'tanggal_selesai'  => 'nullable|date|after_or_equal:tanggal_mulai',
             'tanda_tangan'     => 'required|string',
         ], [
-            'work_inspection_id.required' => 'Pilih Daftar Periksa Izin Kerja yang sudah disetujui Staff HSE sebelum mengajukan Safety Permit.',
             'work_inspection_id.exists' => 'Daftar Periksa Izin Kerja tidak ditemukan.',
         ]);
 
-        $inspection = WorkInspection::query()
-            ->approved()
-            ->whereDoesntHave('permit')
-            ->find($request->input('work_inspection_id'));
+        $inspection = null;
 
-        if (! $inspection) {
-            throw ValidationException::withMessages([
-                'work_inspection_id' => 'Daftar Periksa Izin Kerja harus sudah disetujui Staff HSE dan belum dipakai permit lain.',
-            ]);
-        }
+        if ($request->filled('work_inspection_id')) {
+            $inspection = WorkInspection::query()
+                ->approved()
+                ->whereDoesntHave('permit')
+                ->find($request->input('work_inspection_id'));
 
-        if ($inspection->site !== $request->input('site') || $inspection->tipe !== $request->input('tipe')) {
-            throw ValidationException::withMessages([
-                'work_inspection_id' => 'Site dan tipe permit harus sama dengan Daftar Periksa Izin Kerja yang dipilih.',
-            ]);
+            if (! $inspection) {
+                throw ValidationException::withMessages([
+                    'work_inspection_id' => 'Daftar Periksa Izin Kerja harus sudah disetujui Staff HSE dan belum dipakai permit lain.',
+                ]);
+            }
+
+            if ($inspection->site !== $request->input('site') || $inspection->tipe !== $request->input('tipe')) {
+                throw ValidationException::withMessages([
+                    'work_inspection_id' => 'Site dan tipe permit harus sama dengan Daftar Periksa Izin Kerja yang dipilih.',
+                ]);
+            }
         }
 
         if ($request->input('tipe') === 'Eksternal') {
@@ -87,7 +90,7 @@ class PermitController extends Controller
             $permit = Permit::create([
                 'no_permit'             => $noPermit,
                 'user_id'               => null,
-                'work_inspection_id'    => $inspection->id,
+                'work_inspection_id'    => $inspection?->id,
                 'divisi_pengaju'        => $request->divisi_pengaju,
                 'tipe'                  => $request->input('tipe', 'Internal'),
                 'site'                  => $request->input('site', 'Madiun'),
@@ -111,7 +114,7 @@ class PermitController extends Controller
             ]);
 
             $permit->forceFill([
-                'status'       => 'Review Staff',
+                'status'       => $inspection ? 'Review Staff' : Permit::STATUS_WAITING_INSPECTION,
                 'submitted_at' => now(),
             ])->save();
 
@@ -146,7 +149,9 @@ class PermitController extends Controller
             return $permit;
         });
 
-        PermitMailNotifier::notifyStaff($permit);
+        if ($permit->status === 'Review Staff') {
+            PermitMailNotifier::notifyStaff($permit);
+        }
 
         return redirect(URL::signedRoute('public.permits.success', ['permit' => $permit->id]));
     }
@@ -156,6 +161,9 @@ class PermitController extends Controller
     {
         return view('public.permits.success', [
             'permit' => $permit,
+            'checklistUrl' => $permit->needsWorkInspection()
+                ? URL::signedRoute('public.work-inspections.create-for-permit', ['permit' => $permit->id])
+                : null,
             'cancelUrl' => URL::signedRoute('public.permits.cancel.show', ['permit' => $permit->id]),
             'successUrl' => URL::signedRoute('public.permits.success', ['permit' => $permit->id]),
         ]);

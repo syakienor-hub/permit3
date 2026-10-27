@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Permit;
 use App\Models\PermitDocument;
+use App\Models\WorkInspection;
 use App\Services\PermitMailNotifier;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
@@ -357,6 +358,15 @@ class ApprovalController extends Controller
             return redirect('/admin/approvals')->with('error', 'Permit tidak valid untuk direview.');
         }
 
+        if ($config['expectedStatus'] === 'Review Staff') {
+            $permit->loadMissing('workInspection');
+
+            if (! $permit->workInspection || $permit->workInspection->status !== WorkInspection::STATUS_APPROVED) {
+                return redirect('/admin/approvals/' . $permit->id)
+                    ->with('error', 'Permit belum memiliki Daftar Periksa Izin Kerja yang disetujui. Setujui daftar periksa terlebih dahulu.');
+            }
+        }
+
         // Tanpa akun pengaju, tidak ada alur revisi — hanya setujui.
         $request->validate([
             'tanda_tangan' => 'required|string',
@@ -412,7 +422,7 @@ class ApprovalController extends Controller
             abort(403, 'Permit bukan wewenang site Anda.');
         }
 
-        $allowedStatuses = ['Review Staff', 'Review Manager', 'Revision', 'Active', 'Closed', 'Cancelled'];
+        $allowedStatuses = [Permit::STATUS_WAITING_INSPECTION, 'Review Staff', 'Review Manager', 'Revision', 'Active', 'Closed', 'Cancelled'];
         if (!in_array($permit->status, $allowedStatuses)) {
             abort(403, 'Permit tidak tersedia untuk diakses.');
         }
@@ -443,7 +453,7 @@ class ApprovalController extends Controller
         }
 
         // Hanya izinkan download dari permit yang sedang dalam status review
-        $allowedStatuses = ['Review Staff', 'Review Manager', 'Revision', 'Active', 'Closed'];
+        $allowedStatuses = [Permit::STATUS_WAITING_INSPECTION, 'Review Staff', 'Review Manager', 'Revision', 'Active', 'Closed'];
         if (!in_array($permit->status, $allowedStatuses)) {
             abort(403, 'Permit tidak tersedia untuk diakses.');
         }

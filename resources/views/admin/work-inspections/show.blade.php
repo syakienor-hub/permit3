@@ -78,7 +78,7 @@
                     <div><p class="text-gray-400">No. Telepon</p><p class="font-semibold text-gray-700">{{ $inspection->telepon }}</p></div>
                     <div><p class="text-gray-400">Mulai Tanggal</p><p class="font-semibold text-gray-700">{{ $inspection->tanggal_mulai?->format('d/m/Y') ?? '—' }}</p></div>
                     <div><p class="text-gray-400">Diajukan</p><p class="font-semibold text-gray-700">{{ ($inspection->submitted_at ?? $inspection->created_at)?->format('d/m/Y H:i') }}</p></div>
-                    <div><p class="text-gray-400">Safety Permit Terkait</p><p class="font-semibold text-gray-700">{{ $inspection->permit->no_permit ?? 'Belum ada' }}</p></div>
+                    <div><p class="text-gray-400">Safety Permit Terkait</p><p class="font-semibold text-gray-700">{{ $inspection->permit->no_permit ?? $inspection->requestedPermit->no_permit ?? 'Belum ada' }}</p></div>
                     <div><p class="text-gray-400">Diperiksa Oleh</p><p class="font-semibold text-gray-700">{{ $inspection->reviewer->name ?? '—' }}</p></div>
                 </div>
             </div>

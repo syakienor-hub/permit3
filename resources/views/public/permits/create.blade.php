@@ -51,7 +51,7 @@
     <main class="max-w-5xl mx-auto px-4 md:px-6 py-6 md:py-8">
         <div class="mb-6">
             <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight">Ajukan Safety Permit</h1>
-            <p class="text-sm text-gray-500 mt-1">Tanpa login. Isi lengkap, langsung masuk antrian verifikasi <span class="font-semibold text-gray-700">Staff HSE</span>.</p>
+            <p class="text-sm text-gray-500 mt-1">Tanpa login. Jika Daftar Periksa sudah disetujui, permit langsung masuk verifikasi <span class="font-semibold text-gray-700">Staff HSE</span>. Jika belum, permit menunggu daftar periksa terlebih dahulu.</p>
         </div>
 
         @if($errors->any())
@@ -152,18 +152,18 @@
 
                 <div class="bg-white rounded-2xl border border-gray-100 shadow-sm">
                     <div class="px-4 md:px-6 py-4 border-b border-gray-100">
-                        <h3 class="text-base font-semibold text-gray-800">Daftar Periksa Izin Kerja <span class="text-red-500">*</span></h3>
-                        <p class="text-sm text-gray-400 mt-0.5">Pilih daftar periksa berisiko tinggi yang sudah disetujui Staff HSE</p>
+                        <h3 class="text-base font-semibold text-gray-800">Daftar Periksa Izin Kerja <span class="text-gray-400 font-normal">(opsional)</span></h3>
+                        <p class="text-sm text-gray-400 mt-0.5">Pilih daftar periksa yang sudah disetujui, atau lengkapi setelah permit diajukan</p>
                     </div>
                     <div class="px-4 md:px-6 py-5">
                         @if($inspections->isEmpty())
                             <div class="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
                                 <p class="font-semibold">Belum ada daftar periksa yang disetujui.</p>
-                                <p class="mt-1">Isi dan setujui <a href="/daftar-periksa" class="font-bold underline">Daftar Periksa Izin Kerja</a> terlebih dahulu sebelum mengajukan Safety Permit.</p>
+                                <p class="mt-1">Anda tetap bisa mengajukan Safety Permit sekarang. Setelah permit diajukan, Anda akan diarahkan untuk membuat <a href="/daftar-periksa" class="font-bold underline">Daftar Periksa Izin Kerja</a>. Permit baru masuk review Staff HSE setelah daftar periksa disetujui.</p>
                             </div>
                         @else
-                            <select name="work_inspection_id" id="work-inspection-select" class="form-input" required onchange="applyInspection(this)">
-                                <option value="">— Pilih Daftar Periksa —</option>
+                            <select name="work_inspection_id" id="work-inspection-select" class="form-input" onchange="applyInspection(this)">
+                                <option value="">— Belum ada, lengkapi setelah permit diajukan —</option>
                                 @foreach($inspections as $inspection)
                                     <option value="{{ $inspection->id }}"
                                         data-site="{{ $inspection->site }}"
@@ -179,7 +179,7 @@
                                 @endforeach
                             </select>
                             <p class="text-xs text-gray-400 mt-2">
-                                Data site, tipe, divisi, pekerjaan, kontraktor, dan lokasi akan terisi otomatis.
+                                Jika dipilih, data site, tipe, divisi, pekerjaan, kontraktor, dan lokasi akan terisi otomatis.
                                 <a href="/cek-daftar-periksa" class="font-semibold text-inka-navy hover:underline">Cek status daftar periksa</a>.
                             </p>
                         @endif
@@ -506,7 +506,6 @@
     <script>
         let currentStep = 0;
         const totalSteps = 7;
-        const hasApprovedInspection = {{ $inspections->isNotEmpty() ? 'true' : 'false' }};
         let selectedTipe = 'Internal';
 
         function selectTipe(tipe) {
@@ -558,10 +557,6 @@
         function changeStep(direction) {
             let nextStep = currentStep + direction;
             if (nextStep < 0 || nextStep >= totalSteps) return;
-            if (direction > 0 && currentStep === 0 && !hasApprovedInspection) {
-                alert('Belum ada Daftar Periksa Izin Kerja yang disetujui Staff HSE. Silakan isi dan tunggu persetujuan terlebih dahulu.');
-                return;
-            }
             if (direction > 0) {
                 const stepEl = document.getElementById('step-' + currentStep);
                 const inputs = stepEl.querySelectorAll('input[required], select[required], textarea[required]');

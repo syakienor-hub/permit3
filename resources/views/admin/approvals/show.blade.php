@@ -4,6 +4,7 @@
     @php
         $statusMap = [
             'Draft'                    => 'bg-gray-100 text-gray-600',
+            'Menunggu Daftar Periksa'  => 'bg-amber-100 text-amber-700',
             'Submitted'                => 'bg-blue-100 text-blue-700',
             'Review Staff'             => 'bg-orange-100 text-orange-700',
             'Review Manager'           => 'bg-orange-100 text-orange-700',

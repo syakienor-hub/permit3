@@ -635,6 +635,7 @@
 
                                 $statusMap = [
                                     'Draft'                    => 'bg-gray-100 text-gray-600 border-gray-200',
+                                    'Menunggu Daftar Periksa'  => 'bg-amber-50 text-amber-700 border-amber-200/70',
                                     'Submitted'                => 'bg-blue-50 text-blue-700 border-blue-200/70',
                                     'Review Staff'             => 'bg-orange-50 text-orange-700 border-orange-200/70',
                                     'Review Manager'           => 'bg-orange-50 text-orange-700 border-orange-200/70',
@@ -717,7 +718,7 @@
                         $mMulai = $permit->tanggal_mulai ? $permit->tanggal_mulai->format('d/m/Y') : null;
                         $mSelesai = $permit->tanggal_selesai ? $permit->tanggal_selesai->format('d/m/Y') : null;
                         $mTgl = ($mMulai && $mSelesai) ? (($mMulai === $mSelesai) ? $mMulai : "$mMulai – $mSelesai") : ($mMulai ?? $mSelesai ?? ($permit->submitted_at ? $permit->submitted_at->format('d/m/Y') : '—'));
-                        $mStatusMap = ['Draft'=>'bg-gray-100 text-gray-600 border-gray-200','Submitted'=>'bg-blue-50 text-blue-700 border-blue-200/70','Review Staff'=>'bg-orange-50 text-orange-700 border-orange-200/70','Review Manager'=>'bg-orange-50 text-orange-700 border-orange-200/70','Revision'=>'bg-red-50 text-red-700 border-red-200/70','Active'=>'bg-green-50 text-green-700 border-green-200/70','Closed'=>'bg-slate-50 text-slate-700 border-slate-200','Cancelled'=>'bg-red-600 text-white border-red-600'];
+                        $mStatusMap = ['Draft'=>'bg-gray-100 text-gray-600 border-gray-200','Menunggu Daftar Periksa'=>'bg-amber-50 text-amber-700 border-amber-200/70','Submitted'=>'bg-blue-50 text-blue-700 border-blue-200/70','Review Staff'=>'bg-orange-50 text-orange-700 border-orange-200/70','Review Manager'=>'bg-orange-50 text-orange-700 border-orange-200/70','Revision'=>'bg-red-50 text-red-700 border-red-200/70','Active'=>'bg-green-50 text-green-700 border-green-200/70','Closed'=>'bg-slate-50 text-slate-700 border-slate-200','Cancelled'=>'bg-red-600 text-white border-red-600'];
                         $mPayload = ['no_permit'=>$permit->no_permit,'site'=>$permit->site ?? 'Madiun','tipe'=>$permit->tipe,'nama_pekerjaan'=>$permit->nama_pekerjaan,'divisi'=>optional($permit->user)->name ?? $permit->divisi_pengaju ?? '—','kontraktor'=>$permit->kontraktor,'lokasi'=>$permit->lokasi ?? '—','tanggal_permit'=>$mTgl,'penanggung_jawab'=>$permit->penanggung_jawab ?? '—','status'=>$permit->status,'status_badge'=>$mStatusMap[$permit->status] ?? 'bg-gray-100 text-gray-600','klasifikasi'=>$mKlas];
                     @endphp
                     <button type="button" @click="openModal({{ json_encode($mPayload) }})" class="block w-full text-left px-4 py-4 active:bg-blue-50/50">

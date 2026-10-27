@@ -62,7 +62,7 @@ class PermitController extends Controller
         }
 
         $user = Auth::user();
-        $status = $request->input('action') === 'submit' ? 'Review Staff' : 'Draft';
+        $status = $request->input('action') === 'submit' ? Permit::STATUS_WAITING_INSPECTION : 'Draft';
 
         $permit = DB::transaction(function () use ($request, $user, $status) {
             // Auto-generate nomor permit
@@ -94,7 +94,7 @@ class PermitController extends Controller
 
             $permit->forceFill([
                 'status'       => $status,
-                'submitted_at' => $status === 'Review Staff' ? now() : null,
+                'submitted_at' => $status === 'Draft' ? null : now(),
             ])->save();
 
             $klasifikasiSelected = (array) $request->input('klasifikasi_pekerjaan', []);
@@ -131,7 +131,7 @@ class PermitController extends Controller
 
         $message = $status === 'Draft'
             ? 'Permit berhasil disimpan sebagai Draft.'
-            : 'Permit berhasil diajukan.';
+            : 'Permit berhasil diajukan. Lengkapi Daftar Periksa Izin Kerja agar permit dapat direview Staff HSE.';
 
         if ($status === 'Review Staff') {
             PermitMailNotifier::notifyStaff($permit);
@@ -196,7 +196,7 @@ class PermitController extends Controller
             session()->put($sessionKey, true);
         }
 
-        $status = $request->input('action') === 'submit' ? 'Review Staff' : 'Draft';
+        $status = $request->input('action') === 'submit' ? Permit::STATUS_WAITING_INSPECTION : 'Draft';
 
         DB::transaction(function () use ($request, $permit, $status) {
             // Handle perubahan tipe
@@ -264,7 +264,7 @@ class PermitController extends Controller
 
             $permit->forceFill([
                 'status'       => $status,
-                'submitted_at' => $status === 'Review Staff' ? now() : $permit->submitted_at,
+                'submitted_at' => $status === 'Draft' ? $permit->submitted_at : now(),
             ])->save();
         });
 
@@ -278,7 +278,7 @@ class PermitController extends Controller
 
         $message = $status === 'Draft'
             ? 'Perubahan permit berhasil disimpan sebagai Draft.'
-            : 'Permit berhasil diajukan.';
+            : 'Permit berhasil diajukan. Lengkapi Daftar Periksa Izin Kerja agar permit dapat direview Staff HSE.';
 
         if ($status === 'Review Staff') {
             PermitMailNotifier::notifyStaff($permit->fresh());

@@ -435,6 +435,10 @@
                 </div>
             </div>
 
+            <div class="mt-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+                Setelah di-submit, permit berstatus <strong>Menunggu Daftar Periksa</strong>. Anda akan membuat Daftar Periksa Izin Kerja dari halaman detail permit. Permit baru masuk Review Staff setelah daftar periksa disetujui.
+            </div>
+
             {{-- Tombol aksi utama --}}
             <div class="mt-5 flex flex-col sm:flex-row gap-3 justify-end">
                 <button type="submit" name="action" value="draft" id="btn-draft"

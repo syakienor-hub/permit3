@@ -9,7 +9,7 @@
         </div>
         <select name="status" class="border border-gray-200 rounded-xl text-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-inka-navy/20 focus:border-inka-navy text-gray-600">
             <option value="">Semua Status</option>
-            @foreach(['Draft','Submitted','Review Staff','Review Manager','Revision','Active','Closed','Cancelled'] as $s)
+            @foreach(['Draft','Menunggu Daftar Periksa','Submitted','Review Staff','Review Manager','Revision','Active','Closed','Cancelled'] as $s)
                 <option value="{{ $s }}" {{ request('status') === $s ? 'selected' : '' }}>{{ $s }}</option>
             @endforeach
         </select>
@@ -72,6 +72,7 @@
                         @php
                             $statusMap = [
                                 'Draft'                    => 'bg-gray-100 text-gray-600',
+                                'Menunggu Daftar Periksa'  => 'bg-amber-100 text-amber-700',
                                 'Submitted'                => 'bg-blue-100 text-blue-700',
                                 'Review Staff'             => 'bg-orange-100 text-orange-700',
                                 'Review Manager'           => 'bg-orange-100 text-orange-700',

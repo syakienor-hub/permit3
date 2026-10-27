@@ -3,10 +3,13 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Permit;
 use App\Models\WorkInspection;
+use App\Services\PermitMailNotifier;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class WorkInspectionApprovalController extends Controller
 {
@@ -94,7 +97,7 @@ class WorkInspectionApprovalController extends Controller
     {
         $inspection = WorkInspection::query()
             ->visibleTo(Auth::user())
-            ->with(['reviewer', 'permit'])
+            ->with(['reviewer', 'permit', 'requestedPermit'])
             ->findOrFail($id);
 
         return view('admin.work-inspections.show', compact('inspection'));
@@ -118,7 +121,7 @@ class WorkInspectionApprovalController extends Controller
     {
         return WorkInspection::query()
             ->visibleTo(Auth::user())
-            ->with(['reviewer', 'permit'])
+            ->with(['reviewer', 'permit', 'requestedPermit'])
             ->findOrFail($id);
     }
 
@@ -138,6 +141,7 @@ class WorkInspectionApprovalController extends Controller
     {
         $inspection = WorkInspection::query()
             ->visibleTo(Auth::user())
+            ->with('requestedPermit')
             ->findOrFail($id);
 
         if ($inspection->status !== WorkInspection::STATUS_PENDING) {
@@ -145,22 +149,53 @@ class WorkInspectionApprovalController extends Controller
                 ->with('error', 'Daftar periksa ini sudah diproses.');
         }
 
+        $permit = $inspection->requestedPermit;
+
+        if ($permit) {
+            if ($permit->status !== Permit::STATUS_WAITING_INSPECTION || $permit->work_inspection_id) {
+                return redirect('/admin/work-inspections/' . $inspection->id)
+                    ->with('error', 'Safety Permit terkait sudah tidak menunggu daftar periksa.');
+            }
+
+            if ($permit->site !== $inspection->site || $permit->tipe !== $inspection->tipe) {
+                return redirect('/admin/work-inspections/' . $inspection->id)
+                    ->with('error', 'Site/tipe daftar periksa tidak cocok dengan Safety Permit terkait.');
+            }
+        }
+
         $validated = $request->validate([
             'safety_officer_nama' => 'required|string|max:255',
             'tanda_tangan' => 'required|string',
         ]);
 
-        $inspection->forceFill([
-            'status' => WorkInspection::STATUS_APPROVED,
-            'safety_officer_nama' => $validated['safety_officer_nama'],
-            'staff_signature' => $validated['tanda_tangan'],
-            'reviewed_by' => Auth::id(),
-            'reviewed_at' => now(),
-            'rejection_reason' => null,
-        ])->save();
+        DB::transaction(function () use ($inspection, $validated, $permit) {
+            $inspection->forceFill([
+                'status' => WorkInspection::STATUS_APPROVED,
+                'safety_officer_nama' => $validated['safety_officer_nama'],
+                'staff_signature' => $validated['tanda_tangan'],
+                'reviewed_by' => Auth::id(),
+                'reviewed_at' => now(),
+                'rejection_reason' => null,
+            ])->save();
+
+            if ($permit) {
+                $permit->forceFill([
+                    'work_inspection_id' => $inspection->id,
+                    'status' => 'Review Staff',
+                ])->save();
+            }
+        });
+
+        if ($permit) {
+            PermitMailNotifier::notifyStaff($permit->fresh());
+        }
+
+        $message = $permit
+            ? 'Daftar Periksa disetujui. Safety Permit ' . $permit->no_permit . ' kini masuk Review Staff.'
+            : 'Daftar Periksa berhasil disetujui.';
 
         return redirect('/admin/work-inspections/' . $inspection->id)
-            ->with('success', 'Daftar Periksa berhasil disetujui.');
+            ->with('success', $message);
     }
 
     public function reject(Request $request, $id)

@@ -22,6 +22,12 @@
         </div>
         <h1 class="text-xl sm:text-2xl font-extrabold text-gray-800">Daftar Periksa Berhasil Dikirim</h1>
         <p class="text-sm text-gray-500 mt-1">Pengajuan menunggu verifikasi Staff HSE.</p>
+        @if($requestedPermit)
+            <p class="text-sm text-gray-500 mt-1">
+                Terhubung ke Safety Permit <span class="font-semibold text-gray-700">{{ $requestedPermit->no_permit }}</span>.
+                Permit otomatis masuk Review Staff setelah daftar periksa disetujui.
+            </p>
+        @endif
 
         <div class="mt-6 rounded-xl border border-gray-100 bg-gray-50/60 px-4 py-4 text-left">
             <p class="text-xs text-gray-400">Nomor Daftar Periksa</p>
@@ -34,13 +40,21 @@
         </div>
 
         <p class="text-sm text-gray-500 mt-4">
-            Simpan nomor ini. Setelah disetujui Staff HSE, nomor dipakai pada form Safety Permit.
-            Status dapat dicek dengan nomor daftar periksa dan nomor telepon yang diisi.
+            @if($requestedPermit)
+                Simpan nomor ini. Status dapat dicek dengan nomor daftar periksa dan nomor telepon yang diisi.
+            @else
+                Simpan nomor ini. Setelah disetujui Staff HSE, nomor dipakai pada form Safety Permit.
+                Status dapat dicek dengan nomor daftar periksa dan nomor telepon yang diisi.
+            @endif
         </p>
 
         <div class="flex flex-col sm:flex-row gap-2.5 mt-6">
             <a href="{{ $statusUrl }}" class="flex-1 px-5 py-2.5 rounded-xl bg-inka-navy text-white text-sm font-semibold hover:opacity-90 transition-opacity">Cek Status</a>
-            <a href="/ajukan-permit" class="flex-1 px-5 py-2.5 rounded-xl border border-gray-200 text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-colors">Ajukan Safety Permit</a>
+            @if($permitSuccessUrl)
+                <a href="{{ $permitSuccessUrl }}" class="flex-1 px-5 py-2.5 rounded-xl border border-gray-200 text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-colors">Lihat Permit</a>
+            @else
+                <a href="/ajukan-permit" class="flex-1 px-5 py-2.5 rounded-xl border border-gray-200 text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-colors">Ajukan Safety Permit</a>
+            @endif
         </div>
     </div>
 </body>

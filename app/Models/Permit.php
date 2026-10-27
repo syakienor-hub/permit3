@@ -12,6 +12,8 @@ class Permit extends Model
     /** Daftar site yang didukung (multi-site: Madiun & Banyuwangi) */
     public const SITES = ['Madiun', 'Banyuwangi'];
 
+    public const STATUS_WAITING_INSPECTION = 'Menunggu Daftar Periksa';
+
     protected $fillable = [
         'no_permit',
         'user_id',
@@ -67,6 +69,17 @@ class Permit extends Model
     public function workInspection()
     {
         return $this->belongsTo(WorkInspection::class);
+    }
+
+    /** Daftar periksa yang diajukan khusus untuk permit ini (sebelum disetujui). */
+    public function requestedInspections()
+    {
+        return $this->hasMany(WorkInspection::class, 'requested_permit_id');
+    }
+
+    public function needsWorkInspection(): bool
+    {
+        return $this->status === self::STATUS_WAITING_INSPECTION && ! $this->work_inspection_id;
     }
 
     /** Relasi ke dokumen pendukung */

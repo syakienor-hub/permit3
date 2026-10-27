@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\Public;
 
 use App\Http\Controllers\Controller;
+use App\Models\Permit;
 use App\Models\WorkInspection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\URL;
+use Illuminate\Validation\ValidationException;
 
 class WorkInspectionController extends Controller
 {
@@ -15,7 +17,45 @@ class WorkInspectionController extends Controller
         return view('public.work-inspections.create');
     }
 
+    /** Form daftar periksa yang terhubung ke permit yang menunggu daftar periksa. */
+    public function createForPermit(Permit $permit)
+    {
+        if (! $permit->needsWorkInspection()) {
+            return redirect(URL::signedRoute('public.permits.success', ['permit' => $permit->id]))
+                ->with('info', 'Permit ini tidak menunggu daftar periksa.');
+        }
+
+        $activeRequest = $permit->requestedInspections()
+            ->whereIn('status', [WorkInspection::STATUS_PENDING, WorkInspection::STATUS_APPROVED])
+            ->latest()
+            ->first();
+
+        if ($activeRequest) {
+            return redirect(URL::signedRoute('public.work-inspections.success', ['workInspection' => $activeRequest->id]))
+                ->with('info', 'Daftar periksa untuk permit ini sudah diajukan.');
+        }
+
+        return view('public.work-inspections.create', compact('permit'));
+    }
+
     public function store(Request $request)
+    {
+        return $this->storeInspection($request);
+    }
+
+    /** Simpan daftar periksa yang terhubung ke permit tertentu. */
+    public function storeForPermit(Request $request, Permit $permit)
+    {
+        if (! $permit->needsWorkInspection()) {
+            throw ValidationException::withMessages([
+                'permit' => 'Permit ini tidak menunggu daftar periksa.',
+            ]);
+        }
+
+        return $this->storeInspection($request, $permit);
+    }
+
+    private function storeInspection(Request $request, ?Permit $permit = null)
     {
         $validated = $request->validate([
             'divisi_pengaju' => 'required|string|max:255',
@@ -58,6 +98,12 @@ class WorkInspectionController extends Controller
             'supervisor_jam' => 'nullable|date_format:H:i',
         ]);
 
+        if ($permit && ($permit->site !== $validated['site'] || $permit->tipe !== $validated['tipe'])) {
+            throw ValidationException::withMessages([
+                'site' => 'Site dan tipe daftar periksa harus sama dengan Safety Permit yang diajukan.',
+            ]);
+        }
+
         $answers = [];
 
         foreach (array_keys(WorkInspection::ANSWER_LABELS) as $key) {
@@ -67,13 +113,14 @@ class WorkInspectionController extends Controller
         $answers['izin_lain_ket'] = $validated['answers']['izin_lain_ket'] ?? null;
         $answers['apd_khusus_ket'] = $validated['answers']['apd_khusus_ket'] ?? null;
 
-        $inspection = DB::transaction(function () use ($validated, $answers) {
+        $inspection = DB::transaction(function () use ($validated, $answers, $permit) {
             $year = date('Y');
             $sequence = WorkInspection::whereYear('created_at', $year)->count() + 1;
 
             return WorkInspection::create([
                 'no_periksa' => sprintf('%03d/DPIKBT/INKA/%d', $sequence, $year),
                 'site' => $validated['site'],
+                'requested_permit_id' => $permit?->id,
                 'tipe' => $validated['tipe'],
                 'divisi_pengaju' => $validated['divisi_pengaju'],
                 'nama_pekerjaan' => $validated['nama_pekerjaan'],
@@ -100,8 +147,14 @@ class WorkInspectionController extends Controller
 
     public function success(WorkInspection $workInspection)
     {
+        $permit = $workInspection->requestedPermit;
+
         return view('public.work-inspections.success', [
             'inspection' => $workInspection,
+            'requestedPermit' => $permit,
+            'permitSuccessUrl' => $permit
+                ? URL::signedRoute('public.permits.success', ['permit' => $permit->id])
+                : null,
             'statusUrl' => URL::signedRoute('public.work-inspections.status.form'),
             'successUrl' => URL::signedRoute('public.work-inspections.success', ['workInspection' => $workInspection->id]),
         ]);

@@ -6,6 +6,7 @@ use App\Models\Permit;
 use App\Models\User;
 use App\Models\WorkInspection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\URL;
 use Tests\TestCase;
 
 class WorkInspectionTest extends TestCase
@@ -209,12 +210,105 @@ class WorkInspectionTest extends TestCase
             ->assertSee('Belum ada daftar periksa yang disetujui');
     }
 
-    public function test_permit_requires_approved_daftar_periksa(): void
+    public function test_permit_can_be_submitted_without_daftar_periksa(): void
     {
         $this->post('/ajukan-permit', $this->permitPayload(null))
-            ->assertSessionHasErrors('work_inspection_id');
+            ->assertRedirect();
 
-        $this->assertDatabaseCount('permits', 0);
+        $permit = Permit::firstOrFail();
+
+        $this->assertNull($permit->work_inspection_id);
+        $this->assertSame(Permit::STATUS_WAITING_INSPECTION, $permit->status);
+        $this->assertNotNull($permit->submitted_at);
+    }
+
+    public function test_linked_daftar_periksa_advances_waiting_permit_after_staff_approval(): void
+    {
+        $staff = User::factory()->create(['role' => 'staff', 'site' => 'Madiun']);
+
+        $this->post('/ajukan-permit', $this->permitPayload(null))->assertRedirect();
+        $permit = Permit::firstOrFail();
+
+        $checklistUrl = URL::signedRoute('public.work-inspections.create-for-permit', ['permit' => $permit->id]);
+
+        $this->get($checklistUrl)
+            ->assertOk()
+            ->assertSee($permit->no_permit);
+
+        $this->post($checklistUrl, $this->payload())
+            ->assertRedirect();
+
+        $inspection = WorkInspection::firstOrFail();
+
+        $this->assertSame($permit->id, $inspection->requested_permit_id);
+        $this->assertSame(WorkInspection::STATUS_PENDING, $inspection->status);
+
+        $this->actingAs($staff)
+            ->post('/admin/work-inspections/' . $inspection->id . '/approve', [
+                'safety_officer_nama' => 'Staff HSE Madiun',
+                'tanda_tangan' => 'data:image/png;base64,abc',
+            ])
+            ->assertRedirect('/admin/work-inspections/' . $inspection->id);
+
+        $permit->refresh();
+
+        $this->assertSame(WorkInspection::STATUS_APPROVED, $inspection->fresh()->status);
+        $this->assertSame($inspection->id, $permit->work_inspection_id);
+        $this->assertSame('Review Staff', $permit->status);
+    }
+
+    public function test_divisi_submit_waits_for_daftar_periksa_and_shows_checklist_action(): void
+    {
+        $divisi = User::factory()->create(['role' => 'divisi']);
+
+        $this->actingAs($divisi)
+            ->post('/divisi/permits', [
+                'action' => 'submit',
+                'tipe' => 'Internal',
+                'site' => 'Madiun',
+                'nama_pekerjaan' => 'Perbaikan pipa steam',
+                'kontraktor' => 'PT Contoh Kontraktor',
+                'lokasi' => 'Area Produksi',
+                'tanda_tangan' => 'data:image/png;base64,abc',
+            ])
+            ->assertRedirect('/divisi/dashboard');
+
+        $permit = Permit::firstOrFail();
+
+        $this->assertSame($divisi->id, $permit->user_id);
+        $this->assertSame(Permit::STATUS_WAITING_INSPECTION, $permit->status);
+        $this->assertNull($permit->work_inspection_id);
+
+        $this->actingAs($divisi)
+            ->get('/divisi/permits/' . $permit->id)
+            ->assertOk()
+            ->assertSee('Menunggu Daftar Periksa')
+            ->assertSee('Buat Daftar Periksa');
+    }
+
+    public function test_staff_cannot_approve_permit_without_approved_daftar_periksa(): void
+    {
+        $staff = User::factory()->create(['role' => 'staff', 'site' => 'Madiun']);
+        $permit = Permit::create([
+            'no_permit' => 'WP-2026-ABCDEF12',
+            'divisi_pengaju' => 'Divisi Teknik',
+            'tipe' => 'Internal',
+            'site' => 'Madiun',
+            'nama_pekerjaan' => 'Perbaikan pipa steam',
+            'kontraktor' => 'PT Contoh Kontraktor',
+            'lokasi' => 'Area Produksi',
+            'telepon' => '08123456789',
+        ]);
+        $permit->forceFill(['status' => 'Review Staff', 'submitted_at' => now()])->save();
+
+        $this->actingAs($staff)
+            ->put('/admin/approvals/' . $permit->id, [
+                'tanda_tangan' => 'data:image/png;base64,abc',
+            ])
+            ->assertRedirect('/admin/approvals/' . $permit->id)
+            ->assertSessionHas('error');
+
+        $this->assertSame('Review Staff', $permit->fresh()->status);
     }
 
     public function test_pending_daftar_periksa_cannot_be_used_for_permit(): void

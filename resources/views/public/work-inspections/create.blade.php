@@ -43,8 +43,13 @@
         <p class="text-xs font-bold uppercase tracking-wider text-orange-500">Form K3LH IV-01.013</p>
         <h1 class="text-2xl sm:text-3xl font-extrabold text-gray-900 mt-1">Daftar Periksa Izin Pekerjaan Berisiko Tinggi</h1>
         <p class="text-sm text-gray-500 mt-2 max-w-3xl">
-            Isi daftar periksa ini sebelum mengajukan Safety Permit. Setelah disetujui Staff HSE,
-            nomor daftar periksa dapat dipakai pada form Safety Permit.
+            @if(isset($permit) && $permit)
+                Daftar periksa untuk Safety Permit <span class="font-semibold text-gray-700">{{ $permit->no_permit }}</span>.
+                Setelah disetujui Staff HSE, permit otomatis masuk antrian Review Staff.
+            @else
+                Isi daftar periksa ini sebelum mengajukan Safety Permit. Setelah disetujui Staff HSE,
+                nomor daftar periksa dapat dipakai pada form Safety Permit.
+            @endif
         </p>
     </div>
 
@@ -54,6 +59,28 @@
         </svg>
         <p>Bila "Daftar Periksa Izin Kerja" telah dilakukan dengan baik, pekerjaan boleh dilanjutkan setelah mendapat pengesahan Safety Permit.</p>
     </div>
+
+    @php
+        $forPermit = isset($permit) && $permit;
+        $siteValue = old('site', $forPermit ? $permit->site : 'Madiun');
+        $tipeValue = old('tipe', $forPermit ? $permit->tipe : 'Internal');
+        $divisiValue = old('divisi_pengaju', $forPermit ? $permit->divisi_pengaju : '');
+        $kontraktorValue = old('kontraktor', $forPermit ? $permit->kontraktor : '');
+        $pekerjaanValue = old('nama_pekerjaan', $forPermit ? $permit->nama_pekerjaan : '');
+        $lokasiValue = old('lokasi', $forPermit ? $permit->lokasi : '');
+        $teleponValue = old('telepon', $forPermit ? $permit->telepon : '');
+        $tanggalValue = old('tanggal_mulai', $forPermit && $permit->tanggal_mulai ? $permit->tanggal_mulai->format('Y-m-d') : '');
+        $peralatanValue = old('jenis_peralatan', $forPermit && is_array($permit->peralatan_kerja)
+            ? collect($permit->peralatan_kerja)->pluck('alat')->filter()->implode(', ')
+            : '');
+    @endphp
+
+    @if($forPermit)
+        <div class="mb-5 rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800">
+            <p class="font-semibold">Terhubung ke Safety Permit {{ $permit->no_permit }}</p>
+            <p class="mt-1">Site dan tipe mengikuti permit. Setelah daftar periksa ini disetujui, permit otomatis masuk Review Staff.</p>
+        </div>
+    @endif
 
     @if($errors->any())
         <div class="mb-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
@@ -66,7 +93,9 @@
         </div>
     @endif
 
-    <form method="POST" action="/daftar-periksa" id="inspection-form" class="space-y-5">
+    <form method="POST"
+          action="{{ $forPermit ? URL::signedRoute('public.work-inspections.store-for-permit', ['permit' => $permit->id]) : '/daftar-periksa' }}"
+          id="inspection-form" class="space-y-5">
         @csrf
 
         {{-- DATA PEKERJAAN --}}
@@ -78,47 +107,57 @@
             <div class="px-4 sm:px-6 py-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                     <label class="form-label">Site <span class="text-red-500">*</span></label>
-                    <select name="site" class="form-input" required>
-                        @foreach(\App\Models\WorkInspection::SITES as $site)
-                            <option value="{{ $site }}" @selected(old('site', 'Madiun') === $site)>Site {{ $site }}</option>
-                        @endforeach
-                    </select>
+                    @if($forPermit)
+                        <input type="hidden" name="site" value="{{ $siteValue }}">
+                        <p class="form-input bg-gray-50">{{ $siteValue }}</p>
+                    @else
+                        <select name="site" class="form-input" required>
+                            @foreach(\App\Models\WorkInspection::SITES as $site)
+                                <option value="{{ $site }}" @selected($siteValue === $site)>Site {{ $site }}</option>
+                            @endforeach
+                        </select>
+                    @endif
                 </div>
                 <div>
                     <label class="form-label">Tipe Pekerjaan <span class="text-red-500">*</span></label>
-                    <select name="tipe" class="form-input" required>
-                        <option value="Internal" @selected(old('tipe') === 'Internal')>Internal</option>
-                        <option value="Eksternal" @selected(old('tipe') === 'Eksternal')>Eksternal (Kontraktor)</option>
-                    </select>
+                    @if($forPermit)
+                        <input type="hidden" name="tipe" value="{{ $tipeValue }}">
+                        <p class="form-input bg-gray-50">{{ $tipeValue }}</p>
+                    @else
+                        <select name="tipe" class="form-input" required>
+                            <option value="Internal" @selected($tipeValue === 'Internal')>Internal</option>
+                            <option value="Eksternal" @selected($tipeValue === 'Eksternal')>Eksternal (Kontraktor)</option>
+                        </select>
+                    @endif
                 </div>
                 <div>
                     <label class="form-label">Divisi / Unit Pengaju <span class="text-red-500">*</span></label>
-                    <input type="text" name="divisi_pengaju" value="{{ old('divisi_pengaju') }}" class="form-input" placeholder="Contoh: Divisi Teknik" required>
+                    <input type="text" name="divisi_pengaju" value="{{ $divisiValue }}" class="form-input" placeholder="Contoh: Divisi Teknik" required>
                 </div>
                 <div>
                     <label class="form-label">Nama Kontraktor / Pelaksana <span class="text-red-500">*</span></label>
-                    <input type="text" name="kontraktor" value="{{ old('kontraktor') }}" class="form-input" placeholder="Nama perusahaan / pelaksana" required>
+                    <input type="text" name="kontraktor" value="{{ $kontraktorValue }}" class="form-input" placeholder="Nama perusahaan / pelaksana" required>
                 </div>
                 <div class="sm:col-span-2">
                     <label class="form-label">Pekerjaan <span class="text-red-500">*</span></label>
-                    <input type="text" name="nama_pekerjaan" value="{{ old('nama_pekerjaan') }}" class="form-input" placeholder="Contoh: Perbaikan pipa steam di Area Produksi" required>
+                    <input type="text" name="nama_pekerjaan" value="{{ $pekerjaanValue }}" class="form-input" placeholder="Contoh: Perbaikan pipa steam di Area Produksi" required>
                 </div>
                 <div class="sm:col-span-2">
                     <label class="form-label">Jenis Peralatan / Material</label>
-                    <input type="text" name="jenis_peralatan" value="{{ old('jenis_peralatan') }}" class="form-input" placeholder="Contoh: Mesin las, gerinda, pipa steam">
+                    <input type="text" name="jenis_peralatan" value="{{ $peralatanValue }}" class="form-input" placeholder="Contoh: Mesin las, gerinda, pipa steam">
                 </div>
                 <div class="sm:col-span-2">
                     <label class="form-label">Lokasi <span class="text-red-500">*</span></label>
-                    <input type="text" name="lokasi" value="{{ old('lokasi') }}" class="form-input" placeholder="Contoh: Area Produksi, Gedung B" required>
+                    <input type="text" name="lokasi" value="{{ $lokasiValue }}" class="form-input" placeholder="Contoh: Area Produksi, Gedung B" required>
                 </div>
                 <div>
                     <label class="form-label">No. Telepon <span class="text-red-500">*</span></label>
-                    <input type="text" name="telepon" value="{{ old('telepon') }}" class="form-input" placeholder="08xxxxxxxxxx" required>
+                    <input type="text" name="telepon" value="{{ $teleponValue }}" class="form-input" placeholder="08xxxxxxxxxx" required>
                     <p class="text-xs text-gray-400 mt-1">Dipakai untuk cek status.</p>
                 </div>
                 <div>
                     <label class="form-label">Mulai Tanggal <span class="text-red-500">*</span></label>
-                    <input type="date" name="tanggal_mulai" value="{{ old('tanggal_mulai') }}" class="form-input" required>
+                    <input type="date" name="tanggal_mulai" value="{{ $tanggalValue }}" class="form-input" required>
                 </div>
             </div>
         </section>

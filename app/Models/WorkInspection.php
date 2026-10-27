@@ -37,6 +37,7 @@ class WorkInspection extends Model
     protected $fillable = [
         'no_periksa',
         'site',
+        'requested_permit_id',
         'tipe',
         'divisi_pengaju',
         'nama_pekerjaan',
@@ -74,6 +75,11 @@ class WorkInspection extends Model
     public function permit()
     {
         return $this->hasOne(Permit::class);
+    }
+
+    public function requestedPermit()
+    {
+        return $this->belongsTo(Permit::class, 'requested_permit_id');
     }
 
     public function reviewer()
