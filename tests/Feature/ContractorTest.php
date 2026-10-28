@@ -154,7 +154,7 @@ class ContractorTest extends TestCase
         return array_merge([
             'vendor' => 'PT Contoh Kontraktor',
             'pic' => 'Budi Santoso',
-            'jenis_pekerjaan' => Classification::firstOrFail()->code,
+            'jenis_pekerjaan' => 'umum',
             'telepon' => '08123456789',
             'nama_pekerjaan' => 'Pekerjaan perbaikan atap gudang.',
             'tanggal_mulai' => now()->toDateString(),

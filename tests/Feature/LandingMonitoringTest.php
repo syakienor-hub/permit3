@@ -88,14 +88,14 @@ class LandingMonitoringTest extends TestCase
     public function test_contractor_monitoring_can_be_filtered_by_site_status_and_search(): void
     {
         $alpha = $this->makeContractor('PT Alpha Konstruksi', 'Madiun', Contractor::STATUS_WAITING);
-        $beta = $this->makeContractor('CV Beta Teknik', 'Banyuwangi', Contractor::STATUS_FINAL);
+        $beta = $this->makeContractor('CV Beta Teknik', 'Banyuwangi', Contractor::STATUS_FINAL, Contractor::APPROVAL_APPROVED);
 
         $this->get('/?k_site=Banyuwangi')
             ->assertOk()
             ->assertSee($beta->vendor)
             ->assertDontSee($alpha->vendor);
 
-        $this->get('/?k_status=HSE Plan Final')
+        $this->get('/?k_status=' . Contractor::APPROVAL_APPROVED)
             ->assertOk()
             ->assertSee($beta->vendor)
             ->assertDontSee($alpha->vendor);
@@ -114,8 +114,12 @@ class LandingMonitoringTest extends TestCase
             ->assertSee('Tidak ada kontraktor yang cocok dengan pencarian');
     }
 
-    private function makeContractor(string $vendor, string $site, string $status): Contractor
-    {
+    private function makeContractor(
+        string $vendor,
+        string $site,
+        string $status,
+        string $approvalStatus = Contractor::APPROVAL_PENDING
+    ): Contractor {
         return Contractor::create([
             'token' => substr(hash('sha256', $vendor), 0, 40),
             'vendor' => $vendor,
@@ -129,6 +133,7 @@ class LandingMonitoringTest extends TestCase
             'lokasi' => 'Workshop',
             'site' => $site,
             'status' => $status,
+            'approval_status' => $approvalStatus,
         ]);
     }
 
