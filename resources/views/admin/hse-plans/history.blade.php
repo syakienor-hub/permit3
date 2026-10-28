@@ -35,11 +35,23 @@
                 class="w-full pl-9 pr-4 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-inka-navy/20 focus:border-inka-navy">
         </div>
 
-        <select name="status" class="border border-gray-200 rounded-xl text-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-inka-navy/20 focus:border-inka-navy text-gray-600">
-            <option value="">Semua Status</option>
-            <option value="{{ \App\Models\HsePlan::STATUS_APPROVED }}" @selected(request('status') === \App\Models\HsePlan::STATUS_APPROVED)>Disetujui</option>
-            <option value="{{ \App\Models\HsePlan::STATUS_REJECTED }}" @selected(request('status') === \App\Models\HsePlan::STATUS_REJECTED)>Ditolak</option>
-        </select>
+
+        <select name="status"
+        class="text-xs font-semibold border border-gray-200 rounded-lg bg-white text-gray-700 pl-3 pr-10 py-2 min-w-[145px] focus:outline-none focus:border-inka-navy">
+
+    <option value="">Semua Status</option>
+
+    <option value="{{ \App\Models\HsePlan::STATUS_APPROVED }}"
+            @selected(request('status') === \App\Models\HsePlan::STATUS_APPROVED)>
+        Disetujui
+    </option>
+
+    <option value="{{ \App\Models\HsePlan::STATUS_REJECTED }}"
+            @selected(request('status') === \App\Models\HsePlan::STATUS_REJECTED)>
+        Ditolak
+    </option>
+</select>
+
 
         <select name="site" class="border border-gray-200 rounded-xl text-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-inka-navy/20 focus:border-inka-navy text-gray-600">
             <option value="">Semua Site</option>

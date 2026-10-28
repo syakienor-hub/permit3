@@ -570,18 +570,32 @@
             </div>
             <form method="GET" action="{{ url('/') }}#monitoring" class="px-4 md:px-6 py-3 border-b border-gray-100 bg-white flex flex-wrap items-center gap-x-3 gap-y-2">
                 <label class="text-xs font-semibold text-gray-500">Filter site:</label>
-                <select name="site" onchange="this.form.submit()" class="text-xs font-semibold border border-gray-200 rounded-lg px-3 py-1.5 text-gray-700 focus:outline-none focus:border-inka-navy">
-                    <option value="">Semua Site</option>
-                    @foreach(\App\Models\Permit::SITES as $s)
-                        <option value="{{ $s }}" {{ request('site') === $s ? 'selected' : '' }}>{{ $s }}</option>
-                    @endforeach
-                </select>
+
+
+                <select name="k_site"
+        onchange="this.form.submit()"
+        class="text-xs font-semibold border border-gray-200 rounded-lg pl-3 pr-8 py-1.5 min-w-[115px] bg-white text-gray-700 focus:outline-none focus:border-inka-navy">
+    @foreach(\App\Models\Permit::SITES as $s)
+        <option value="{{ $s }}" {{ request('site') === $s ? 'selected' : '' }}>
+            {{ $s }}
+        </option>
+    @endforeach
+</select>
+
                 <label class="text-xs font-semibold text-gray-500">Filter tipe:</label>
-                <select name="tipe" onchange="this.form.submit()" class="text-xs font-semibold border border-gray-200 rounded-lg px-3 py-1.5 text-gray-700 focus:outline-none focus:border-inka-navy">
-                    <option value="">Semua Tipe</option>
-                    <option value="Internal" {{ request('tipe') === 'Internal' ? 'selected' : '' }}>Internal</option>
-                    <option value="Eksternal" {{ request('tipe') === 'Eksternal' ? 'selected' : '' }}>Eksternal</option>
-                </select>
+
+                <select name="tipe"
+        onchange="this.form.submit()"
+        class="text-xs font-semibold border border-gray-200 rounded-lg pl-3 pr-8 py-1.5 min-w-[120px] bg-white text-gray-700 focus:outline-none focus:border-inka-navy">
+    <option value="">Semua Tipe</option>
+    <option value="Internal" {{ request('tipe') === 'Internal' ? 'selected' : '' }}>
+        Internal
+    </option>
+    <option value="Eksternal" {{ request('tipe') === 'Eksternal' ? 'selected' : '' }}>
+        Eksternal
+    </option>
+</select>
+
                 @if(request('site') || request('tipe') || request('search'))
                 <a href="{{ url('/') }}#monitoring" class="text-xs text-gray-400 hover:text-gray-600">Reset</a>
                 @endif
@@ -950,49 +964,102 @@
                 </div>
             </div>
 
-            <form method="GET" action="{{ url('/') }}#monitoring-kontraktor" class="px-4 md:px-6 py-3 border-b border-gray-100 bg-white flex flex-wrap items-center gap-x-3 gap-y-2">
-                @foreach(['site', 'tipe', 'search'] as $permitFilter)
-                    @if(request()->filled($permitFilter))
-                        <input type="hidden" name="{{ $permitFilter }}" value="{{ request($permitFilter) }}">
-                    @endif
-                @endforeach
-                <label class="text-xs font-semibold text-gray-500">Filter site:</label>
-                <select name="k_site" onchange="this.form.submit()" class="text-xs font-semibold border border-gray-200 rounded-lg px-3 py-1.5 text-gray-700 focus:outline-none focus:border-inka-navy">
-                    <option value="">Semua Site</option>
-                    @foreach(\App\Models\HsePlan::SITES as $s)
-                        <option value="{{ $s }}" {{ request('k_site') === $s ? 'selected' : '' }}>{{ $s }}</option>
-                    @endforeach
-                </select>
-                <label class="text-xs font-semibold text-gray-500">Status Kontraktor:</label>
-                <select name="k_status" onchange="this.form.submit()" class="text-xs font-semibold border border-gray-200 rounded-lg px-3 py-1.5 text-gray-700 focus:outline-none focus:border-inka-navy">
-                    <option value="">Semua Status</option>
-                    
-<option value="pending" @selected(request('k_status') === 'pending')>
-    On Hold
-</option>
-<option value="approved" @selected(request('k_status') === 'approved')>
-    Approved
-</option>
-<option value="inactive" @selected(request('k_status') === 'inactive')>
-    Nonaktif
-</option>
+           
+{{-- FILTER MONITORING KONTRAKTOR --}}
+<form method="GET"
+      action="{{ url('/') }}#monitoring-kontraktor"
+      class="px-4 md:px-6 py-3 border-b border-gray-100 bg-white flex flex-wrap items-center gap-x-3 gap-y-2">
 
-                </select>
-                @if(request('k_site') || request('k_status') || request('k_search'))
-                    <a href="{{ url('/') }}#monitoring-kontraktor" class="text-xs text-gray-400 hover:text-gray-600">Reset</a>
-                @endif
-                <div class="ml-auto flex items-center gap-2 w-full sm:w-auto">
-                    <div class="relative flex-1 sm:flex-none">
-                        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11a6 6 0 11-12 0 6 6 0 0112 0z"/>
-                        </svg>
-                        <input type="text" name="k_search" value="{{ request('k_search') }}" maxlength="100"
-                               placeholder="Cari kontraktor, PIC, pekerjaan..."
-                               class="w-full sm:w-64 text-xs border border-gray-200 rounded-lg pl-8 pr-3 py-1.5 text-gray-700 placeholder-gray-400 focus:outline-none focus:border-inka-navy">
-                    </div>
-                    <button type="submit" class="text-xs font-semibold bg-inka-navy text-white px-3 py-1.5 rounded-lg hover:opacity-90 transition-opacity">Cari</button>
-                </div>
-            </form>
+    @foreach(['site', 'tipe', 'search'] as $permitFilter)
+        @if(request()->filled($permitFilter))
+            <input type="hidden"
+                   name="{{ $permitFilter }}"
+                   value="{{ request($permitFilter) }}">
+        @endif
+    @endforeach
+
+    {{-- FILTER SITE --}}
+    <label class="text-xs font-semibold text-gray-500">
+        Filter site:
+    </label>
+
+    <select name="k_site"
+            onchange="this.form.submit()"
+            class="text-xs font-semibold border border-gray-200 rounded-lg pl-3 pr-9 py-1.5 min-w-[125px] bg-white text-gray-700 focus:outline-none focus:border-inka-navy">
+
+        <option value="">Semua Site</option>
+
+        @foreach(\App\Models\HsePlan::SITES as $s)
+            <option value="{{ $s }}"
+                    @selected(request('k_site') === $s)>
+                {{ $s }}
+            </option>
+        @endforeach
+    </select>
+
+    {{-- FILTER STATUS --}}
+    <label class="text-xs font-semibold text-gray-500">
+        Status Kontraktor:
+    </label>
+
+    <select name="k_status"
+            onchange="this.form.submit()"
+            class="text-xs font-semibold border border-gray-200 rounded-lg pl-3 pr-9 py-1.5 min-w-[140px] bg-white text-gray-700 focus:outline-none focus:border-inka-navy">
+
+        <option value="">Semua Status</option>
+
+        <option value="pending"
+                @selected(request('k_status') === 'pending')>
+            On Hold
+        </option>
+
+        <option value="approved"
+                @selected(request('k_status') === 'approved')>
+            Approved
+        </option>
+
+        <option value="inactive"
+                @selected(request('k_status') === 'inactive')>
+            Nonaktif
+        </option>
+    </select>
+
+    {{-- RESET --}}
+    @if(request('k_site') || request('k_status') || request('k_search'))
+        <a href="{{ url('/') }}#monitoring-kontraktor"
+           class="text-xs text-gray-400 hover:text-gray-600">
+            Reset
+        </a>
+    @endif
+
+    {{-- PENCARIAN --}}
+    <div class="ml-auto flex items-center gap-2 w-full sm:w-auto">
+
+        <div class="relative flex-1 sm:flex-none">
+            <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none"
+                 fill="none" stroke="currentColor"
+                 viewBox="0 0 24 24">
+                <path stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M21 21l-4.35-4.35M17 11a6 6 0 11-12 0 6 6 0 0112 0z"/>
+            </svg>
+
+            <input type="text"
+                   name="k_search"
+                   value="{{ request('k_search') }}"
+                   maxlength="100"
+                   placeholder="Cari kontraktor, PIC, pekerjaan..."
+                   class="w-full sm:w-64 text-xs border border-gray-200 rounded-lg pl-8 pr-3 py-1.5 text-gray-700 placeholder-gray-400 focus:outline-none focus:border-inka-navy">
+        </div>
+
+        <button type="submit"
+                class="text-xs font-semibold bg-inka-navy text-white px-3 py-1.5 rounded-lg hover:opacity-90 transition-opacity">
+            Cari
+        </button>
+    </div>
+</form>
+
 
             @if($contractors->isEmpty())
                 <div class="py-16 text-center text-gray-400">
@@ -1055,19 +1122,41 @@
                                 ];
                                 $contractorStatusBadge = $contractorStatusMap[$contractor->status] ?? 'bg-gray-100 text-gray-600 border-gray-200';
 
-                                $contractorPayload = [
-                                    'vendor' => $contractor->vendor,
-                                    'pic' => $contractor->pic,
-                                    'jenis' => $jenisLabel,
-                                    'nama_pekerjaan' => $contractor->nama_pekerjaan,
-                                    'site' => $contractor->site,
-                                    'lokasi' => $contractor->lokasi ?? '—',
-                                    'periode' => $periode,
-                                    'jumlah' => $contractor->jumlah_pekerja,
-                                    'status' => $contractor->status,
-                                    'status_badge' => $contractorStatusBadge,
-                                    'dokumen' => $contractor->documents_count,
-                                ];
+                                
+$approvalStatusModal = $contractor->approval_status ?? 'pending';
+
+$modalStatusLabels = [
+    'pending' => 'On Hold',
+    'on_hold' => 'On Hold',
+    'approved' => 'Approved',
+    'inactive' => 'Nonaktif',
+];
+
+$modalStatusColors = [
+    'pending' => 'bg-amber-50 text-amber-700 border-amber-200/70',
+    'on_hold' => 'bg-orange-50 text-orange-700 border-orange-200/70',
+    'approved' => 'bg-green-50 text-green-700 border-green-200/70',
+    'inactive' => 'bg-gray-100 text-gray-600 border-gray-200',
+];
+
+$contractorPayload = [
+    'vendor' => $contractor->vendor,
+    'pic' => $contractor->pic,
+    'jenis' => $jenisLabel,
+    'nama_pekerjaan' => $contractor->nama_pekerjaan,
+    'site' => $contractor->site,
+    'lokasi' => $contractor->lokasi ?? '—',
+    'periode' => $periode,
+    'jumlah' => $contractor->jumlah_pekerja,
+
+    // Status mengikuti approval Manager HSE
+    'status' => $modalStatusLabels[$approvalStatusModal] ?? 'On Hold',
+    'status_badge' => $modalStatusColors[$approvalStatusModal]
+        ?? 'bg-gray-100 text-gray-600 border-gray-200',
+
+    'dokumen' => $contractor->documents_count,
+];
+
                             @endphp
                             <tr class="transition-colors">
     <td class="text-center text-gray-500">

@@ -52,6 +52,24 @@
 
     <main class="max-w-5xl mx-auto px-4 md:px-6 py-6 md:py-8">
         <div class="mb-6">
+            
+{{-- TOMBOL KEMBALI --}}
+<a href="{{ url('/#monitoring-kontraktor') }}"
+   class="inline-flex items-center gap-2 mb-4 text-sm font-semibold text-gray-500 hover:text-inka-navy transition-colors">
+
+    <svg class="w-4 h-4"
+         fill="none"
+         stroke="currentColor"
+         viewBox="0 0 24 24">
+        <path stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M15 19l-7-7 7-7"/>
+    </svg>
+
+    Kembali
+</a>
+
             <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight">Tambah Data Kontraktor</h1>
             <p class="text-sm text-gray-500 mt-1">Isi data kontraktor dan lampirkan dokumen. Jika belum memiliki HSE Plan, Anda dapat langsung mengisi form HSE Plan di bagian bawah.</p>
         </div>
