@@ -43,7 +43,7 @@ SIMONIKA hadir sebagai solusi digital end-to-end: mulai dari pengajuan publik ta
 
 ### 4.1 Landing Page Publik (`/`)
 
-- Hero section dengan 4 tombol aksi seragam: **Ajukan Safety Permit**, **Daftar Periksa Izin**, **Cek Status**, **Ajukan Data Kontraktor**
+- Hero section dengan 3 tombol aksi seragam: **Ajukan Safety Permit**, **Cek Status**, **Ajukan Data Kontraktor** (+ **Ke Dashboard** bila sudah login)
 - Tabel monitoring permit publik (semua status kecuali `Draft`) dengan filter site, tipe, dan pencarian
 - Tabel monitoring kontraktor publik
 - Section alur pengajuan (5 langkah)
@@ -65,13 +65,13 @@ SIMONIKA hadir sebagai solusi digital end-to-end: mulai dari pengajuan publik ta
   - Step 6: Review & submit
 - Nomor permit: `WP-<tahun>-<8 hex chars>` (anti race-condition)
 - `idempotency_key` mencegah double-submit
-- Setelah submit → halaman sukses dengan signed URL, permit masuk `Menunggu Daftar Periksa` (bila belum punya daftar periksa disetujui) atau langsung `Review Staff`
+- Setelah submit → halaman sukses, permit langsung masuk `Review Staff` (Daftar Periksa dikelola terpisah oleh Staff HSE)
 
 #### Status Permit
 | Status | Keterangan |
 |---|---|
 | `Draft` | Disimpan, belum diajukan (hanya via akun Divisi) |
-| `Menunggu Daftar Periksa` | Permit publik menunggu daftar periksa disetujui |
+| `Submitted` | Status lama, tidak lagi dipakai alur submit (orphan) |
 | `Review Staff` | Antrean Staff HSE |
 | `Review Manager` | Antrean Manager HSE |
 | `Revision` | Dikembalikan + catatan revisi wajib |
@@ -81,7 +81,7 @@ SIMONIKA hadir sebagai solusi digital end-to-end: mulai dari pengajuan publik ta
 
 #### Alur Approval
 ```
-Pengajuan Publik → Menunggu Daftar Periksa → (Daftar Periksa Disetujui) → Review Staff
+Pengajuan Publik → Review Staff
 Divisi (akun)   → Draft → (submit) → Review Staff
 Review Staff    → (staff approve + TTD) → Review Manager
 Review Manager  → (manager approve + TTD) → Active
@@ -95,27 +95,25 @@ Review Staff/Manager → (revise + catatan) → Revision → (divisi edit+submit
 
 ### 4.3 Daftar Periksa Izin Pekerjaan Berisiko Tinggi
 
-#### Pengajuan Publik (`/daftar-periksa`)
-- Form publik tanpa login berisi:
-  - Data pekerjaan (divisi, tipe, site, nama pekerjaan, kontraktor, lokasi, telepon, tanggal mulai)
+Fitur ini **terpisah dari Safety Permit** dan **hanya dapat diakses Staff HSE** site Madiun / Banyuwangi melalui dashboard (`role:staff`). Tidak ada akses publik.
+
+#### Form Dashboard (`/admin/work-inspections/create`)
+- Staff membuka form di dashboard, site otomatis mengikuti `users.site` (tidak dapat diubah dari form).
+- Isian:
+  - Data pekerjaan (divisi, tipe, nama pekerjaan, kontraktor, peralatan, lokasi, telepon, tanggal mulai)
   - 19 pertanyaan checklist YA/TIDAK (Bagian A: 10 soal + Bagian B: 9 soal)
   - LOTO (Lock Out & Tag Out): nama pelaksana, tanggal, jam
-  - Tanda tangan digital pelaksana LOTO
   - Supervisor (opsional)
+- Tanda tangan diambil pada **satu perangkat di site**: pelaksana/user menandatangani (`tanda_tangan`), lalu staff menandatangani sebagai Safety Officer (`staff_signature`).
 - Nomor: `XXX/DPIKBT/INKA/<tahun>`
-- Bisa terhubung ke Safety Permit yang menunggu (`/daftar-periksa/untuk-permit/{permit}`, signed URL)
+- Setelah submit, daftar periksa langsung final berstatus `Disetujui` (kedua tanda tangan wajib terisi).
 
-#### Alur Status Daftar Periksa
-```
-Diajukan → Menunggu Verifikasi → (Staff approve + TTD Safety Officer) → Disetujui
-                                → (Staff tolak + alasan) → Ditolak
-```
-
-#### Cek Status (`/cek-daftar-periksa`)
-- Cari dengan nomor daftar periksa + nomor telepon
-- Tampilkan detail + jawaban checklist
-- **Tombol unduh PDF muncul hanya jika status `Disetujui`** (signed URL, throttle 10/menit)
-- PDF berisi data pekerjaan, checklist, LOTO, tanda tangan pelaksana & Safety Officer
+#### Akses & Status
+- Staff hanya melihat daftar periksa site-nya (`visibleTo`), termasuk PDF.
+- Manager / staff site lain / staff tanpa site ditolak (403).
+- Status: `Menunggu Verifikasi` (warisan data lama), `Disetujui`, `Ditolak`.
+- Route approve/reject hanya dipertahankan untuk memproses data lama yang masih `Menunggu Verifikasi`.
+- PDF (`/admin/work-inspections/{id}/pdf`) berisi data pekerjaan, checklist, LOTO, tanda tangan pelaksana & Safety Officer.
 
 ### 4.4 Data Kontraktor (`/data-kontraktor`)
 
@@ -148,7 +146,7 @@ Diajukan → Menunggu Verifikasi → (Staff approve + TTD Safety Officer) → Di
 
 ### 4.6 Cek Status Terpadu (`/cek-status`)
 
-- Satu halaman untuk mengecek status semua jenis dokumen: Permit, HSE Plan, Daftar Periksa
+- Satu halaman untuk mengecek status dokumen publik: Permit dan HSE Plan (Daftar Periksa tidak lagi publik)
 - Input: nomor dokumen + nomor telepon
 
 ### 4.7 Dashboard Divisi
@@ -160,7 +158,7 @@ Diajukan → Menunggu Verifikasi → (Staff approve + TTD Safety Officer) → Di
 ### 4.8 Dashboard Admin (Staff & Manager HSE)
 
 - Widget antrean sesuai role:
-  - Staff: antrean `Review Staff` + daftar periksa `Menunggu Verifikasi`
+  - Staff: antrean `Review Staff` + total daftar periksa site-nya (dibuat via dashboard)
   - Manager: antrean `Review Manager` + HSE Plan `Review Manager`
 - Tabel permit FIFO (urut `submitted_at ASC`)
 - Permit detail: grid A (Klasifikasi) · B (Informasi) · C (Bahaya) · D (Pencegahan) · E (APD) · F (Dokumen)
@@ -203,7 +201,7 @@ Diajukan → Menunggu Verifikasi → (Staff approve + TTD Safety Officer) → Di
   - `inka-border` — `#dee2e6`
   - `accent-orange` / `amber-500` — `#f2994a`
 - **Komponen reusable**: `permit-tipe-badge`, `permit-klasifikasi-badges`, `permit-status-badge`, `permit-tanggal`
-- **Badge warna status**: Draft (abu) · Menunggu Daftar Periksa (amber) · Review Staff/Manager (oranye) · Revision (merah) · Active (hijau) · Closed (slate) · Cancelled (merah solid)
+- **Badge warna status**: Draft (abu) · Review Staff/Manager (oranye) · Revision (merah) · Active (hijau) · Closed (slate) · Cancelled (merah solid)
 - **Responsif**: mobile-first, layout berubah di breakpoint `sm` / `md` / `lg`
 - **Alpine.js**: dipakai untuk modal monitoring, dropdown navbar, wizard step, canvas tanda tangan
 
@@ -249,8 +247,7 @@ Enam kode klasifikasi tersedia sebagai master:
 | Safety Permit | `/divisi/permits/{id}/pdf/download` | Divisi pemilik (semua status) |
 | Safety Permit | `/admin/permits/{id}/pdf/download` | Staff/Manager (gate: Review Staff/Manager, Revision, Active, Closed) |
 | Safety Permit | `/superadmin/permits/{id}/pdf/download` | Superadmin (gate: Review Staff/Manager, Revision, Active, Closed) |
-| Daftar Periksa | `/admin/work-inspections/{id}/pdf/download` | Staff/Manager (semua status) |
-| Daftar Periksa | `/daftar-periksa/{id}/pdf` *(signed)* | Publik (hanya status `Disetujui`) |
+| Daftar Periksa | `/admin/work-inspections/{id}/pdf/download` | Staff HSE site terkait (semua status) |
 | HSE Plan | `/admin/hse-plans/{id}/pdf/download` | Staff/Manager |
 
 Semua PDF dibuat dengan `barryvdh/laravel-dompdf`, ukuran A4 portrait.

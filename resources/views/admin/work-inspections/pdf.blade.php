@@ -107,8 +107,8 @@
                 <td class="data-value">{{ $inspection->telepon }}</td>
             </tr>
             <tr>
-                <td class="data-label">Safety Permit Terkait</td>
-                <td class="data-value">{{ $inspection->permit->no_permit ?? $inspection->requestedPermit->no_permit ?? 'Belum ada' }}</td>
+                <td class="data-label">Site</td>
+                <td class="data-value">{{ $inspection->site }}</td>
                 <td class="data-label">Diajukan</td>
                 <td class="data-value">{{ $tanggal?->format('d/m/Y H:i') ?? '-' }}</td>
             </tr>

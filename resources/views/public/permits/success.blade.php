@@ -51,20 +51,10 @@
                 status <span class="font-semibold text-orange-600">{{ $permit->status }}</span>.
             </p>
 
-            @if($checklistUrl)
-                <div class="mt-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-left text-sm text-amber-800">
-                    <p class="font-semibold">Lengkapi Daftar Periksa Izin Kerja</p>
-                    <p class="mt-1">Permit ini belum masuk antrian review Staff HSE. Buat daftar periksa terlebih dahulu; setelah disetujui, permit otomatis masuk Review Staff.</p>
-                </div>
-            @endif
-
             <p class="text-xs text-gray-400 mt-3">Simpan tautan halaman ini agar Anda dapat membuka detail permit. Anda juga dapat memeriksa status kapan saja di <a href="/cek-permit" class="font-semibold text-inka-navy hover:underline">Cek Status Permit</a> menggunakan nomor permit dan nomor telepon yang Anda isi.</p>
         @endif
 
         <div class="mt-6 flex flex-col sm:flex-row gap-2.5 sm:gap-3 justify-center">
-            @if($checklistUrl)
-                <a href="{{ $checklistUrl }}" class="px-5 py-2.5 rounded-xl bg-inka-navy text-white text-sm font-semibold hover:opacity-90 transition-opacity">Buat Daftar Periksa</a>
-            @endif
             @if(!in_array($permit->status, ['Closed', 'Cancelled']))
                 <a href="{{ $cancelUrl }}" class="px-5 py-2.5 rounded-xl border border-red-200 text-sm font-semibold text-red-600 hover:bg-red-50 transition-colors">Batalkan Permit</a>
             @else

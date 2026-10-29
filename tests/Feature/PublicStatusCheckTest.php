@@ -4,7 +4,6 @@ namespace Tests\Feature;
 
 use App\Models\HsePlan;
 use App\Models\Permit;
-use App\Models\WorkInspection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -18,7 +17,7 @@ class PublicStatusCheckTest extends TestCase
             ->assertOk()
             ->assertSee('Cek Status Pengajuan')
             ->assertSee('HSE Plan')
-            ->assertSee('Daftar Periksa');
+            ->assertDontSee('Daftar Periksa');
     }
 
     public function test_permit_can_be_checked_from_unified_page(): void
@@ -47,23 +46,6 @@ class PublicStatusCheckTest extends TestCase
             ->assertOk()
             ->assertSee($hsePlan->no_hse_plan)
             ->assertSee('HSE Plan Disetujui');
-    }
-
-    public function test_work_inspection_can_be_checked_from_unified_page(): void
-    {
-        $inspection = $this->makeInspection([
-            'status' => WorkInspection::STATUS_APPROVED,
-            'telepon' => '08123456789',
-        ]);
-
-        $this->post('/cek-status', [
-            'jenis' => 'daftar-periksa',
-            'no_periksa' => $inspection->no_periksa,
-            'telepon' => '08123456789',
-        ])
-            ->assertOk()
-            ->assertSee($inspection->no_periksa)
-            ->assertSee('Disetujui');
     }
 
     public function test_mismatched_phone_redirects_back_with_error(): void
@@ -124,26 +106,5 @@ class PublicStatusCheckTest extends TestCase
         return $hsePlan->fresh();
     }
 
-    private function makeInspection(array $attributes = []): WorkInspection
-    {
-        $inspection = WorkInspection::create([
-            'no_periksa' => '001/DPIKBT/INKA/2026',
-            'site' => 'Madiun',
-            'tipe' => 'Internal',
-            'divisi_pengaju' => 'Divisi Teknik',
-            'nama_pekerjaan' => 'Perbaikan pipa steam',
-            'kontraktor' => 'PT Contoh Kontraktor',
-            'lokasi' => 'Area Produksi',
-            'telepon' => '08123456789',
-            'tanggal_mulai' => '2026-10-25',
-            'answers' => array_fill_keys(array_keys(WorkInspection::ANSWER_LABELS), true),
-            'tanda_tangan' => 'data:image/png;base64,abc',
-            'status' => WorkInspection::STATUS_PENDING,
-            'submitted_at' => now(),
-        ]);
 
-        $inspection->forceFill($attributes)->save();
-
-        return $inspection->fresh();
-    }
 }

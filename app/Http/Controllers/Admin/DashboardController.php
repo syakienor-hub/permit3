@@ -39,9 +39,7 @@ class DashboardController extends Controller
                 ->whereDate('updated_at', $today)
                 ->count();
             $counts['permit_active'] = (clone $permitQuery)->where('status', 'Active')->count();
-            $counts['inspection_pending'] = (clone $inspectionQuery)
-                ->where('status', WorkInspection::STATUS_PENDING)
-                ->count();
+            $counts['inspection_pending'] = (clone $inspectionQuery)->count();
             $counts['hse_review'] = HsePlan::query()
                 ->visibleTo($user)
                 ->where('status', HsePlan::STATUS_REVIEW)
@@ -55,9 +53,8 @@ class DashboardController extends Controller
                 ->get();
 
             $inspections = (clone $inspectionQuery)
-                ->where('status', WorkInspection::STATUS_PENDING)
                 ->with('reviewer')
-                ->orderByRaw('COALESCE(submitted_at, created_at) ASC')
+                ->orderByRaw('COALESCE(submitted_at, created_at) DESC')
                 ->take(5)
                 ->get();
         } elseif ($role === 'manager') {

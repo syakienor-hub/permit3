@@ -5,7 +5,6 @@
         $canEdit = in_array($permit->status, ['Draft', 'Revision']);
         $statusMap = [
             'Draft'                    => 'bg-gray-100 text-gray-600',
-            'Menunggu Daftar Periksa'  => 'bg-amber-100 text-amber-700',
             'Submitted'                => 'bg-blue-100 text-blue-700',
             'Review Staff'             => 'bg-orange-100 text-orange-700',
             'Review Manager'           => 'bg-orange-100 text-orange-700',
@@ -67,19 +66,6 @@
             {{ str_starts_with($permit->status, 'Review') ? 'Menunggu ' . $permit->status : $permit->status }}
         </span>
     </div>
-
-    @if($permit->needsWorkInspection())
-    <div class="bg-amber-50 border border-amber-200 rounded-2xl px-4 md:px-6 py-4 mb-5 flex flex-col sm:flex-row sm:items-center gap-3">
-        <div class="flex-1">
-            <p class="text-sm font-semibold text-amber-800">Permit menunggu Daftar Periksa Izin Kerja</p>
-            <p class="text-sm text-amber-700 mt-1">Lengkapi daftar periksa agar permit dapat masuk antrian review Staff HSE.</p>
-        </div>
-        <a href="{{ URL::signedRoute('public.work-inspections.create-for-permit', ['permit' => $permit->id]) }}"
-           class="inline-flex items-center justify-center gap-2 bg-inka-navy text-white text-sm font-semibold px-4 py-2 rounded-xl hover:opacity-90 transition-opacity">
-            Buat Daftar Periksa
-        </a>
-    </div>
-    @endif
 
     @if($permit->status === 'Revision' && $permit->catatan_revisi)
     <div class="bg-red-50 border border-red-200 rounded-2xl px-4 md:px-6 py-4 mb-5 flex gap-3">
@@ -157,7 +143,6 @@
                         'No. Telepon'       => $permit->telepon,
                         'Tanggal Mulai'     => $permit->tanggal_mulai?->format('d/m/Y'),
                         'Tanggal Selesai'   => $permit->tanggal_selesai?->format('d/m/Y'),
-                        'Daftar Periksa'    => $permit->workInspection?->no_periksa,
                     ];
                 @endphp
                 @foreach($info as $label => $value)

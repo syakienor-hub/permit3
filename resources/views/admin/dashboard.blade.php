@@ -24,9 +24,8 @@
                     <h1 class="mt-3 text-2xl sm:text-[28px] font-bold leading-tight">{{ $greeting }}, {{ auth()->user()->name }}</h1>
                     <p class="mt-1 text-sm text-white/60">
                         {{ $todayLabel }} &mdash;
-                        @if($counts['permit_pending'] + $counts['inspection_pending'] > 0)
-                            <span class="font-semibold text-white">{{ $counts['permit_pending'] }} permit</span> dan
-                            <span class="font-semibold text-white">{{ $counts['inspection_pending'] }} daftar periksa</span> menunggu tindakan Anda.
+                        @if($counts['permit_pending'] > 0)
+                            <span class="font-semibold text-white">{{ $counts['permit_pending'] }} permit</span> menunggu tindakan Anda.
                         @else
                             Semua antrean sudah tertangani. Kerja bagus, tetap utamakan keselamatan!
                         @endif
@@ -42,7 +41,7 @@
                     </a>
                     <a href="/admin/work-inspections"
                        class="inline-flex items-center gap-2 rounded-xl border border-white/20 bg-white/5 px-4 py-2.5 text-sm font-semibold text-white hover:bg-white/10 transition-colors">
-                        Verifikasi Daftar Periksa
+                        Kelola Daftar Periksa
                     </a>
                 </div>
             </div>
@@ -71,7 +70,7 @@
                     </span>
                 </div>
                 <p class="text-2xl sm:text-3xl font-bold text-purple-500">{{ $counts['inspection_pending'] }}</p>
-                <p class="text-[11px] sm:text-xs text-gray-400 mt-1">Menunggu verifikasi</p>
+                <p class="text-[11px] sm:text-xs text-gray-400 mt-1">Total daftar periksa site ini</p>
             </a>
 
             <a href="/admin/hse-plans"
@@ -160,9 +159,10 @@
                             <span class="w-2 h-2 rounded-full bg-purple-400"></span>
                             <h3 class="text-sm font-bold uppercase tracking-wide text-gray-800">Daftar Periksa</h3>
                         </div>
-                        <p class="text-xs text-gray-400 mt-1">Daftar periksa menunggu verifikasi staff</p>
+                        <p class="text-xs text-gray-400 mt-1">Daftar periksa terbaru site ini</p>
                     </div>
                     <div class="flex items-center gap-3">
+                        <a href="/admin/work-inspections/create" class="text-sm font-semibold text-inka-navy hover:underline whitespace-nowrap">Buat</a>
                         <a href="/admin/work-inspections/history" class="text-sm font-semibold text-gray-400 hover:text-inka-navy whitespace-nowrap">History</a>
                         <a href="/admin/work-inspections" class="text-sm font-semibold text-inka-navy hover:underline whitespace-nowrap">Lihat Semua</a>
                     </div>
@@ -175,8 +175,8 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
                             </svg>
                         </div>
-                        <p class="text-sm font-semibold text-gray-700">Tidak ada daftar periksa yang menunggu verifikasi.</p>
-                        <p class="text-xs text-gray-400 mt-1">Pengajuan baru akan muncul di sini.</p>
+                        <p class="text-sm font-semibold text-gray-700">Belum ada daftar periksa.</p>
+                        <p class="text-xs text-gray-400 mt-1">Buat daftar periksa baru dari dashboard.</p>
                     </div>
                 @else
                     <div class="divide-y divide-gray-50">
@@ -184,7 +184,14 @@
                             <a href="/admin/work-inspections/{{ $inspection->id }}" class="block px-4 md:px-6 py-4 hover:bg-slate-50/70 transition-colors">
                                 <div class="flex items-center justify-between gap-3 mb-1.5">
                                     <span class="text-xs font-bold text-inka-navy font-mono">{{ $inspection->no_periksa }}</span>
-                                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-semibold bg-orange-100 text-orange-700 shrink-0">Menunggu Verifikasi</span>
+                                    @php
+                                        $inspectionBadge = match($inspection->status) {
+                                            \App\Models\WorkInspection::STATUS_APPROVED => 'bg-green-100 text-green-700',
+                                            \App\Models\WorkInspection::STATUS_REJECTED => 'bg-red-100 text-red-700',
+                                            default => 'bg-orange-100 text-orange-700',
+                                        };
+                                    @endphp
+                                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-semibold {{ $inspectionBadge }} shrink-0">{{ $inspection->status }}</span>
                                 </div>
                                 <p class="text-sm font-semibold text-gray-800 truncate">{{ $inspection->nama_pekerjaan }}</p>
                                 <p class="text-xs text-gray-400 mt-1 truncate">
@@ -194,7 +201,7 @@
                                 </p>
                                 <div class="flex items-center justify-between gap-3 mt-2.5">
                                     <span class="text-xs text-gray-400">{{ ($inspection->submitted_at ?? $inspection->created_at)?->format('d/m/Y H:i') }}</span>
-                                    <span class="text-xs font-semibold text-inka-navy">Verifikasi</span>
+                                    <span class="text-xs font-semibold text-inka-navy">Lihat</span>
                                 </div>
                             </a>
                         @endforeach

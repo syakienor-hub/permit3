@@ -23,16 +23,13 @@
             <p class="text-sm text-gray-500 mt-1">Pilih jenis pengajuan, lalu masukkan nomor dan nomor telepon yang Anda isi saat mengajukan.</p>
         </div>
 
-        <div class="grid grid-cols-3 gap-1 rounded-xl bg-slate-100 p-1 mb-5" role="tablist">
+        <div class="grid grid-cols-2 gap-1 rounded-xl bg-slate-100 p-1 mb-5" role="tablist">
             <button type="button" role="tab" @click="tab = 'permit'"
                 :class="tab === 'permit' ? 'bg-white text-inka-navy shadow-sm' : 'text-gray-500 hover:text-gray-700'"
                 class="px-2 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-colors">Permit</button>
             <button type="button" role="tab" @click="tab = 'hse-plan'"
                 :class="tab === 'hse-plan' ? 'bg-white text-inka-navy shadow-sm' : 'text-gray-500 hover:text-gray-700'"
                 class="px-2 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-colors">HSE Plan</button>
-            <button type="button" role="tab" @click="tab = 'daftar-periksa'"
-                :class="tab === 'daftar-periksa' ? 'bg-white text-inka-navy shadow-sm' : 'text-gray-500 hover:text-gray-700'"
-                class="px-2 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-colors">Daftar Periksa</button>
         </div>
 
         @if($errors->any())
@@ -107,34 +104,6 @@
             @endif
         </div>
 
-        {{-- Daftar Periksa --}}
-        <div x-show="tab === 'daftar-periksa'" x-cloak>
-            <form method="POST" action="/cek-status" class="space-y-4">
-                @csrf
-                <input type="hidden" name="jenis" value="daftar-periksa">
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">Nomor Daftar Periksa <span class="text-red-500">*</span></label>
-                    <input type="text" name="no_periksa" required maxlength="100"
-                        value="{{ old('no_periksa', $jenis === 'daftar-periksa' && isset($inspection) ? $inspection->no_periksa : '') }}"
-                        placeholder="Contoh: 001/DPIKBT/INKA/2026"
-                        class="w-full border-gray-300 rounded-xl focus:border-inka-navy focus:ring-inka-navy text-sm font-mono">
-                </div>
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">Nomor Telepon <span class="text-red-500">*</span></label>
-                    <input type="text" name="telepon" required maxlength="50"
-                        value="{{ old('telepon', $jenis === 'daftar-periksa' && isset($inspection) ? $inspection->telepon : '') }}"
-                        placeholder="Nomor yang dipakai saat mengajukan"
-                        class="w-full border-gray-300 rounded-xl focus:border-inka-navy focus:ring-inka-navy text-sm">
-                </div>
-                <button type="submit" class="w-full px-5 py-2.5 rounded-xl bg-inka-navy text-white text-sm font-semibold hover:opacity-90 transition-opacity">
-                    Cek Status
-                </button>
-            </form>
-
-            @if($jenis === 'daftar-periksa' && isset($inspection))
-                @include('public.partials.status-work-inspection-result', ['inspection' => $inspection])
-            @endif
-        </div>
     </div>
 </body>
 </html>

@@ -315,7 +315,6 @@
                 </div>
             </div>
             <a href="/ajukan-permit" class="hover:text-[var(--navy-950)] transition-colors whitespace-nowrap">Ajukan Permit</a>
-            <a href="/daftar-periksa" class="hover:text-[var(--navy-950)] transition-colors whitespace-nowrap">Daftar Periksa</a>
             
 <a href="#monitoring-kontraktor"
    @click="activeNav = 'monitoring-kontraktor'"
@@ -354,7 +353,6 @@
                 Monitoring Kontraktor
             </a>
             <a href="/ajukan-permit" @click="mobileOpen = false" class="py-3 border-b border-gray-100">Ajukan Permit</a>
-            <a href="/daftar-periksa" @click="mobileOpen = false" class="py-3 border-b border-gray-100">Daftar Periksa Izin</a>
            
 <a href="#monitoring-kontraktor"
    @click="activeNav = 'monitoring-kontraktor'; mobileOpen = false"
@@ -403,12 +401,6 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                     </svg>
                     Ajukan Safety Permit
-                </a>
-                <a href="/daftar-periksa" class="btn btn-outline-light btn-lg">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
-                    </svg>
-                    Daftar Periksa Izin
                 </a>
                 <a href="/cek-status" class="btn btn-outline-light btn-lg">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -677,7 +669,6 @@
 
                                 $statusMap = [
                                     'Draft'                    => 'bg-gray-100 text-gray-600 border-gray-200',
-                                    'Menunggu Daftar Periksa'  => 'bg-amber-50 text-amber-700 border-amber-200/70',
                                     'Submitted'                => 'bg-blue-50 text-blue-700 border-blue-200/70',
                                     'Review Staff'             => 'bg-orange-50 text-orange-700 border-orange-200/70',
                                     'Review Manager'           => 'bg-orange-50 text-orange-700 border-orange-200/70',
@@ -760,7 +751,7 @@
                         $mMulai = $permit->tanggal_mulai ? $permit->tanggal_mulai->format('d/m/Y') : null;
                         $mSelesai = $permit->tanggal_selesai ? $permit->tanggal_selesai->format('d/m/Y') : null;
                         $mTgl = ($mMulai && $mSelesai) ? (($mMulai === $mSelesai) ? $mMulai : "$mMulai – $mSelesai") : ($mMulai ?? $mSelesai ?? ($permit->submitted_at ? $permit->submitted_at->format('d/m/Y') : '—'));
-                        $mStatusMap = ['Draft'=>'bg-gray-100 text-gray-600 border-gray-200','Menunggu Daftar Periksa'=>'bg-amber-50 text-amber-700 border-amber-200/70','Submitted'=>'bg-blue-50 text-blue-700 border-blue-200/70','Review Staff'=>'bg-orange-50 text-orange-700 border-orange-200/70','Review Manager'=>'bg-orange-50 text-orange-700 border-orange-200/70','Revision'=>'bg-red-50 text-red-700 border-red-200/70','Active'=>'bg-green-50 text-green-700 border-green-200/70','Closed'=>'bg-slate-50 text-slate-700 border-slate-200','Cancelled'=>'bg-red-600 text-white border-red-600'];
+                        $mStatusMap = ['Draft'=>'bg-gray-100 text-gray-600 border-gray-200','Submitted'=>'bg-blue-50 text-blue-700 border-blue-200/70','Review Staff'=>'bg-orange-50 text-orange-700 border-orange-200/70','Review Manager'=>'bg-orange-50 text-orange-700 border-orange-200/70','Revision'=>'bg-red-50 text-red-700 border-red-200/70','Active'=>'bg-green-50 text-green-700 border-green-200/70','Closed'=>'bg-slate-50 text-slate-700 border-slate-200','Cancelled'=>'bg-red-600 text-white border-red-600'];
                         $mPayload = ['no_permit'=>$permit->no_permit,'site'=>$permit->site ?? 'Madiun','tipe'=>$permit->tipe,'nama_pekerjaan'=>$permit->nama_pekerjaan,'divisi'=>optional($permit->user)->name ?? $permit->divisi_pengaju ?? '—','kontraktor'=>$permit->kontraktor,'lokasi'=>$permit->lokasi ?? '—','tanggal_permit'=>$mTgl,'penanggung_jawab'=>$permit->penanggung_jawab ?? '—','status'=>$permit->status,'status_badge'=>$mStatusMap[$permit->status] ?? 'bg-gray-100 text-gray-600','klasifikasi'=>$mKlas];
                     @endphp
                     <button type="button" @click="openModal({{ json_encode($mPayload) }})" class="block w-full text-left px-4 py-4 active:bg-blue-50/50">
@@ -1421,12 +1412,12 @@ $mStatusBadge = $mStatusMap[$mApprovalStatus]
         <div class="max-w-[560px] mx-auto text-center mb-8 md:mb-[46px] reveal">
             <div class="sec-tag">Alur Pengajuan</div>
             <h2 class="text-[22px] sm:text-[28px] font-extrabold tracking-[-.01em] mb-3 text-[var(--navy-950)]">Bagaimana Cara Mengajukan Izin Kerja</h2>
-            <p class="text-[14.5px] text-[var(--ink-600)]">Satu alur terpadu — dari data kontraktor, HSE Plan, daftar periksa, sampai Safety Permit dan monitoring.</p>
+            <p class="text-[14.5px] text-[var(--ink-600)]">Satu alur terpadu — dari data kontraktor, HSE Plan, sampai Safety Permit dan monitoring.</p>
         </div>
 
         <div class="flow">
             <div class="flow-line"></div>
-            <div class="flow-grid grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4 relative z-10">
+            <div class="flow-grid grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 relative z-10">
                 <div class="flow-step reveal" style="transition-delay:0ms">
                     <div class="sn">1</div>
                     <h4>Data Kontraktor</h4>
@@ -1441,25 +1432,19 @@ $mStatusBadge = $mStatusMap[$mApprovalStatus]
                 </div>
                 <div class="flow-step reveal" style="transition-delay:160ms">
                     <div class="sn">3</div>
-                    <h4>Daftar Periksa Izin</h4>
-                    <p>Isi checklist pekerjaan berisiko tinggi untuk diverifikasi Staff HSE.</p>
-                    <a href="/daftar-periksa" class="flow-link">Isi Daftar Periksa &rarr;</a>
+                    <h4>Ajukan Safety Permit</h4>
+                    <p>Lengkapi klasifikasi pekerjaan, bahaya, APD, dan dokumen pendukung.</p>
+                    <a href="/ajukan-permit" class="flow-link">Ajukan Permit &rarr;</a>
                 </div>
                 <div class="flow-step reveal" style="transition-delay:240ms">
                     <div class="sn">4</div>
-                    <h4>Ajukan Safety Permit</h4>
-                    <p>Pilih daftar periksa yang disetujui, lengkapi klasifikasi, bahaya, APD, dan dokumen.</p>
-                    <a href="/ajukan-permit" class="flow-link">Ajukan Permit &rarr;</a>
-                </div>
-                <div class="flow-step reveal" style="transition-delay:320ms">
-                    <div class="sn">5</div>
                     <h4>Verifikasi Berlapis</h4>
                     <p>Staff HSE memverifikasi permit, lalu Manager HSE menyetujui sebelum pekerjaan aktif.</p>
                 </div>
-                <div class="flow-step reveal" style="transition-delay:400ms">
-                    <div class="sn">6</div>
+                <div class="flow-step reveal" style="transition-delay:320ms">
+                    <div class="sn">5</div>
                     <h4>Monitoring &amp; Status</h4>
-                    <p>Pantau permit, HSE Plan, dan daftar periksa secara real-time.</p>
+                    <p>Pantau permit, HSE Plan, dan kontraktor secara real-time.</p>
                     <a href="#monitoring" class="flow-link">Lihat Monitoring &rarr;</a>
                 </div>
             </div>
@@ -1467,7 +1452,7 @@ $mStatusBadge = $mStatusMap[$mApprovalStatus]
 
         <div class="flow-note reveal-scale" style="transition-delay:200ms">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="shrink-0 mt-0.5"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg>
-            <span><strong>Info:</strong> pengajuan publik tidak memerlukan akun. Pekerjaan oleh <strong>kontraktor (Eksternal)</strong> melalui Data Kontraktor &rarr; HSE Plan &rarr; Daftar Periksa &rarr; Safety Permit. Pekerjaan <strong>Internal</strong> dapat langsung ke Daftar Periksa lalu Safety Permit. Semua status terpantau di tabel Monitoring dan dapat dicek kapan saja.</span>
+            <span><strong>Info:</strong> pengajuan publik tidak memerlukan akun. Pekerjaan oleh <strong>kontraktor (Eksternal)</strong> melalui Data Kontraktor &rarr; HSE Plan &rarr; Safety Permit. Pekerjaan <strong>Internal</strong> dapat langsung mengajukan Safety Permit. Daftar Periksa Izin Pekerjaan Berisiko Tinggi dikelola oleh Staff HSE melalui dashboard. Semua status terpantau di tabel Monitoring dan dapat dicek kapan saja.</span>
         </div>
     </div>
 </section>
@@ -1513,7 +1498,6 @@ $mStatusBadge = $mStatusMap[$mApprovalStatus]
                     <ul class="flex flex-col gap-2.5">
                         <li><a href="#monitoring" class="text-sm text-white/85 hover:text-white transition-opacity">Monitoring Permit</a></li>
                         <li><a href="#monitoring-kontraktor" class="text-sm text-white/85 hover:text-white transition-opacity">Monitoring Kontraktor</a></li>
-                        <li><a href="/daftar-periksa" class="text-sm text-white/85 hover:text-white transition-opacity">Daftar Periksa Izin</a></li>
                         <li><a href="#alur" class="text-sm text-white/85 hover:text-white transition-opacity">Alur Pengajuan</a></li>
                         <li><a href="#tentang" class="text-sm text-white/85 hover:text-white transition-opacity">Tentang Kami</a></li>
                         <li><a href="{{ route('login') }}" class="text-sm text-white/85 hover:text-white transition-opacity">Login</a></li>

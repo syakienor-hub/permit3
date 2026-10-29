@@ -62,7 +62,7 @@ class PermitController extends Controller
         }
 
         $user = Auth::user();
-        $status = $request->input('action') === 'submit' ? Permit::STATUS_WAITING_INSPECTION : 'Draft';
+        $status = $request->input('action') === 'submit' ? 'Review Staff' : 'Draft';
 
         $permit = DB::transaction(function () use ($request, $user, $status) {
             // Auto-generate nomor permit
@@ -131,7 +131,7 @@ class PermitController extends Controller
 
         $message = $status === 'Draft'
             ? 'Permit berhasil disimpan sebagai Draft.'
-            : 'Permit berhasil diajukan. Lengkapi Daftar Periksa Izin Kerja agar permit dapat direview Staff HSE.';
+            : 'Permit berhasil diajukan dan masuk antrean Review Staff HSE.';
 
         if ($status === 'Review Staff') {
             PermitMailNotifier::notifyStaff($permit);
@@ -196,7 +196,7 @@ class PermitController extends Controller
             session()->put($sessionKey, true);
         }
 
-        $status = $request->input('action') === 'submit' ? Permit::STATUS_WAITING_INSPECTION : 'Draft';
+        $status = $request->input('action') === 'submit' ? 'Review Staff' : 'Draft';
 
         DB::transaction(function () use ($request, $permit, $status) {
             // Handle perubahan tipe
@@ -278,7 +278,7 @@ class PermitController extends Controller
 
         $message = $status === 'Draft'
             ? 'Perubahan permit berhasil disimpan sebagai Draft.'
-            : 'Permit berhasil diajukan. Lengkapi Daftar Periksa Izin Kerja agar permit dapat direview Staff HSE.';
+            : 'Permit berhasil diajukan dan masuk antrean Review Staff HSE.';
 
         if ($status === 'Review Staff') {
             PermitMailNotifier::notifyStaff($permit->fresh());

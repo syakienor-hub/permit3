@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Public;
 use App\Http\Controllers\Controller;
 use App\Models\HsePlan;
 use App\Models\Permit;
-use App\Models\WorkInspection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\URL;
 
@@ -15,10 +14,9 @@ class StatusCheckController extends Controller
     private const TYPES = [
         'permit' => 'no_permit',
         'hse-plan' => 'no_hse_plan',
-        'daftar-periksa' => 'no_periksa',
     ];
 
-    /** Form cek status terpadu (permit, HSE Plan, daftar periksa). */
+    /** Form cek status terpadu (permit, HSE Plan). */
     public function create(Request $request)
     {
         return view('public.status-check', ['jenis' => $this->resolveType($request->query('jenis'))]);
@@ -42,7 +40,6 @@ class StatusCheckController extends Controller
         return match ($jenis) {
             'permit' => $this->checkPermit($field, $nomor, $telepon),
             'hse-plan' => $this->checkHsePlan($field, $nomor, $telepon),
-            'daftar-periksa' => $this->checkWorkInspection($field, $nomor, $telepon),
         };
     }
 
@@ -77,19 +74,6 @@ class StatusCheckController extends Controller
         }
 
         return view('public.status-check', ['jenis' => 'hse-plan', 'hsePlan' => $hsePlan]);
-    }
-
-    private function checkWorkInspection(string $field, string $nomor, string $telepon)
-    {
-        $inspection = WorkInspection::where('no_periksa', $nomor)
-            ->where('telepon', $telepon)
-            ->first();
-
-        if (! $inspection) {
-            return $this->notFound('daftar-periksa', $field, $nomor, $telepon, 'Data daftar periksa tidak ditemukan. Periksa kembali nomor daftar periksa dan nomor telepon yang dipakai saat mengajukan.');
-        }
-
-        return view('public.status-check', ['jenis' => 'daftar-periksa', 'inspection' => $inspection]);
     }
 
     private function notFound(string $jenis, string $field, string $nomor, string $telepon, string $message)

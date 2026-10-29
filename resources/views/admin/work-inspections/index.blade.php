@@ -45,8 +45,7 @@
         </div>
 
         <select name="status" class="border border-gray-200 rounded-xl text-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-inka-navy/20 focus:border-inka-navy text-gray-600">
-            <option value="">Status: Menunggu Verifikasi</option>
-            <option value="Semua" @selected(request('status') === 'Semua')>Semua Status</option>
+            <option value="">Semua Status</option>
             @foreach([\App\Models\WorkInspection::STATUS_PENDING, \App\Models\WorkInspection::STATUS_APPROVED, \App\Models\WorkInspection::STATUS_REJECTED] as $status)
                 <option value="{{ $status }}" @selected(request('status') === $status)>{{ $status }}</option>
             @endforeach
@@ -70,9 +69,15 @@
         <div class="flex items-center justify-between px-4 md:px-6 py-4 border-b border-gray-100">
             <div>
                 <h3 class="text-sm font-semibold text-gray-800">Daftar Periksa Izin Pekerjaan Berisiko Tinggi</h3>
-                <p class="text-xs text-gray-400 mt-0.5">Form K3LH IV-01.013 — prasyarat sebelum Safety Permit</p>
+                <p class="text-xs text-gray-400 mt-0.5">Form K3LH IV-01.013 — dikelola Staff HSE site Madiun &amp; Banyuwangi</p>
             </div>
-            <a href="/admin/work-inspections/history" class="text-xs font-semibold text-inka-navy hover:underline">Lihat History</a>
+            <div class="flex items-center gap-3">
+                <a href="/admin/work-inspections/history" class="text-xs font-semibold text-gray-400 hover:text-inka-navy">History</a>
+                <a href="/admin/work-inspections/create" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-inka-navy text-white text-xs font-semibold hover:opacity-90">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                    Buat Daftar Periksa
+                </a>
+            </div>
         </div>
 
         @if($inspections->isEmpty())
@@ -83,7 +88,7 @@
                     </svg>
                 </div>
                 <p class="text-base font-semibold text-gray-700">Belum ada daftar periksa.</p>
-                <p class="text-sm text-gray-400 mt-1">Pengajuan baru akan muncul di sini.</p>
+                <p class="text-sm text-gray-400 mt-1">Buat daftar periksa baru melalui tombol di atas.</p>
             </div>
         @else
             <div class="overflow-x-auto">
@@ -116,9 +121,6 @@
                             <tr class="cursor-pointer transition-colors" onclick="window.location='/admin/work-inspections/{{ $inspection->id }}'">
                                 <td class="whitespace-nowrap">
                                     <p class="font-bold text-inka-navy text-sm">{{ $inspection->no_periksa }}</p>
-                                    @if($inspection->permit)
-                                        <p class="text-[10px] text-gray-400">Permit: {{ $inspection->permit->no_permit }}</p>
-                                    @endif
                                 </td>
                                 <td class="whitespace-nowrap text-sm text-gray-600">{{ ($inspection->submitted_at ?? $inspection->created_at)?->format('d/m/Y') }}</td>
                                 <td class="text-sm text-gray-700">{{ $inspection->nama_pekerjaan }}</td>

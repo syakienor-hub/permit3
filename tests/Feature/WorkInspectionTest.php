@@ -6,78 +6,146 @@ use App\Models\Permit;
 use App\Models\User;
 use App\Models\WorkInspection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Facades\Mail;
 use Tests\TestCase;
 
 class WorkInspectionTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_public_form_can_be_rendered(): void
+    public function test_public_daftar_periksa_routes_are_removed(): void
     {
-        $this->get('/daftar-periksa')
+        $this->get('/daftar-periksa')->assertNotFound();
+        $this->get('/cek-daftar-periksa')->assertNotFound();
+        $this->post('/daftar-periksa', [])->assertNotFound();
+    }
+
+    public function test_guest_is_redirected_to_login(): void
+    {
+        $this->get('/admin/work-inspections')->assertRedirect('/login');
+        $this->get('/admin/work-inspections/create')->assertRedirect('/login');
+    }
+
+    public function test_staff_can_render_create_form_for_own_site(): void
+    {
+        $staff = $this->makeUser('staff', 'Madiun');
+
+        $this->actingAs($staff)
+            ->get('/admin/work-inspections/create')
             ->assertOk()
             ->assertSee('Daftar Periksa Izin Pekerjaan Berisiko Tinggi')
-            ->assertSee('Kirim Daftar Periksa');
+            ->assertSee('Madiun')
+            ->assertSee('Tanda Tangan Pelaksana')
+            ->assertSee('Tanda Tangan Safety Officer');
     }
 
-    public function test_public_can_submit_daftar_periksa(): void
+    public function test_staff_can_store_completed_inspection_with_both_signatures(): void
     {
-        $response = $this->post('/daftar-periksa', $this->payload());
+        $staff = $this->makeUser('staff', 'Madiun');
 
-        $response->assertRedirect();
+        $response = $this->actingAs($staff)->post('/admin/work-inspections', $this->payload());
 
         $inspection = WorkInspection::firstOrFail();
 
-        $this->assertSame('PT Contoh Kontraktor', $inspection->kontraktor);
-        $this->assertMatchesRegularExpression('#^\d{3}/DPIKBT/INKA/\d{4}$#', $inspection->no_periksa);
-        $this->assertSame(WorkInspection::STATUS_PENDING, $inspection->status);
+        $response->assertRedirect('/admin/work-inspections/' . $inspection->id);
+
+        $this->assertSame('Madiun', $inspection->site);
+        $this->assertSame('Disetujui', $inspection->status);
+        $this->assertSame($staff->id, $inspection->reviewed_by);
         $this->assertNotNull($inspection->submitted_at);
+        $this->assertNotNull($inspection->reviewed_at);
+        $this->assertSame('data:image/png;base64,pelaksana', $inspection->tanda_tangan);
+        $this->assertSame('data:image/png;base64,staff', $inspection->staff_signature);
         $this->assertTrue($inspection->answer('listrik_diputus'));
-        $this->assertFalse($inspection->answer('masih_ada_aliran'));
+        $this->assertStringStartsWith('001/DPIKBT/INKA/', $inspection->no_periksa);
+    }
 
-        $this->get($response->headers->get('Location'))
+    public function test_store_always_uses_staff_site_even_when_site_is_tampered(): void
+    {
+        $staff = $this->makeUser('staff', 'Madiun');
+
+        $this->actingAs($staff)->post('/admin/work-inspections', $this->payload([
+            'site' => 'Banyuwangi',
+        ]))->assertRedirect();
+
+        $this->assertSame('Madiun', WorkInspection::firstOrFail()->site);
+    }
+
+    public function test_store_requires_both_signatures(): void
+    {
+        $staff = $this->makeUser('staff', 'Madiun');
+
+        $this->actingAs($staff)
+            ->post('/admin/work-inspections', $this->payload([
+                'tanda_tangan' => '',
+                'staff_signature' => '',
+            ]))
+            ->assertSessionHasErrors(['tanda_tangan', 'staff_signature']);
+
+        $this->assertSame(0, WorkInspection::count());
+    }
+
+    public function test_staff_only_sees_inspections_from_own_site(): void
+    {
+        $staff = $this->makeUser('staff', 'Madiun');
+        $own = $this->makeInspection(['site' => 'Madiun', 'no_periksa' => '001/DPIKBT/INKA/2026']);
+        $other = $this->makeInspection(['site' => 'Banyuwangi', 'no_periksa' => '002/DPIKBT/INKA/2026']);
+
+        $this->actingAs($staff)
+            ->get('/admin/work-inspections')
             ->assertOk()
-            ->assertSee('Daftar Periksa Berhasil Dikirim')
-            ->assertSee($inspection->no_periksa);
+            ->assertSee($own->no_periksa)
+            ->assertDontSee($other->no_periksa);
+
+        $this->actingAs($staff)
+            ->get('/admin/work-inspections/' . $other->id)
+            ->assertNotFound();
+
+        $this->actingAs($staff)
+            ->get('/admin/work-inspections/' . $other->id . '/pdf')
+            ->assertNotFound();
     }
 
-    public function test_public_can_check_status_with_number_and_phone(): void
+    public function test_non_site_staff_and_other_roles_cannot_access(): void
     {
-        $this->post('/daftar-periksa', $this->payload());
-        $inspection = WorkInspection::firstOrFail();
+        $manager = $this->makeUser('manager', null);
+        $staffWithoutSite = $this->makeUser('staff', null);
+        $staffOtherSite = $this->makeUser('staff', 'Semarang');
 
-        $this->post('/cek-daftar-periksa', [
-            'no_periksa' => $inspection->no_periksa,
-            'telepon' => '08123456789',
-        ])
+        $this->actingAs($manager)->get('/admin/work-inspections')->assertForbidden();
+        $this->actingAs($staffWithoutSite)->get('/admin/work-inspections')->assertForbidden();
+        $this->actingAs($staffOtherSite)->get('/admin/work-inspections/create')->assertForbidden();
+    }
+
+    public function test_history_only_lists_completed_inspections(): void
+    {
+        $staff = $this->makeUser('staff', 'Madiun');
+        $approved = $this->makeInspection([
+            'no_periksa' => '001/DPIKBT/INKA/2026',
+            'status' => WorkInspection::STATUS_APPROVED,
+            'reviewed_at' => now(),
+        ]);
+        $pending = $this->makeInspection([
+            'no_periksa' => '002/DPIKBT/INKA/2026',
+            'status' => WorkInspection::STATUS_PENDING,
+        ]);
+
+        $this->actingAs($staff)
+            ->get('/admin/work-inspections/history')
             ->assertOk()
-            ->assertSee($inspection->no_periksa)
-            ->assertSee('Menunggu Verifikasi Staff HSE');
+            ->assertSee($approved->no_periksa)
+            ->assertDontSee($pending->no_periksa);
     }
 
-    public function test_wrong_phone_does_not_reveal_daftar_periksa(): void
+    public function test_legacy_pending_inspection_can_still_be_approved(): void
     {
-        $this->post('/daftar-periksa', $this->payload());
-        $inspection = WorkInspection::firstOrFail();
-
-        $this->post('/cek-daftar-periksa', [
-            'no_periksa' => $inspection->no_periksa,
-            'telepon' => '08999999999',
-        ])
-            ->assertSessionHasErrors('no_periksa')
-            ->assertDontSee($inspection->nama_pekerjaan);
-    }
-
-    public function test_staff_can_approve_daftar_periksa_with_signature(): void
-    {
-        $staff = User::factory()->create(['role' => 'staff', 'site' => 'Madiun']);
-        $inspection = $this->makeInspection();
+        $staff = $this->makeUser('staff', 'Madiun');
+        $inspection = $this->makeInspection(['status' => WorkInspection::STATUS_PENDING]);
 
         $this->actingAs($staff)
             ->post('/admin/work-inspections/' . $inspection->id . '/approve', [
-                'safety_officer_nama' => 'Staff HSE Madiun',
-                'tanda_tangan' => 'data:image/png;base64,abc',
+                'safety_officer_nama' => 'Safety Officer Madiun',
+                'tanda_tangan' => 'data:image/png;base64,staff',
             ])
             ->assertRedirect('/admin/work-inspections/' . $inspection->id);
 
@@ -85,76 +153,47 @@ class WorkInspectionTest extends TestCase
 
         $this->assertSame(WorkInspection::STATUS_APPROVED, $inspection->status);
         $this->assertSame($staff->id, $inspection->reviewed_by);
-        $this->assertSame('Staff HSE Madiun', $inspection->safety_officer_nama);
-        $this->assertSame('data:image/png;base64,abc', $inspection->staff_signature);
-        $this->assertNotNull($inspection->reviewed_at);
+        $this->assertSame('data:image/png;base64,staff', $inspection->staff_signature);
     }
 
-    public function test_staff_can_reject_daftar_periksa_with_reason(): void
+    public function test_staff_can_approve_permit_without_any_daftar_periksa(): void
     {
-        $staff = User::factory()->create(['role' => 'staff', 'site' => 'Madiun']);
-        $inspection = $this->makeInspection();
+        Mail::fake();
+
+        $staff = $this->makeUser('staff', 'Madiun');
+        $permit = Permit::create([
+            'no_permit' => 'WP-2026-' . strtoupper(bin2hex(random_bytes(4))),
+            'nama_pekerjaan' => 'Pekerjaan Pengelasan',
+            'kontraktor' => 'PT Contoh Kontraktor',
+            'lokasi' => 'Area Produksi',
+            'tipe' => 'Internal',
+            'site' => 'Madiun',
+            'divisi_pengaju' => 'Divisi Produksi',
+            'telepon' => '08123456789',
+        ]);
+
+        $permit->forceFill([
+            'status' => 'Review Staff',
+            'submitted_at' => now(),
+        ])->save();
+
+        $this->assertSame(0, WorkInspection::count());
 
         $this->actingAs($staff)
-            ->post('/admin/work-inspections/' . $inspection->id . '/reject', [
-                'rejection_reason' => 'APAR belum tersedia di lokasi.',
+            ->put('/admin/approvals/' . $permit->id, [
+                'tanda_tangan' => 'data:image/png;base64,staff',
             ])
-            ->assertRedirect('/admin/work-inspections/' . $inspection->id);
+            ->assertRedirect('/admin/approvals');
 
-        $inspection->refresh();
-
-        $this->assertSame(WorkInspection::STATUS_REJECTED, $inspection->status);
-        $this->assertSame('APAR belum tersedia di lokasi.', $inspection->rejection_reason);
-        $this->assertNull($inspection->staff_signature);
+        $this->assertSame('Review Manager', $permit->fresh()->status);
     }
 
-    public function test_manager_cannot_approve_daftar_periksa(): void
+    public function test_staff_can_view_and_download_pdf(): void
     {
-        $manager = User::factory()->create(['role' => 'manager']);
-        $inspection = $this->makeInspection();
-
-        $this->actingAs($manager)
-            ->post('/admin/work-inspections/' . $inspection->id . '/approve', [
-                'safety_officer_nama' => 'Manager HSE',
-                'tanda_tangan' => 'data:image/png;base64,abc',
-            ])
-            ->assertForbidden();
-
-        $this->assertSame(WorkInspection::STATUS_PENDING, $inspection->fresh()->status);
-    }
-
-    public function test_staff_index_only_shows_own_site(): void
-    {
-        $staff = User::factory()->create(['role' => 'staff', 'site' => 'Madiun']);
-        $own = $this->makeInspection('Menunggu Verifikasi', null, '001/DPIKBT/INKA/2026');
-
-        $other = $this->makeInspection('Menunggu Verifikasi', null, '002/DPIKBT/INKA/2026');
-        $other->update(['site' => 'Banyuwangi']);
-
-        $this->actingAs($staff)
-            ->get('/admin/work-inspections?status=Semua')
-            ->assertOk()
-            ->assertSee($own->no_periksa)
-            ->assertDontSee($other->no_periksa);
-    }
-
-    public function test_staff_from_another_site_cannot_view_daftar_periksa(): void
-    {
-        $staff = User::factory()->create(['role' => 'staff', 'site' => 'Banyuwangi']);
-        $inspection = $this->makeInspection();
-
-        $this->actingAs($staff)
-            ->get('/admin/work-inspections/' . $inspection->id)
-            ->assertNotFound();
-    }
-
-    public function test_staff_can_view_and_download_daftar_periksa_pdf(): void
-    {
-        $staff = User::factory()->create(['role' => 'staff', 'site' => 'Madiun']);
-        $inspection = $this->makeInspection(WorkInspection::STATUS_APPROVED, $staff->id);
-        $inspection->update([
-            'safety_officer_nama' => 'Staff HSE Madiun',
-            'staff_signature' => $this->fakeSignature(),
+        $staff = $this->makeUser('staff', 'Madiun');
+        $inspection = $this->makeInspection([
+            'no_periksa' => '001/DPIKBT/INKA/2026',
+            'status' => WorkInspection::STATUS_APPROVED,
         ]);
 
         $this->actingAs($staff)
@@ -168,193 +207,12 @@ class WorkInspectionTest extends TestCase
             ->assertDownload('Daftar-Periksa-001-DPIKBT-INKA-2026.pdf');
     }
 
-    public function test_staff_from_another_site_cannot_access_daftar_periksa_pdf(): void
+    private function makeUser(string $role, ?string $site): User
     {
-        $staff = User::factory()->create(['role' => 'staff', 'site' => 'Banyuwangi']);
-        $inspection = $this->makeInspection();
-
-        $this->actingAs($staff)
-            ->get('/admin/work-inspections/' . $inspection->id . '/pdf')
-            ->assertNotFound();
-
-        $this->actingAs($staff)
-            ->get('/admin/work-inspections/' . $inspection->id . '/pdf/download')
-            ->assertNotFound();
-    }
-
-    public function test_manager_can_access_daftar_periksa_pdf(): void
-    {
-        $manager = User::factory()->create(['role' => 'manager']);
-        $inspection = $this->makeInspection();
-
-        $this->actingAs($manager)
-            ->get('/admin/work-inspections/' . $inspection->id . '/pdf')
-            ->assertOk()
-            ->assertHeader('content-type', 'application/pdf');
-    }
-
-    public function test_permit_form_lists_approved_daftar_periksa(): void
-    {
-        $inspection = $this->makeInspection(WorkInspection::STATUS_APPROVED);
-
-        $this->get('/ajukan-permit')
-            ->assertOk()
-            ->assertSee('Daftar Periksa Izin Kerja')
-            ->assertSee($inspection->no_periksa);
-    }
-
-    public function test_permit_form_warns_when_no_approved_daftar_periksa(): void
-    {
-        $this->get('/ajukan-permit')
-            ->assertOk()
-            ->assertSee('Belum ada daftar periksa yang disetujui');
-    }
-
-    public function test_permit_can_be_submitted_without_daftar_periksa(): void
-    {
-        $this->post('/ajukan-permit', $this->permitPayload(null))
-            ->assertRedirect();
-
-        $permit = Permit::firstOrFail();
-
-        $this->assertNull($permit->work_inspection_id);
-        $this->assertSame(Permit::STATUS_WAITING_INSPECTION, $permit->status);
-        $this->assertNotNull($permit->submitted_at);
-    }
-
-    public function test_linked_daftar_periksa_advances_waiting_permit_after_staff_approval(): void
-    {
-        $staff = User::factory()->create(['role' => 'staff', 'site' => 'Madiun']);
-
-        $this->post('/ajukan-permit', $this->permitPayload(null))->assertRedirect();
-        $permit = Permit::firstOrFail();
-
-        $checklistUrl = URL::signedRoute('public.work-inspections.create-for-permit', ['permit' => $permit->id]);
-
-        $this->get($checklistUrl)
-            ->assertOk()
-            ->assertSee($permit->no_permit);
-
-        $this->post($checklistUrl, $this->payload())
-            ->assertRedirect();
-
-        $inspection = WorkInspection::firstOrFail();
-
-        $this->assertSame($permit->id, $inspection->requested_permit_id);
-        $this->assertSame(WorkInspection::STATUS_PENDING, $inspection->status);
-
-        $this->actingAs($staff)
-            ->post('/admin/work-inspections/' . $inspection->id . '/approve', [
-                'safety_officer_nama' => 'Staff HSE Madiun',
-                'tanda_tangan' => 'data:image/png;base64,abc',
-            ])
-            ->assertRedirect('/admin/work-inspections/' . $inspection->id);
-
-        $permit->refresh();
-
-        $this->assertSame(WorkInspection::STATUS_APPROVED, $inspection->fresh()->status);
-        $this->assertSame($inspection->id, $permit->work_inspection_id);
-        $this->assertSame('Review Staff', $permit->status);
-    }
-
-    public function test_divisi_submit_waits_for_daftar_periksa_and_shows_checklist_action(): void
-    {
-        $divisi = User::factory()->create(['role' => 'divisi']);
-
-        $this->actingAs($divisi)
-            ->post('/divisi/permits', [
-                'action' => 'submit',
-                'tipe' => 'Internal',
-                'site' => 'Madiun',
-                'nama_pekerjaan' => 'Perbaikan pipa steam',
-                'kontraktor' => 'PT Contoh Kontraktor',
-                'lokasi' => 'Area Produksi',
-                'tanda_tangan' => 'data:image/png;base64,abc',
-            ])
-            ->assertRedirect('/divisi/dashboard');
-
-        $permit = Permit::firstOrFail();
-
-        $this->assertSame($divisi->id, $permit->user_id);
-        $this->assertSame(Permit::STATUS_WAITING_INSPECTION, $permit->status);
-        $this->assertNull($permit->work_inspection_id);
-
-        $this->actingAs($divisi)
-            ->get('/divisi/permits/' . $permit->id)
-            ->assertOk()
-            ->assertSee('Menunggu Daftar Periksa')
-            ->assertSee('Buat Daftar Periksa');
-    }
-
-    public function test_staff_cannot_approve_permit_without_approved_daftar_periksa(): void
-    {
-        $staff = User::factory()->create(['role' => 'staff', 'site' => 'Madiun']);
-        $permit = Permit::create([
-            'no_permit' => 'WP-2026-ABCDEF12',
-            'divisi_pengaju' => 'Divisi Teknik',
-            'tipe' => 'Internal',
-            'site' => 'Madiun',
-            'nama_pekerjaan' => 'Perbaikan pipa steam',
-            'kontraktor' => 'PT Contoh Kontraktor',
-            'lokasi' => 'Area Produksi',
-            'telepon' => '08123456789',
+        return User::factory()->create([
+            'role' => $role,
+            'site' => $site,
         ]);
-        $permit->forceFill(['status' => 'Review Staff', 'submitted_at' => now()])->save();
-
-        $this->actingAs($staff)
-            ->put('/admin/approvals/' . $permit->id, [
-                'tanda_tangan' => 'data:image/png;base64,abc',
-            ])
-            ->assertRedirect('/admin/approvals/' . $permit->id)
-            ->assertSessionHas('error');
-
-        $this->assertSame('Review Staff', $permit->fresh()->status);
-    }
-
-    public function test_pending_daftar_periksa_cannot_be_used_for_permit(): void
-    {
-        $inspection = $this->makeInspection();
-
-        $this->post('/ajukan-permit', $this->permitPayload($inspection->id))
-            ->assertSessionHasErrors('work_inspection_id');
-
-        $this->assertDatabaseCount('permits', 0);
-    }
-
-    public function test_approved_daftar_periksa_can_be_used_for_permit(): void
-    {
-        $inspection = $this->makeInspection(WorkInspection::STATUS_APPROVED);
-
-        $this->post('/ajukan-permit', $this->permitPayload($inspection->id))
-            ->assertRedirect();
-
-        $permit = Permit::firstOrFail();
-
-        $this->assertSame($inspection->id, $permit->work_inspection_id);
-        $this->assertSame('Review Staff', $permit->status);
-    }
-
-    public function test_used_daftar_periksa_cannot_be_used_for_second_permit(): void
-    {
-        $staff = User::factory()->create(['role' => 'staff', 'site' => 'Madiun']);
-        $inspection = $this->makeInspection(WorkInspection::STATUS_APPROVED, $staff->id);
-
-        Permit::create([
-            'no_permit' => 'WP-2026-ABCDEF12',
-            'work_inspection_id' => $inspection->id,
-            'divisi_pengaju' => 'Divisi Teknik',
-            'tipe' => 'Internal',
-            'site' => 'Madiun',
-            'nama_pekerjaan' => 'Pekerjaan pertama',
-            'kontraktor' => 'PT Contoh Kontraktor',
-            'lokasi' => 'Area Produksi',
-            'status' => 'Review Staff',
-        ]);
-
-        $this->post('/ajukan-permit', $this->permitPayload($inspection->id))
-            ->assertSessionHasErrors('work_inspection_id');
-
-        $this->assertDatabaseCount('permits', 1);
     }
 
     private function payload(array $overrides = []): array
@@ -362,95 +220,54 @@ class WorkInspectionTest extends TestCase
         return array_merge([
             'divisi_pengaju' => 'Divisi Teknik',
             'tipe' => 'Internal',
-            'site' => 'Madiun',
-            'nama_pekerjaan' => 'Perbaikan pipa steam',
-            'kontraktor' => 'PT Contoh Kontraktor',
-            'jenis_peralatan' => 'Mesin las, pipa steam',
-            'lokasi' => 'Area Produksi',
-            'telepon' => '08123456789',
-            'tanggal_mulai' => '2026-10-25',
-            'answers' => [
-                'izin_lain' => '1',
-                'izin_lain_ket' => '',
-                'listrik_diputus' => '1',
-                'keran_ditutup' => '1',
-                'pipa_dikosongkan' => '1',
-                'tanda_bahaya' => '1',
-                'karyawan_diberitahu' => '1',
-                'alat_listrik_diputus' => '1',
-                'pipa_fluida_diputus' => '1',
-                'pipa_dikeringkan' => '1',
-                'energi_dilepas' => '1',
-                'tes_energi' => '1',
-                'masih_ada_aliran' => '0',
-                'supervisor_siap' => '1',
-                'apd_khusus' => '1',
-                'apd_khusus_ket' => 'Full body harness',
-                'perancah_baik' => '1',
-                'barikade' => '1',
-                'apar' => '1',
-                'evakuasi_diberitahu' => '1',
-                'safety_briefing' => '1',
-            ],
-            'loto_nama' => 'Budi',
-            'loto_tanggal' => '2026-10-25',
-            'loto_jam' => '08:00',
-            'tanda_tangan' => 'data:image/png;base64,abc',
-            'supervisor_nama' => 'Supervisor A',
-            'supervisor_tanggal' => '2026-10-25',
-            'supervisor_jam' => '08:30',
-        ], $overrides);
-    }
-
-    private function fakeSignature(): string
-    {
-        return 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
-    }
-
-    private function makeInspection(
-        string $status = WorkInspection::STATUS_PENDING,
-        ?int $reviewedBy = null,
-        string $noPeriksa = '001/DPIKBT/INKA/2026'
-    ): WorkInspection {
-        return WorkInspection::create([
-            'no_periksa' => $noPeriksa,
-            'site' => 'Madiun',
-            'tipe' => 'Internal',
-            'divisi_pengaju' => 'Divisi Teknik',
             'nama_pekerjaan' => 'Perbaikan pipa steam',
             'kontraktor' => 'PT Contoh Kontraktor',
             'jenis_peralatan' => 'Mesin las',
             'lokasi' => 'Area Produksi',
             'telepon' => '08123456789',
             'tanggal_mulai' => '2026-10-25',
-            'answers' => array_fill_keys(array_keys(WorkInspection::ANSWER_LABELS), true),
-            'loto_nama' => 'Budi',
+            'answers' => array_fill_keys(array_keys(WorkInspection::ANSWER_LABELS), '1') + [
+                'izin_lain_ket' => 'Izin panas',
+                'apd_khusus_ket' => 'Full body harness',
+            ],
+            'loto_nama' => 'Budi Santoso',
             'loto_tanggal' => '2026-10-25',
             'loto_jam' => '08:00',
-            'tanda_tangan' => $this->fakeSignature(),
-            'status' => $status,
-            'submitted_at' => now(),
-            'reviewed_by' => $reviewedBy,
-            'reviewed_at' => $status === WorkInspection::STATUS_PENDING ? null : now(),
-        ]);
+            'tanda_tangan' => 'data:image/png;base64,pelaksana',
+            'supervisor_nama' => 'Supervisor Produksi',
+            'supervisor_tanggal' => '2026-10-25',
+            'supervisor_jam' => '08:30',
+            'safety_officer_nama' => 'Safety Officer Madiun',
+            'staff_signature' => 'data:image/png;base64,staff',
+        ], $overrides);
     }
 
-    private function permitPayload(?int $inspectionId): array
+    private function makeInspection(array $attributes = []): WorkInspection
     {
-        return [
-            'work_inspection_id' => $inspectionId,
-            'divisi_pengaju' => 'Divisi Teknik',
-            'tipe' => 'Internal',
+        $inspection = WorkInspection::create([
+            'no_periksa' => 'DP-' . strtoupper(bin2hex(random_bytes(4))),
             'site' => 'Madiun',
+            'tipe' => 'Internal',
+            'divisi_pengaju' => 'Divisi Teknik',
             'nama_pekerjaan' => 'Perbaikan pipa steam',
             'kontraktor' => 'PT Contoh Kontraktor',
             'lokasi' => 'Area Produksi',
-            'penanggung_jawab' => 'Supervisor A',
             'telepon' => '08123456789',
             'tanggal_mulai' => '2026-10-25',
-            'tanggal_selesai' => '2026-10-26',
-            'klasifikasi_pekerjaan' => ['panas'],
-            'tanda_tangan' => 'data:image/png;base64,abc',
-        ];
+            'answers' => array_fill_keys(array_keys(WorkInspection::ANSWER_LABELS), true),
+            'loto_nama' => 'Budi Santoso',
+            'loto_tanggal' => '2026-10-25',
+            'loto_jam' => '08:00',
+            'tanda_tangan' => 'data:image/png;base64,pelaksana',
+            'safety_officer_nama' => 'Safety Officer Madiun',
+            'staff_signature' => 'data:image/png;base64,staff',
+            'status' => WorkInspection::STATUS_APPROVED,
+            'submitted_at' => now(),
+            'reviewed_at' => now(),
+        ]);
+
+        $inspection->forceFill($attributes)->save();
+
+        return $inspection->fresh();
     }
 }
