@@ -2,231 +2,431 @@
     <x-slot name="title">Buat Daftar Periksa</x-slot>
 
     @php
-        $forSite = $site;
+        $items = \App\Models\WorkInspection::ITEMS;
+        $options = \App\Models\WorkInspection::ANSWER_OPTIONS;
+        $today = now()->toDateString();
     @endphp
 
-    <div class="mb-5">
-        <a href="/admin/work-inspections" class="text-sm text-gray-500 hover:text-inka-navy">&larr; Kembali ke Daftar Periksa</a>
-        <p class="text-xs font-bold uppercase tracking-wider text-orange-500 mt-3">Form K3LH IV-01.013</p>
-        <h1 class="text-xl sm:text-2xl font-extrabold text-gray-800 mt-1">Daftar Periksa Izin Pekerjaan Berisiko Tinggi</h1>
-        <p class="text-sm text-gray-500 mt-1">
-            Diisi melalui dashboard Staff HSE site <span class="font-semibold text-gray-700">{{ $forSite }}</span>.
-            Tanda tangan pelaksana dan Safety Officer diambil pada satu perangkat yang sama.
-        </p>
-    </div>
-
-    <div class="mb-5 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-        Bila Daftar Periksa Izin Kerja telah dilakukan dengan baik, pekerjaan boleh dilanjutkan sesuai ketentuan HSE.
-    </div>
-
-    @if($errors->any())
-        <div class="mb-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-            <p class="font-semibold mb-1">Periksa kembali isian berikut:</p>
-            <ul class="list-disc pl-5 space-y-0.5">
-                @foreach($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
+    <div class="mx-auto max-w-5xl">
+        <div class="mb-5 flex items-center justify-between gap-3">
+            <a href="/admin/work-inspections" class="inline-flex items-center gap-1.5 text-sm font-semibold text-[#5b6b8c] hover:text-[#122040]">
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                Kembali ke Daftar Periksa
+            </a>
+            <span class="inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1.5 text-[11px] font-bold uppercase tracking-[.06em] text-[#1f9d8a] ring-1 ring-[#e4e7ef]">
+                <span class="h-1.5 w-1.5 rounded-full bg-[#1f9d8a]"></span>
+                Site {{ $site }}
+            </span>
         </div>
-    @endif
 
-    <form method="POST" action="/admin/work-inspections" id="inspection-form" class="space-y-5">
-        @csrf
-
-        {{-- DATA PEKERJAAN --}}
-        <section class="bg-white rounded-2xl border border-gray-100 shadow-sm">
-            <div class="px-4 sm:px-6 py-4 border-b border-gray-100">
-                <h2 class="text-base font-bold text-gray-800">1. Data Pekerjaan</h2>
-                <p class="text-xs text-gray-400 mt-0.5">Identitas pekerjaan yang akan dilakukan.</p>
-            </div>
-            <div class="px-4 sm:px-6 py-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-sm font-semibold text-gray-500 mb-1.5">Site</label>
-                    <p class="form-input bg-gray-50">{{ $forSite }}</p>
-                </div>
-                <div>
-                    <label class="block text-sm font-semibold text-gray-500 mb-1.5">Tipe Pekerjaan <span class="text-red-500">*</span></label>
-                    <select name="tipe" class="form-input" required>
-                        <option value="Internal" @selected(old('tipe') === 'Internal')>Internal</option>
-                        <option value="Eksternal" @selected(old('tipe') === 'Eksternal')>Eksternal (Kontraktor)</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-sm font-semibold text-gray-500 mb-1.5">Divisi / Unit Pengaju <span class="text-red-500">*</span></label>
-                    <input type="text" name="divisi_pengaju" value="{{ old('divisi_pengaju') }}" class="form-input" placeholder="Contoh: Divisi Teknik" required>
-                </div>
-                <div>
-                    <label class="block text-sm font-semibold text-gray-500 mb-1.5">Nama Kontraktor / Pelaksana <span class="text-red-500">*</span></label>
-                    <input type="text" name="kontraktor" value="{{ old('kontraktor') }}" class="form-input" placeholder="Nama perusahaan / pelaksana" required>
-                </div>
-                <div class="sm:col-span-2">
-                    <label class="block text-sm font-semibold text-gray-500 mb-1.5">Pekerjaan <span class="text-red-500">*</span></label>
-                    <input type="text" name="nama_pekerjaan" value="{{ old('nama_pekerjaan') }}" class="form-input" placeholder="Contoh: Perbaikan pipa steam di Area Produksi" required>
-                </div>
-                <div class="sm:col-span-2">
-                    <label class="block text-sm font-semibold text-gray-500 mb-1.5">Jenis Peralatan / Material</label>
-                    <input type="text" name="jenis_peralatan" value="{{ old('jenis_peralatan') }}" class="form-input" placeholder="Contoh: Mesin las, gerinda, pipa steam">
-                </div>
-                <div class="sm:col-span-2">
-                    <label class="block text-sm font-semibold text-gray-500 mb-1.5">Lokasi <span class="text-red-500">*</span></label>
-                    <input type="text" name="lokasi" value="{{ old('lokasi') }}" class="form-input" placeholder="Contoh: Area Produksi, Gedung B" required>
-                </div>
-                <div>
-                    <label class="block text-sm font-semibold text-gray-500 mb-1.5">No. Telepon <span class="text-red-500">*</span></label>
-                    <input type="text" name="telepon" value="{{ old('telepon') }}" class="form-input" placeholder="08xxxxxxxxxx" required>
-                </div>
-                <div>
-                    <label class="block text-sm font-semibold text-gray-500 mb-1.5">Mulai Tanggal <span class="text-red-500">*</span></label>
-                    <input type="date" name="tanggal_mulai" value="{{ old('tanggal_mulai') }}" class="form-input" required>
+        <div class="wi-hero relative mb-6 overflow-hidden rounded-[28px] px-6 py-8 text-white sm:px-10 sm:py-11">
+            <div class="relative z-10 max-w-3xl">
+                <p class="mb-3 inline-flex items-center gap-2 text-[11.5px] font-bold uppercase tracking-[.08em] text-[#f5a623]">
+                    <span class="h-px w-4 bg-[#f5a623]"></span>
+                    Form K3LH IV - Rev.0
+                </p>
+                <h1 class="text-[30px] font-extrabold leading-[1.15] tracking-[-.02em] sm:text-[40px]">
+                    Daftar Periksa Izin Pekerjaan Berisiko Tinggi
+                </h1>
+                <p class="mt-3 max-w-2xl text-[14.5px] leading-relaxed text-white/70">
+                    Diisi oleh Staff QM&amp;SHE site {{ $site }} sebelum pekerjaan berisiko tinggi dimulai.
+                    Pemeriksaan dan tanda tangan dilakukan pada satu perangkat yang sama.
+                </p>
+                <div class="mt-6 flex flex-wrap gap-2.5 text-[12px] font-semibold text-white/80">
+                    <span class="rounded-full bg-white/10 px-3.5 py-1.5 ring-1 ring-white/15">PT INKA (Persero)</span>
+                    <span class="rounded-full bg-white/10 px-3.5 py-1.5 ring-1 ring-white/15">QM&amp;SHE Banyuwangi</span>
+                    <span class="rounded-full bg-white/10 px-3.5 py-1.5 ring-1 ring-white/15">28 item pemeriksaan</span>
                 </div>
             </div>
-        </section>
+        </div>
 
-        {{-- BAGIAN A --}}
-        <section class="bg-white rounded-2xl border border-gray-100 shadow-sm">
-            <div class="px-4 sm:px-6 py-4 border-b border-gray-100">
-                <h2 class="text-base font-bold text-gray-800">2. Pemeriksaan Sumber Energi &amp; Area Kerja</h2>
-                <p class="text-xs text-gray-400 mt-0.5">Jawab YA atau TIDAK sesuai kondisi sebenarnya di lapangan.</p>
-            </div>
-            <div class="px-4 sm:px-6">
-                <x-yn-question field="izin_lain" label="Apakah ada izin lain yang telah dimintakan?" />
-                <div class="pb-4">
-                    <label class="block text-sm font-semibold text-gray-500 mb-1.5">Bila YA, izin apa yang telah dimintakan?</label>
-                    <input type="text" name="answers[izin_lain_ket]" value="{{ old('answers.izin_lain_ket') }}" class="form-input" placeholder="Jenis izin lain (opsional)">
-                </div>
+        <div class="mb-6 flex items-start gap-3 rounded-2xl border border-[#f0d090] bg-[#fdf1da] px-4 py-3.5 text-[13px] leading-relaxed text-[#8a5a12]">
+            <svg class="mt-0.5 h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
+            <p>Bila daftar periksa telah dilakukan dengan baik, pekerjaan boleh dilanjutkan sesuai ketentuan HSE. Item yang bernilai <span class="font-bold">NOK</span> wajib ditindaklanjuti sebelum pekerjaan dimulai.</p>
+        </div>
 
-                <x-yn-question field="listrik_diputus" label="Apakah telah dilakukan pemutusan aliran listrik?" hint="Bila TIDAK, harap lakukan pemutusan terlebih dahulu." />
-                <x-yn-question field="keran_ditutup" label="Apakah keran-keran telah ditutup dan pompa telah diputus aliran listriknya?" />
-                <x-yn-question field="pipa_dikosongkan" label="Apakah pipa yang mungkin masih berisi fluida berbahaya telah dikosongkan?" hint="Diisi bila jawaban pertanyaan sebelumnya YA." />
-                <x-yn-question field="tanda_bahaya" label="Apakah telah diberikan tanda &quot;BERBAHAYA ADA PERBAIKAN/ADA PEKERJAAN&quot;?" />
-                <x-yn-question field="karyawan_diberitahu" label="Apakah karyawan di sekitar area kerja telah diberitahu?" hint="Bila tanda belum dipasang, lakukan pemasangan terlebih dahulu." />
+        @if($errors->any())
+            <div class="mb-6 rounded-2xl border border-red-200 bg-red-50 px-5 py-4 text-sm text-red-700">
+                <p class="mb-1 font-bold">Periksa kembali isian berikut:</p>
+                <ul class="list-disc space-y-0.5 pl-5">
+                    @foreach($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
 
-                <div class="py-4 border-b border-gray-100">
-                    <p class="text-sm font-semibold text-gray-700 leading-relaxed">Pastikan hal berikut telah dilakukan:</p>
-                </div>
-                <x-yn-question field="alat_listrik_diputus" label="Seluruh alat yang digerakkan listrik telah diputus aliran listriknya." />
-                <x-yn-question field="pipa_fluida_diputus" label="Seluruh pipa masuk fluida yang tersambung telah diputus alirannya." />
-                <x-yn-question field="pipa_dikeringkan" label="Seluruh pipa telah dikeringkan dan tidak lagi mengandung fluida berbahaya." />
-                <x-yn-question field="energi_dilepas" label="Apakah energi yang tersisa di dalam peralatan atau mesin telah dihilangkan/dilepaskan?" hint="Bila TIDAK, lakukan pelepasan energi." />
-            </div>
-        </section>
+        <form method="POST" action="/admin/work-inspections" id="inspection-form" class="space-y-6">
+            @csrf
 
-        {{-- BAGIAN B --}}
-        <section class="bg-white rounded-2xl border border-gray-100 shadow-sm">
-            <div class="px-4 sm:px-6 py-4 border-b border-gray-100">
-                <h2 class="text-base font-bold text-gray-800">3. Pemeriksaan Lanjutan</h2>
-                <p class="text-xs text-gray-400 mt-0.5">Pemeriksaan APD, area kerja, dan kesiapan darurat.</p>
-            </div>
-            <div class="px-4 sm:px-6">
-                <x-yn-question field="tes_energi" label="Apakah dilakukan pengetesan bahwa energi tidak lagi tersisa atau telah dilepaskan?" />
-                <x-yn-question field="masih_ada_aliran" label="Apakah masih ada aliran listrik atau saluran lain yang berhubungan dengan mesin atau peralatan?" />
-                <x-yn-question field="supervisor_siap" label="Apakah Supervisor telah siap memeriksa bahwa tanda &quot;BERBAHAYA ADA PERBAIKAN/ADA PEKERJAAN&quot; tetap terpasang?" />
-                <x-yn-question field="apd_khusus" label="Apakah Alat Pelindung Diri khusus untuk pekerjaan ini telah tersedia dan siap dipakai?" />
-                <div class="pb-4">
-                    <label class="block text-sm font-semibold text-gray-500 mb-1.5">Sebutkan APD khusus yang digunakan</label>
-                    <input type="text" name="answers[apd_khusus_ket]" value="{{ old('answers.apd_khusus_ket') }}" class="form-input" placeholder="Contoh: full body harness, respirator, sarung tangan tahan panas">
-                </div>
-                <x-yn-question field="perancah_baik" label="Apakah semua perancah/penyangga/tangga telah terpasang dengan baik?" />
-                <x-yn-question field="barikade" label="Apakah telah terpasang barikade/pagar/police line di area kerja yang berbahaya?" />
-                <x-yn-question field="apar" label="Apakah telah disediakan APAR dan peralatan keadaan darurat lainnya di lokasi kerja?" />
-                <x-yn-question field="evakuasi_diberitahu" label="Apakah seluruh tenaga kerja sudah diberitahu jalur evakuasi, titik kumpul, dan sarana darurat lainnya?" />
-                <x-yn-question field="safety_briefing" label="Apakah seluruh tenaga kerja sudah dilakukan safety briefing?" />
-            </div>
-        </section>
-
-        {{-- BAGIAN C --}}
-        <section class="bg-white rounded-2xl border border-gray-100 shadow-sm">
-            <div class="px-4 sm:px-6 py-4 border-b border-gray-100">
-                <h2 class="text-base font-bold text-gray-800">4. LOTO &amp; Tanda Tangan</h2>
-                <p class="text-xs text-gray-400 mt-0.5">Lock Out &amp; Tag Out diisi oleh pelaksana pekerjaan.</p>
-            </div>
-            <div class="px-4 sm:px-6 py-5 space-y-4">
-                <div class="rounded-xl bg-gray-50 border border-gray-100 px-4 py-3 text-sm text-gray-600">
-                    "LOTO (Lock Out &amp; Tag Out)" telah diisi/dipasang dengan sebenarnya oleh:
-                </div>
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div class="sm:col-span-3">
-                        <label class="block text-sm font-semibold text-gray-500 mb-1.5">Nama Pelaksana LOTO <span class="text-red-500">*</span></label>
-                        <input type="text" name="loto_nama" value="{{ old('loto_nama') }}" class="form-input" placeholder="Nama lengkap" required>
-                    </div>
+            <section class="wi-card">
+                <div class="wi-card-head">
                     <div>
-                        <label class="block text-sm font-semibold text-gray-500 mb-1.5">Tanggal <span class="text-red-500">*</span></label>
-                        <input type="date" name="loto_tanggal" value="{{ old('loto_tanggal') }}" class="form-input" required>
+                        <p class="wi-eyebrow">Identitas Dokumen</p>
+                        <h2 class="wi-title">Data Pekerjaan</h2>
                     </div>
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-500 mb-1.5">Jam <span class="text-red-500">*</span></label>
-                        <input type="time" name="loto_jam" value="{{ old('loto_jam') }}" class="form-input" required>
-                    </div>
+                    <span class="wi-step">01</span>
                 </div>
 
-                <div>
-                    <div class="flex items-center justify-between mb-2">
-                        <label class="block text-sm font-semibold text-gray-500">Tanda Tangan Pelaksana / User <span class="text-red-500">*</span></label>
-                        <button type="button" onclick="clearSignature('pelaksana')" class="text-xs font-semibold text-gray-400 hover:text-red-500">Hapus</button>
-                    </div>
-                    <div id="signature-container-pelaksana" class="relative border-2 border-dashed border-gray-300 rounded-xl overflow-hidden bg-white cursor-crosshair w-full aspect-[3/1]">
-                        <canvas id="signature-canvas-pelaksana" class="block w-full h-full" style="touch-action: none;"></canvas>
-                        <span id="signature-placeholder-pelaksana" class="absolute inset-0 flex items-center justify-center text-sm text-gray-300 pointer-events-none select-none">Tanda tangan pelaksana di sini</span>
-                    </div>
-                    <input type="hidden" name="tanda_tangan" id="tanda-tangan-input">
-                    <p id="signature-error-pelaksana" class="text-sm text-red-500 mt-1.5 hidden">Tanda tangan pelaksana wajib diisi.</p>
-                </div>
-
-                <div class="rounded-xl bg-gray-50 border border-gray-100 px-4 py-3 text-sm text-gray-600 mt-2">
-                    Diperiksa kembali oleh Supervisor (opsional):
-                </div>
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div class="sm:col-span-3">
-                        <label class="block text-sm font-semibold text-gray-500 mb-1.5">Nama Supervisor</label>
-                        <input type="text" name="supervisor_nama" value="{{ old('supervisor_nama') }}" class="form-input" placeholder="Nama supervisor">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-500 mb-1.5">Tanggal</label>
-                        <input type="date" name="supervisor_tanggal" value="{{ old('supervisor_tanggal') }}" class="form-input">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-500 mb-1.5">Jam</label>
-                        <input type="time" name="supervisor_jam" value="{{ old('supervisor_jam') }}" class="form-input">
-                    </div>
-                </div>
-
-                <div class="border-t border-gray-100 pt-4">
-                    <p class="text-sm font-semibold text-gray-700 mb-3">Tanda Tangan Safety Officer</p>
-                    <div class="grid grid-cols-1 gap-4">
+                <div class="wi-card-body">
+                    <div class="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
                         <div>
-                            <label class="block text-sm font-semibold text-gray-500 mb-1.5">Nama Safety Officer <span class="text-red-500">*</span></label>
-                            <input type="text" name="safety_officer_nama" value="{{ old('safety_officer_nama', auth()->user()->name) }}" class="form-input" required>
+                            <label class="wi-label">No. Dokumen</label>
+                            <p class="wi-readonly">FORM K3LH IV - REV.0</p>
                         </div>
                         <div>
-                            <div class="flex items-center justify-between mb-2">
-                                <label class="block text-sm font-semibold text-gray-500">Tanda Tangan Safety Officer <span class="text-red-500">*</span></label>
-                                <button type="button" onclick="clearSignature('staff')" class="text-xs font-semibold text-gray-400 hover:text-red-500">Hapus</button>
-                            </div>
-                            <div id="signature-container-staff" class="relative border-2 border-dashed border-gray-300 rounded-xl overflow-hidden bg-white cursor-crosshair w-full aspect-[3/1]">
-                                <canvas id="signature-canvas-staff" class="block w-full h-full" style="touch-action: none;"></canvas>
-                                <span id="signature-placeholder-staff" class="absolute inset-0 flex items-center justify-center text-sm text-gray-300 pointer-events-none select-none">Tanda tangan Safety Officer di sini</span>
-                            </div>
-                            <input type="hidden" name="staff_signature" id="staff-signature-input">
-                            <p id="signature-error-staff" class="text-sm text-red-500 mt-1.5 hidden">Tanda tangan Safety Officer wajib diisi.</p>
+                            <label class="wi-label">Tgl. Terbit</label>
+                            <p class="wi-readonly">{{ \Illuminate\Support\Carbon::parse($today)->translatedFormat('d F Y') }}</p>
+                        </div>
+                        <div>
+                            <label class="wi-label">Hal</label>
+                            <p class="wi-readonly">1 dari 1</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                        <div class="sm:col-span-2">
+                            <label class="wi-label">Otorisasi</label>
+                            <input type="text" name="otorisasi" value="{{ old('otorisasi') }}" class="wi-input" placeholder="Nomor / nama otorisasi">
+                        </div>
+                        <div class="sm:col-span-2">
+                            <label class="wi-label">Pekerjaan <span class="text-red-500">*</span></label>
+                            <input type="text" name="nama_pekerjaan" value="{{ old('nama_pekerjaan') }}" class="wi-input @error('nama_pekerjaan') is-error @enderror" placeholder="Contoh: Perbaikan pipa steam di Area Produksi" required>
+                        </div>
+                        <div>
+                            <label class="wi-label">Peralatan</label>
+                            <input type="text" name="jenis_peralatan" value="{{ old('jenis_peralatan') }}" class="wi-input" placeholder="Contoh: Mesin las, gerinda">
+                        </div>
+                        <div>
+                            <label class="wi-label">Material</label>
+                            <input type="text" name="material" value="{{ old('material') }}" class="wi-input" placeholder="Contoh: Pipa steam, elektroda">
+                        </div>
+                        <div>
+                            <label class="wi-label">Lokasi <span class="text-red-500">*</span></label>
+                            <input type="text" name="lokasi" value="{{ old('lokasi') }}" class="wi-input @error('lokasi') is-error @enderror" placeholder="Contoh: Area Produksi, Gedung B" required>
+                        </div>
+                        <div>
+                            <label class="wi-label">Mulai tanggal <span class="text-red-500">*</span></label>
+                            <input type="date" name="tanggal_mulai" value="{{ old('tanggal_mulai', $today) }}" class="wi-input @error('tanggal_mulai') is-error @enderror" required>
+                        </div>
+                        <div class="sm:col-span-2">
+                            <label class="wi-label">Petugas pemeriksa <span class="text-red-500">*</span></label>
+                            <input type="text" name="petugas_pemeriksa" value="{{ old('petugas_pemeriksa', auth()->user()->name) }}" class="wi-input @error('petugas_pemeriksa') is-error @enderror" placeholder="Nama petugas yang melakukan pemeriksaan" required>
                         </div>
                     </div>
                 </div>
-            </div>
-        </section>
+            </section>
 
-        <div class="sticky bottom-0 -mx-4 px-4 py-3 bg-white/95 backdrop-blur border-t border-gray-100 sm:static sm:bg-transparent sm:border-0 sm:px-0 sm:py-0">
-            <button type="submit" class="w-full sm:w-auto sm:float-right inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-inka-navy text-white text-sm font-bold hover:opacity-90 transition-opacity">
-                Simpan Daftar Periksa
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-            </button>
-            <p class="text-xs text-gray-400 text-center sm:text-left mt-2 sm:mt-3 sm:clear-both">Daftar periksa langsung tersimpan setelah kedua tanda tangan diisi.</p>
-        </div>
-    </form>
+            <section class="wi-card">
+                <div class="wi-card-head">
+                    <div>
+                        <p class="wi-eyebrow">Pemeriksaan Lapangan</p>
+                        <h2 class="wi-title">Item Pengecekan</h2>
+                        <p class="mt-1 text-[12.5px] text-[#7a849d]">Pilih OK, NOK, atau N/A sesuai kondisi sebenarnya di lapangan.</p>
+                    </div>
+                    <span class="wi-step">02</span>
+                </div>
+
+                <div class="wi-card-body !p-0 sm:!p-0">
+                    <div class="hidden border-b border-[#eef1f7] bg-[#f8fafc] px-5 py-3 text-[11px] font-bold uppercase tracking-[.06em] text-[#7a849d] sm:grid sm:grid-cols-[52px_1fr_196px] sm:gap-4">
+                        <span>No.</span>
+                        <span>Item Pengecekan</span>
+                        <span class="text-center">Hasil</span>
+                    </div>
+
+                    <div class="divide-y divide-[#eef1f7]">
+                        @foreach($items as $key => $label)
+                            @php $selected = old('answers.' . $key); @endphp
+                            <div class="px-5 py-4 transition-colors hover:bg-[#fcfdff] sm:grid sm:grid-cols-[52px_1fr_196px] sm:items-center sm:gap-4 @error('answers.' . $key) bg-red-50/40 @enderror">
+                                <span class="mb-2 inline-flex h-6 min-w-6 items-center justify-center rounded-lg bg-[#f2f5fa] px-1.5 text-[11px] font-bold text-[#5b6b8c] sm:mb-0">{{ $loop->iteration }}</span>
+                                <p class="mb-3 text-[13.5px] leading-relaxed text-[#2a3247] sm:mb-0">{{ $label }}</p>
+                                <div class="flex items-center gap-1.5">
+                                    @foreach($options as $value => $optionLabel)
+                                        <label class="wi-option">
+                                            <input type="radio" name="answers[{{ $key }}]" value="{{ $value }}" @checked($selected === $value) required>
+                                            <span class="opt-{{ $value }}">{{ $optionLabel }}</span>
+                                        </label>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+
+                    <div class="flex flex-wrap gap-x-6 gap-y-2 border-t border-[#eef1f7] bg-[#f8fafc] px-5 py-3.5 text-[11.5px] font-semibold text-[#7a849d]">
+                        <span class="inline-flex items-center gap-2"><i class="h-2 w-2 rounded-full bg-[#1f9d8a]"></i>OK — sesuai standar</span>
+                        <span class="inline-flex items-center gap-2"><i class="h-2 w-2 rounded-full bg-[#dc5a4b]"></i>NOK — perlu tindak lanjut</span>
+                        <span class="inline-flex items-center gap-2"><i class="h-2 w-2 rounded-full bg-[#9aa6c1]"></i>N/A — tidak relevan</span>
+                    </div>
+                </div>
+            </section>
+
+            <section class="wi-card">
+                <div class="wi-card-head">
+                    <div>
+                        <p class="wi-eyebrow">Pengesahan</p>
+                        <h2 class="wi-title">Tanda Tangan</h2>
+                        <p class="mt-1 text-[12.5px] text-[#7a849d]">Ditandatangani oleh Manager dan Staff QM&amp;SHE pada perangkat yang sama.</p>
+                    </div>
+                    <span class="wi-step">03</span>
+                </div>
+
+                <div class="wi-card-body grid grid-cols-1 gap-7 sm:grid-cols-2">
+                    <div>
+                        <div class="mb-2 flex items-center justify-between gap-3">
+                            <label class="wi-label !mb-0">Mengetahui — Plt. Manager QM&amp;SHE {{ $site }} <span class="text-red-500">*</span></label>
+                            <button type="button" onclick="clearSignature('manager')" class="text-[11px] font-bold text-[#9aa6c1] hover:text-red-500">Hapus</button>
+                        </div>
+                        <input type="text" name="manager_nama" value="{{ old('manager_nama') }}" class="wi-input mb-3 @error('manager_nama') is-error @enderror" placeholder="Nama lengkap manager" required>
+                        <div id="signature-container-manager" class="wi-signature">
+                            <canvas id="signature-canvas-manager" class="block h-full w-full" style="touch-action: none;"></canvas>
+                            <span id="signature-placeholder-manager" class="wi-signature-placeholder">Tanda tangan manager di sini</span>
+                        </div>
+                        <input type="hidden" name="tanda_tangan" id="tanda-tangan-input">
+                        <p id="signature-error-manager" class="mt-1.5 hidden text-[12px] font-semibold text-red-500">Tanda tangan manager wajib diisi.</p>
+                    </div>
+
+                    <div>
+                        <div class="mb-2 flex items-center justify-between gap-3">
+                            <label class="wi-label !mb-0">Staff QM&amp;SHE {{ $site }} <span class="text-red-500">*</span></label>
+                            <button type="button" onclick="clearSignature('staff')" class="text-[11px] font-bold text-[#9aa6c1] hover:text-red-500">Hapus</button>
+                        </div>
+                        <p class="wi-readonly mb-3">{{ auth()->user()->name }}</p>
+                        <div id="signature-container-staff" class="wi-signature">
+                            <canvas id="signature-canvas-staff" class="block h-full w-full" style="touch-action: none;"></canvas>
+                            <span id="signature-placeholder-staff" class="wi-signature-placeholder">Tanda tangan staff di sini</span>
+                        </div>
+                        <input type="hidden" name="staff_signature" id="staff-signature-input">
+                        <p id="signature-error-staff" class="mt-1.5 hidden text-[12px] font-semibold text-red-500">Tanda tangan staff wajib diisi.</p>
+                    </div>
+                </div>
+            </section>
+
+            <div class="sticky bottom-0 z-20 -mx-4 border-t border-[#e4e7ef] bg-white/95 px-4 py-3 backdrop-blur sm:static sm:mx-0 sm:rounded-2xl sm:border sm:px-5 sm:py-4 sm:shadow-[0_18px_50px_-30px_rgba(13,21,38,.25)]">
+                <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <p class="text-[12px] leading-relaxed text-[#7a849d]">Daftar periksa langsung tersimpan setelah kedua tanda tangan diisi.</p>
+                    <button type="submit" class="inline-flex items-center justify-center gap-2 rounded-xl bg-[#122040] px-6 py-3 text-sm font-bold text-white transition hover:bg-[#0d1526]">
+                        Simpan Daftar Periksa
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <style>
+        .wi-hero {
+            background:
+                radial-gradient(1100px 360px at 12% -10%, rgba(245,166,35,.18), transparent 55%),
+                linear-gradient(135deg, #0d1526 0%, #122040 55%, #1a2c52 100%);
+        }
+
+        .wi-hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(255,255,255,.045) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,.045) 1px, transparent 1px);
+            background-size: 44px 44px;
+            mask-image: radial-gradient(ellipse 70% 70% at 50% 30%, #000 40%, transparent 90%);
+            -webkit-mask-image: radial-gradient(ellipse 70% 70% at 50% 30%, #000 40%, transparent 90%);
+            pointer-events: none;
+        }
+
+        .wi-card {
+            overflow: hidden;
+            border: 1px solid #e9edf5;
+            border-radius: 24px;
+            background: #fff;
+            box-shadow: 0 18px 50px -34px rgba(13,21,38,.35);
+        }
+
+        .wi-card-head {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 16px;
+            border-bottom: 1px solid #eef1f7;
+            padding: 22px 24px 18px;
+        }
+
+        .wi-card-body { padding: 24px; }
+
+        .wi-eyebrow {
+            margin-bottom: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+            color: #d9861a;
+        }
+
+        .wi-title {
+            font-size: 19px;
+            font-weight: 800;
+            letter-spacing: -.01em;
+            color: #141a2b;
+        }
+
+        .wi-step {
+            display: inline-flex;
+            height: 34px;
+            min-width: 34px;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: #f2f5fa;
+            font-size: 12px;
+            font-weight: 800;
+            color: #5b6b8c;
+        }
+
+        .wi-label {
+            display: block;
+            margin-bottom: 7px;
+            font-size: 12.5px;
+            font-weight: 600;
+            color: #4b5470;
+        }
+
+        .wi-input,
+        .wi-readonly {
+            display: block;
+            width: 100%;
+            min-height: 46px;
+            border: 1px solid #e4e7ef;
+            border-radius: 14px;
+            background: #fbfcfe;
+            padding: 11px 14px;
+            font-size: 14px;
+            line-height: 1.5;
+            color: #141a2b;
+            transition: border-color .15s ease, box-shadow .15s ease, background .15s ease;
+        }
+
+        .wi-readonly {
+            display: flex;
+            align-items: center;
+            background: #f6f8fc;
+            color: #5b6b8c;
+            font-weight: 600;
+        }
+
+        .wi-input::placeholder { color: #a7b1c9; }
+
+        .wi-input:focus {
+            outline: none;
+            border-color: #122040;
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(18,32,64,.08);
+        }
+
+        .wi-input.is-error {
+            border-color: #fca5a5;
+            background: #fff7f7;
+        }
+
+        .wi-input.is-error:focus {
+            border-color: #ef4444;
+            box-shadow: 0 0 0 3px rgba(239,68,68,.14);
+        }
+
+        .wi-option {
+            position: relative;
+            flex: 1 1 0;
+            min-width: 58px;
+            cursor: pointer;
+        }
+
+        .wi-option input {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .wi-option span {
+            display: flex;
+            height: 38px;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #e4e7ef;
+            border-radius: 10px;
+            background: #fff;
+            font-size: 11.5px;
+            font-weight: 700;
+            letter-spacing: .02em;
+            color: #7a849d;
+            transition: all .15s ease;
+        }
+
+        .wi-option:hover span { border-color: #c9d1e2; }
+
+        .wi-option input:focus-visible + span {
+            box-shadow: 0 0 0 3px rgba(245,166,35,.22);
+        }
+
+        .wi-option input:checked + .opt-ok {
+            border-color: #1f9d8a;
+            background: #e8f7f1;
+            color: #0f6b5d;
+        }
+
+        .wi-option input:checked + .opt-nok {
+            border-color: #dc5a4b;
+            background: #fdecea;
+            color: #b03a2e;
+        }
+
+        .wi-option input:checked + .opt-na {
+            border-color: #9aa6c1;
+            background: #eef1f7;
+            color: #4b5470;
+        }
+
+        .wi-signature {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 3 / 1;
+            overflow: hidden;
+            border: 1.5px dashed #c9d1e2;
+            border-radius: 16px;
+            background: #fbfcfe;
+            cursor: crosshair;
+            transition: border-color .15s ease, background .15s ease;
+        }
+
+        .wi-signature:hover {
+            border-color: #9aa6c1;
+            background: #fff;
+        }
+
+        .wi-signature-placeholder {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px;
+            text-align: center;
+            font-size: 12.5px;
+            font-weight: 600;
+            color: #b6bfd2;
+            pointer-events: none;
+            user-select: none;
+        }
+
+        @media (max-width: 639px) {
+            .wi-card-head { padding: 18px 18px 16px; }
+            .wi-card-body { padding: 18px; }
+        }
+    </style>
 
     <script>
         (function () {
             const forms = [
-                { key: 'pelaksana', input: 'tanda-tangan-input' },
+                { key: 'manager', input: 'tanda-tangan-input' },
                 { key: 'staff', input: 'staff-signature-input' },
             ];
 
@@ -253,7 +453,7 @@
                     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
                     ctx.fillStyle = '#ffffff';
                     ctx.fillRect(0, 0, rect.width, rect.height);
-                    ctx.strokeStyle = '#111d33';
+                    ctx.strokeStyle = '#122040';
                     ctx.lineWidth = 2;
                     ctx.lineCap = 'round';
                     ctx.lineJoin = 'round';
@@ -275,6 +475,7 @@
                     drawing = true;
                     hasDrawn = true;
                     placeholder.classList.add('hidden');
+                    error.classList.add('hidden');
                     const p = position(e);
                     ctx.beginPath();
                     ctx.moveTo(p.x, p.y);
@@ -311,7 +512,7 @@
                         const rect = container.getBoundingClientRect();
                         ctx.fillStyle = '#ffffff';
                         ctx.fillRect(0, 0, rect.width, rect.height);
-                        ctx.strokeStyle = '#111d33';
+                        ctx.strokeStyle = '#122040';
                         ctx.lineWidth = 2;
                         ctx.lineCap = 'round';
                         ctx.lineJoin = 'round';
@@ -329,7 +530,7 @@
             };
 
             document.getElementById('inspection-form').addEventListener('submit', function (e) {
-                ['pelaksana', 'staff'].forEach(function (key) {
+                ['manager', 'staff'].forEach(function (key) {
                     if (!signatures[key].hasDrawn()) {
                         e.preventDefault();
                         signatures[key].showError();

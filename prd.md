@@ -98,13 +98,12 @@ Review Staff/Manager → (revise + catatan) → Revision → (divisi edit+submit
 Fitur ini **terpisah dari Safety Permit** dan **hanya dapat diakses Staff HSE** site Madiun / Banyuwangi melalui dashboard (`role:staff`). Tidak ada akses publik.
 
 #### Form Dashboard (`/admin/work-inspections/create`)
+- Mengikuti form resmi **K3LH IV - Rev.0 Daftar Periksa Izin Pekerjaan Berisiko Tinggi PT INKA Banyuwangi**.
 - Staff membuka form di dashboard, site otomatis mengikuti `users.site` (tidak dapat diubah dari form).
-- Isian:
-  - Data pekerjaan (divisi, tipe, nama pekerjaan, kontraktor, peralatan, lokasi, telepon, tanggal mulai)
-  - 19 pertanyaan checklist YA/TIDAK (Bagian A: 10 soal + Bagian B: 9 soal)
-  - LOTO (Lock Out & Tag Out): nama pelaksana, tanggal, jam
-  - Supervisor (opsional)
-- Tanda tangan diambil pada **satu perangkat di site**: pelaksana/user menandatangani (`tanda_tangan`), lalu staff menandatangani sebagai Safety Officer (`staff_signature`).
+- Header dokumen: No. Dokumen `FORM K3LH IV - Rev.0`, Tgl. Terbit (otomatis), Hal `1 dari 1`, serta Otorisasi.
+- Isian: Pekerjaan, Peralatan, Material, Lokasi, Mulai tanggal, dan Petugas pemeriksa.
+- 28 item pengecekan dengan pilihan **OK / NOK / N/A** (bukan YA/TIDAK).
+- Tanda tangan diambil pada **satu perangkat di site**: Plt. Manager QM&SHE Banyuwangi menandatangani (`tanda_tangan`), lalu Staff QM&SHE Banyuwangi menandatangani (`staff_signature`). Nama staff otomatis dari akun yang login.
 - Nomor: `XXX/DPIKBT/INKA/<tahun>`
 - Setelah submit, daftar periksa langsung final berstatus `Disetujui` (kedua tanda tangan wajib terisi).
 
@@ -113,7 +112,7 @@ Fitur ini **terpisah dari Safety Permit** dan **hanya dapat diakses Staff HSE** 
 - Manager / staff site lain / staff tanpa site ditolak (403).
 - Status: `Menunggu Verifikasi` (warisan data lama), `Disetujui`, `Ditolak`.
 - Route approve/reject hanya dipertahankan untuk memproses data lama yang masih `Menunggu Verifikasi`.
-- PDF (`/admin/work-inspections/{id}/pdf`) berisi data pekerjaan, checklist, LOTO, tanda tangan pelaksana & Safety Officer.
+- PDF (`/admin/work-inspections/{id}/pdf`) berisi data pekerjaan, 28 item pengecekan OK/NOK/N/A, dan tanda tangan Plt. Manager QM&SHE serta Staff QM&SHE.
 
 ### 4.4 Data Kontraktor (`/data-kontraktor`)
 

@@ -70,7 +70,7 @@ class AdminDashboardTest extends TestCase
             'lokasi' => 'Area Produksi',
             'telepon' => '08123456789',
             'tanggal_mulai' => '2026-10-25',
-            'answers' => array_fill_keys(array_keys(WorkInspection::ANSWER_LABELS), true),
+            'answers' => array_fill_keys(array_keys(WorkInspection::ITEMS), 'ok'),
             'tanda_tangan' => 'data:image/png;base64,abc',
             'status' => WorkInspection::STATUS_PENDING,
             'submitted_at' => now(),

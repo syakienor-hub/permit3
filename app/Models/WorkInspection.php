@@ -12,39 +12,59 @@ class WorkInspection extends Model
 
     public const SITES = ['Madiun', 'Banyuwangi'];
 
-    public const ANSWER_LABELS = [
-        'izin_lain' => 'Apakah ada izin lain yang telah dimintakan?',
-        'listrik_diputus' => 'Apakah telah dilakukan pemutusan aliran listrik?',
-        'keran_ditutup' => 'Apakah keran-keran telah ditutup dan pompa diputus aliran listriknya?',
-        'pipa_dikosongkan' => 'Apakah pipa yang masih berisi fluida berbahaya telah dikosongkan?',
-        'tanda_bahaya' => 'Apakah telah diberikan tanda "BERBAHAYA ADA PERBAIKAN/ADA PEKERJAAN"?',
-        'karyawan_diberitahu' => 'Apakah karyawan di sekitar telah diberitahu?',
-        'alat_listrik_diputus' => 'Seluruh alat yang digerakkan listrik telah diputus aliran listrik.',
-        'pipa_fluida_diputus' => 'Seluruh pipa masuk fluida yang tersambung telah diputus alirannya.',
-        'pipa_dikeringkan' => 'Seluruh pipa telah dikeringkan dan tidak lagi mengandung fluida berbahaya.',
-        'energi_dilepas' => 'Apakah energi yang tersisa di peralatan/mesin telah dihilangkan atau dilepaskan?',
-        'tes_energi' => 'Apakah dilakukan pengetesan bahwa energi tidak lagi tersisa?',
-        'masih_ada_aliran' => 'Apakah masih ada aliran listrik atau saluran lain yang berhubungan dengan mesin/peralatan?',
-        'supervisor_siap' => 'Apakah Supervisor siap memeriksa tanda bahaya tetap terpasang?',
-        'apd_khusus' => 'Apakah APD khusus untuk pekerjaan ini telah tersedia dan siap dipakai?',
-        'perancah_baik' => 'Apakah semua perancah/penyangga/tangga telah terpasang dengan baik?',
-        'barikade' => 'Apakah telah terpasang barikade/pagar/police line di area kerja?',
-        'apar' => 'Apakah telah disediakan APAR dan peralatan darurat lainnya?',
-        'evakuasi_diberitahu' => 'Apakah seluruh tenaga kerja diberitahu jalur evakuasi dan titik kumpul?',
-        'safety_briefing' => 'Apakah seluruh tenaga kerja telah dilakukan safety briefing?',
+    /** Item resmi Form K3LH IV-01.013 Rev. 0 (QM&SHE Banyuwangi). */
+    public const ITEMS = [
+        'jalur_akses' => 'Terdapat jalur akses aman dan bebas halangan ke lokasi pekerjaan.',
+        'jalur_evakuasi' => 'Jalur evakuasi dan akses keluar aman dan tidak terhalang.',
+        'pencahayaan' => 'Lokasi memiliki pencahayaan yang cukup untuk pekerjaan.',
+        'barikade' => 'Telah terpasang barikade/pagar/safety line di area kerja.',
+        'tanda_bahaya' => 'Area kerja ditandai dengan jelas (BERBAHAYA ADA PERBAIKAN/ADA PEKERJAAN).',
+        'apd' => 'Semua personel memiliki akses ke alat pelindung diri (APD) yang sesuai.',
+        'safety_briefing' => 'Semua tenaga kerja sudah menerima safety briefing.',
+        'area_bersih' => 'Area kerja bersih dari material atau objek yang dapat menimbulkan kebakaran.',
+        'penutup_tahan_api' => 'Tersedia penutup tahan api untuk bahan mudah terbakar yang tidak dapat dipindahkan.',
+        'apar_p3k' => 'APAR, P3K dan peralatan keadaan darurat lainnya telah tersedia di lokasi kerja.',
+        'ventilasi' => 'Sistem ventilasi diaktifkan jika bekerja di ruang tertutup untuk mencegah penumpukan gas berbahaya.',
+        'alat_potong' => 'Alat pemotong atau pengelasan telah diperiksa dan berfungsi dengan baik.',
+        'pengosongan_pipa' => 'Dilakukan pengosongan pipa yang mungkin masih berisi fluida/gas berbahaya.',
+        'utilitas_bawah_tanah' => 'Pemetaan / penandaan keberadaan utilitas bawah tanah (kabel listrik, pipa gas, dsb.).',
+        'tanah_stabil' => 'Tanah di lokasi kerja stabil dan tidak menunjukkan risiko longsor.',
+        'penopang_galian' => 'Sistem penopang atau pengaman dinding galian.',
+        'alat_berat' => 'Alat berat yang digunakan telah diperiksa dan dalam kondisi baik.',
+        'tanda_radiasi' => 'Terdapat tanda bahaya radiasi yang jelas.',
+        'monitor_radiasi' => 'Tersedia peralatan monitor radiasi yang berfungsi dengan baik dan telah dikalibrasi.',
+        'perisai_radiasi' => 'Perisai radiasi (shielding) dipasang untuk meminimalkan eksposur.',
+        'pengujian_atmosfer' => 'Pengujian atmosfer dilakukan untuk memeriksa kadar oksigen, gas beracun, dan gas mudah terbakar.',
+        'pengawas_luar' => 'Terdapat pengawas luar ditugaskan dan siaga sepanjang pekerjaan berlangsung.',
+        'komunikasi_dua_arah' => 'Sistem komunikasi dua arah antara pekerja dan pengawas berfungsi.',
+        'pemutusan_listrik' => 'Telah dilakukan pemutusan aliran listrik.',
+        'verifikasi_bebas_tegangan' => 'Verifikasi bebas tegangan dilakukan (pada mesin, alat, dan instalasi kelistrikan) sebelum pekerjaan dimulai.',
+        'zona_tegangan_tinggi' => 'Area kerja diberi tanda "Zona Tegangan Tinggi" atau serupa.',
+        'isolasi_listrik' => 'Peralatan listrik yang digunakan memiliki isolasi standar.',
+        'lockout_tagout' => 'Sistem lockout/tagout diterapkan.',
+    ];
+
+    public const ANSWER_OPTIONS = [
+        'ok' => 'OK',
+        'nok' => 'NOK',
+        'na' => 'N/A',
     ];
 
     protected $fillable = [
         'no_periksa',
+        'tanggal_terbit',
         'site',
+        'otorisasi',
         'tipe',
         'divisi_pengaju',
         'nama_pekerjaan',
         'kontraktor',
         'jenis_peralatan',
+        'material',
         'lokasi',
         'telepon',
         'tanggal_mulai',
+        'petugas_pemeriksa',
         'answers',
         'loto_nama',
         'loto_tanggal',
@@ -54,6 +74,7 @@ class WorkInspection extends Model
         'supervisor_tanggal',
         'supervisor_jam',
         'safety_officer_nama',
+        'manager_nama',
         'staff_signature',
         'status',
         'submitted_at',
@@ -63,6 +84,7 @@ class WorkInspection extends Model
     ];
 
     protected $casts = [
+        'tanggal_terbit' => 'date',
         'tanggal_mulai' => 'date',
         'loto_tanggal' => 'date',
         'supervisor_tanggal' => 'date',
@@ -101,10 +123,21 @@ class WorkInspection extends Model
         return $query;
     }
 
-    public function answer(string $key): ?bool
+    public function answer(string $key): ?string
     {
         $value = $this->answers[$key] ?? null;
 
-        return $value === null ? null : (bool) $value;
+        if (is_bool($value)) {
+            return $value ? 'ok' : 'nok';
+        }
+
+        return in_array($value, array_keys(self::ANSWER_OPTIONS), true) ? $value : null;
+    }
+
+    public function answerLabel(string $key): ?string
+    {
+        $value = $this->answer($key);
+
+        return $value ? self::ANSWER_OPTIONS[$value] : null;
     }
 }

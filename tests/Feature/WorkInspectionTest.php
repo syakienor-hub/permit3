@@ -35,8 +35,9 @@ class WorkInspectionTest extends TestCase
             ->assertOk()
             ->assertSee('Daftar Periksa Izin Pekerjaan Berisiko Tinggi')
             ->assertSee('Madiun')
-            ->assertSee('Tanda Tangan Pelaksana')
-            ->assertSee('Tanda Tangan Safety Officer');
+            ->assertSee('Mengetahui')
+            ->assertSee('Staff QM&SHE Madiun')
+            ->assertSee('Item Pengecekan');
     }
 
     public function test_staff_can_store_completed_inspection_with_both_signatures(): void
@@ -54,9 +55,12 @@ class WorkInspectionTest extends TestCase
         $this->assertSame($staff->id, $inspection->reviewed_by);
         $this->assertNotNull($inspection->submitted_at);
         $this->assertNotNull($inspection->reviewed_at);
-        $this->assertSame('data:image/png;base64,pelaksana', $inspection->tanda_tangan);
+        $this->assertSame('data:image/png;base64,manager', $inspection->tanda_tangan);
         $this->assertSame('data:image/png;base64,staff', $inspection->staff_signature);
-        $this->assertTrue($inspection->answer('listrik_diputus'));
+        $this->assertSame('ok', $inspection->answer('pemutusan_listrik'));
+        $this->assertSame('Plt. Manager QM&SHE', $inspection->manager_nama);
+        $this->assertSame('Petugas HSE Madiun', $inspection->petugas_pemeriksa);
+        $this->assertSame($staff->name, $inspection->safety_officer_nama);
         $this->assertStringStartsWith('001/DPIKBT/INKA/', $inspection->no_periksa);
     }
 
@@ -81,6 +85,29 @@ class WorkInspectionTest extends TestCase
                 'staff_signature' => '',
             ]))
             ->assertSessionHasErrors(['tanda_tangan', 'staff_signature']);
+
+        $this->assertSame(0, WorkInspection::count());
+    }
+
+    public function test_store_requires_every_official_item_with_valid_option(): void
+    {
+        $staff = $this->makeUser('staff', 'Madiun');
+
+        $answers = array_fill_keys(array_keys(WorkInspection::ITEMS), 'ok');
+        unset($answers['jalur_akses']);
+
+        $this->actingAs($staff)
+            ->post('/admin/work-inspections', $this->payload(['answers' => $answers]))
+            ->assertSessionHasErrors('answers.jalur_akses');
+
+        $this->assertSame(0, WorkInspection::count());
+
+        $invalid = array_fill_keys(array_keys(WorkInspection::ITEMS), 'ok');
+        $invalid['jalur_akses'] = 'ya';
+
+        $this->actingAs($staff)
+            ->post('/admin/work-inspections', $this->payload(['answers' => $invalid]))
+            ->assertSessionHasErrors('answers.jalur_akses');
 
         $this->assertSame(0, WorkInspection::count());
     }
@@ -218,26 +245,16 @@ class WorkInspectionTest extends TestCase
     private function payload(array $overrides = []): array
     {
         return array_merge([
-            'divisi_pengaju' => 'Divisi Teknik',
-            'tipe' => 'Internal',
+            'otorisasi' => 'QM&SHE/BWI/2026',
             'nama_pekerjaan' => 'Perbaikan pipa steam',
-            'kontraktor' => 'PT Contoh Kontraktor',
             'jenis_peralatan' => 'Mesin las',
+            'material' => 'Pipa steam',
             'lokasi' => 'Area Produksi',
-            'telepon' => '08123456789',
             'tanggal_mulai' => '2026-10-25',
-            'answers' => array_fill_keys(array_keys(WorkInspection::ANSWER_LABELS), '1') + [
-                'izin_lain_ket' => 'Izin panas',
-                'apd_khusus_ket' => 'Full body harness',
-            ],
-            'loto_nama' => 'Budi Santoso',
-            'loto_tanggal' => '2026-10-25',
-            'loto_jam' => '08:00',
-            'tanda_tangan' => 'data:image/png;base64,pelaksana',
-            'supervisor_nama' => 'Supervisor Produksi',
-            'supervisor_tanggal' => '2026-10-25',
-            'supervisor_jam' => '08:30',
-            'safety_officer_nama' => 'Safety Officer Madiun',
+            'petugas_pemeriksa' => 'Petugas HSE Madiun',
+            'answers' => array_fill_keys(array_keys(WorkInspection::ITEMS), 'ok'),
+            'manager_nama' => 'Plt. Manager QM&SHE',
+            'tanda_tangan' => 'data:image/png;base64,manager',
             'staff_signature' => 'data:image/png;base64,staff',
         ], $overrides);
     }
@@ -254,12 +271,11 @@ class WorkInspectionTest extends TestCase
             'lokasi' => 'Area Produksi',
             'telepon' => '08123456789',
             'tanggal_mulai' => '2026-10-25',
-            'answers' => array_fill_keys(array_keys(WorkInspection::ANSWER_LABELS), true),
-            'loto_nama' => 'Budi Santoso',
-            'loto_tanggal' => '2026-10-25',
-            'loto_jam' => '08:00',
-            'tanda_tangan' => 'data:image/png;base64,pelaksana',
+            'petugas_pemeriksa' => 'Petugas HSE Madiun',
+            'answers' => array_fill_keys(array_keys(WorkInspection::ITEMS), 'ok'),
+            'tanda_tangan' => 'data:image/png;base64,manager',
             'safety_officer_nama' => 'Safety Officer Madiun',
+            'manager_nama' => 'Plt. Manager QM&SHE',
             'staff_signature' => 'data:image/png;base64,staff',
             'status' => WorkInspection::STATUS_APPROVED,
             'submitted_at' => now(),

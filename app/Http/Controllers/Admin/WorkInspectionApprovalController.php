@@ -65,56 +65,30 @@ class WorkInspectionApprovalController extends Controller
     {
         $site = $this->authorizeSite();
 
-        $validated = $request->validate([
-            'divisi_pengaju' => 'required|string|max:255',
-            'tipe' => 'required|in:Internal,Eksternal',
+        $rules = [
+            'otorisasi' => 'nullable|string|max:255',
             'nama_pekerjaan' => 'required|string|max:255',
-            'kontraktor' => 'required|string|max:255',
             'jenis_peralatan' => 'nullable|string|max:255',
+            'material' => 'nullable|string|max:255',
             'lokasi' => 'required|string|max:255',
-            'telepon' => 'required|string|max:50',
             'tanggal_mulai' => 'required|date',
-            'answers' => 'required|array',
-            'answers.izin_lain' => 'required|boolean',
-            'answers.izin_lain_ket' => 'nullable|string|max:500',
-            'answers.listrik_diputus' => 'required|boolean',
-            'answers.keran_ditutup' => 'required|boolean',
-            'answers.pipa_dikosongkan' => 'required|boolean',
-            'answers.tanda_bahaya' => 'required|boolean',
-            'answers.karyawan_diberitahu' => 'required|boolean',
-            'answers.alat_listrik_diputus' => 'required|boolean',
-            'answers.pipa_fluida_diputus' => 'required|boolean',
-            'answers.pipa_dikeringkan' => 'required|boolean',
-            'answers.energi_dilepas' => 'required|boolean',
-            'answers.tes_energi' => 'required|boolean',
-            'answers.masih_ada_aliran' => 'required|boolean',
-            'answers.supervisor_siap' => 'required|boolean',
-            'answers.apd_khusus' => 'required|boolean',
-            'answers.apd_khusus_ket' => 'nullable|string|max:500',
-            'answers.perancah_baik' => 'required|boolean',
-            'answers.barikade' => 'required|boolean',
-            'answers.apar' => 'required|boolean',
-            'answers.evakuasi_diberitahu' => 'required|boolean',
-            'answers.safety_briefing' => 'required|boolean',
-            'loto_nama' => 'required|string|max:255',
-            'loto_tanggal' => 'required|date',
-            'loto_jam' => 'required|date_format:H:i',
+            'petugas_pemeriksa' => 'required|string|max:255',
+            'manager_nama' => 'required|string|max:255',
             'tanda_tangan' => 'required|string',
-            'supervisor_nama' => 'nullable|string|max:255',
-            'supervisor_tanggal' => 'nullable|date',
-            'supervisor_jam' => 'nullable|date_format:H:i',
-            'safety_officer_nama' => 'required|string|max:255',
             'staff_signature' => 'required|string',
-        ]);
+        ];
+
+        foreach (array_keys(WorkInspection::ITEMS) as $key) {
+            $rules['answers.' . $key] = 'required|in:ok,nok,na';
+        }
+
+        $validated = $request->validate($rules);
 
         $answers = [];
 
-        foreach (array_keys(WorkInspection::ANSWER_LABELS) as $key) {
-            $answers[$key] = $request->boolean('answers.' . $key);
+        foreach (array_keys(WorkInspection::ITEMS) as $key) {
+            $answers[$key] = $validated['answers'][$key];
         }
-
-        $answers['izin_lain_ket'] = $validated['answers']['izin_lain_ket'] ?? null;
-        $answers['apd_khusus_ket'] = $validated['answers']['apd_khusus_ket'] ?? null;
 
         $inspection = DB::transaction(function () use ($validated, $answers, $site) {
             $year = date('Y');
@@ -122,24 +96,23 @@ class WorkInspectionApprovalController extends Controller
 
             return WorkInspection::create([
                 'no_periksa' => sprintf('%03d/DPIKBT/INKA/%d', $sequence, $year),
+                'tanggal_terbit' => now()->toDateString(),
                 'site' => $site,
-                'tipe' => $validated['tipe'],
-                'divisi_pengaju' => $validated['divisi_pengaju'],
+                'otorisasi' => $validated['otorisasi'] ?? null,
+                'tipe' => 'Internal',
+                'divisi_pengaju' => 'QM&SHE',
                 'nama_pekerjaan' => $validated['nama_pekerjaan'],
-                'kontraktor' => $validated['kontraktor'],
+                'kontraktor' => 'PT INKA (Persero)',
                 'jenis_peralatan' => $validated['jenis_peralatan'] ?? null,
+                'material' => $validated['material'] ?? null,
                 'lokasi' => $validated['lokasi'],
-                'telepon' => $validated['telepon'],
+                'telepon' => '-',
                 'tanggal_mulai' => $validated['tanggal_mulai'],
+                'petugas_pemeriksa' => $validated['petugas_pemeriksa'],
                 'answers' => $answers,
-                'loto_nama' => $validated['loto_nama'],
-                'loto_tanggal' => $validated['loto_tanggal'],
-                'loto_jam' => $validated['loto_jam'],
                 'tanda_tangan' => $validated['tanda_tangan'],
-                'supervisor_nama' => $validated['supervisor_nama'] ?? null,
-                'supervisor_tanggal' => $validated['supervisor_tanggal'] ?? null,
-                'supervisor_jam' => $validated['supervisor_jam'] ?? null,
-                'safety_officer_nama' => $validated['safety_officer_nama'],
+                'safety_officer_nama' => Auth::user()->name,
+                'manager_nama' => $validated['manager_nama'],
                 'staff_signature' => $validated['staff_signature'],
                 'status' => WorkInspection::STATUS_APPROVED,
                 'submitted_at' => now(),
