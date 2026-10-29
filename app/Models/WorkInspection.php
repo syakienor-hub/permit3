@@ -7,12 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 class WorkInspection extends Model
 {
     public const STATUS_PENDING = 'Menunggu Verifikasi';
+    public const STATUS_REVIEW_MANAGER = 'Review Manager';
     public const STATUS_APPROVED = 'Disetujui';
     public const STATUS_REJECTED = 'Ditolak';
 
     public const SITES = ['Madiun', 'Banyuwangi'];
 
-    /** Item resmi Form K3LH IV-01.013 Rev. 0 (QM&SHE Banyuwangi). */
+    /** Item resmi Form K3LH IV - Rev.0 (HSE PT INKA). */
     public const ITEMS = [
         'jalur_akses' => 'Terdapat jalur akses aman dan bebas halangan ke lokasi pekerjaan.',
         'jalur_evakuasi' => 'Jalur evakuasi dan akses keluar aman dan tidak terhalang.',
@@ -139,5 +140,16 @@ class WorkInspection extends Model
         $value = $this->answer($key);
 
         return $value ? self::ANSWER_OPTIONS[$value] : null;
+    }
+
+    public static function statusLabel(?string $status): string
+    {
+        return match ($status) {
+            self::STATUS_PENDING => 'Menunggu Verifikasi',
+            self::STATUS_REVIEW_MANAGER => 'Menunggu Manager HSE',
+            self::STATUS_APPROVED => 'Disetujui',
+            self::STATUS_REJECTED => 'Ditolak',
+            default => $status ?: '—',
+        };
     }
 }

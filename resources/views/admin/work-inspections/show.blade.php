@@ -9,12 +9,9 @@
             \App\Models\WorkInspection::STATUS_REJECTED => 'bg-red-100 text-red-700',
             default => 'bg-orange-100 text-orange-700',
         };
-        $label = match($inspection->status) {
-            \App\Models\WorkInspection::STATUS_APPROVED => 'Disetujui',
-            \App\Models\WorkInspection::STATUS_REJECTED => 'Ditolak',
-            default => 'Menunggu Verifikasi',
-        };
+        $label = \App\Models\WorkInspection::statusLabel($inspection->status);
         $isStaff = auth()->user()->role === 'staff';
+        $isManager = auth()->user()->role === 'manager';
     @endphp
 
     @if(session('success'))
@@ -141,16 +138,16 @@
                     </div>
                     <div class="wi-card-body grid grid-cols-1 gap-6 sm:grid-cols-2">
                         <div>
-                            <p class="wi-label">Mengetahui — Plt. Manager QM&amp;SHE {{ $inspection->site }}</p>
+                            <p class="wi-label">Mengetahui — Plt. Manager HSE PT INKA</p>
                             <p class="mb-2 text-sm font-bold text-[#141a2b]">{{ $inspection->manager_nama ?: '—' }}</p>
                             @if($inspection->tanda_tangan)
                                 <img src="{{ $inspection->tanda_tangan }}" alt="Tanda tangan manager" class="w-full rounded-2xl border border-[#e4e7ef] bg-white">
                             @else
-                                <p class="text-sm text-[#9aa6c1]">Belum ada tanda tangan.</p>
+                                <p class="text-sm text-[#9aa6c1]">Menunggu tanda tangan Manager HSE.</p>
                             @endif
                         </div>
                         <div>
-                            <p class="wi-label">Staff QM&amp;SHE {{ $inspection->site }}</p>
+                            <p class="wi-label">Staff HSE PT INKA</p>
                             <p class="mb-2 text-sm font-bold text-[#141a2b]">{{ $inspection->safety_officer_nama ?: '—' }}</p>
                             @if($inspection->staff_signature)
                                 <img src="{{ $inspection->staff_signature }}" alt="Tanda tangan staff" class="w-full rounded-2xl border border-[#e4e7ef] bg-white">
@@ -219,6 +216,53 @@
                     @else
                         <div class="rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm text-amber-800">
                             Menunggu verifikasi Staff HSE. Hanya Staff HSE yang dapat menyetujui daftar periksa ini.
+                        </div>
+                    @endif
+                @endif
+
+                @if($inspection->status === \App\Models\WorkInspection::STATUS_REVIEW_MANAGER)
+                    @if($isManager)
+                        <div class="wi-card">
+                            <div class="wi-card-body">
+                                <h2 class="mb-1 text-base font-extrabold tracking-[-.01em] text-[#141a2b]">Persetujuan Manager HSE</h2>
+                                <p class="mb-4 text-xs text-[#7a849d]">Staff HSE sudah menandatangani. Isi nama dan tanda tangan untuk menyetujui daftar periksa ini.</p>
+
+                                <form method="POST" action="/admin/work-inspections/{{ $inspection->id }}/approve" id="approve-form" class="space-y-3">
+                                    @csrf
+                                    <div>
+                                        <label class="wi-label">Nama Manager HSE</label>
+                                        <input type="text" name="manager_nama" value="{{ old('manager_nama', auth()->user()->name) }}" class="wi-input" required>
+                                    </div>
+                                    <div>
+                                        <div class="mb-1.5 flex items-center justify-between">
+                                            <label class="wi-label !mb-0">Tanda Tangan Manager HSE</label>
+                                            <button type="button" onclick="clearSignature()" class="text-xs font-semibold text-[#9aa6c1] hover:text-red-500">Hapus</button>
+                                        </div>
+                                        <div id="signature-container" class="relative aspect-[2/1] w-full cursor-crosshair overflow-hidden rounded-xl border-2 border-dashed border-[#c9d1e2] bg-white">
+                                            <canvas id="signature-canvas" class="block h-full w-full" style="touch-action: none;"></canvas>
+                                            <span id="signature-placeholder" class="pointer-events-none absolute inset-0 flex select-none items-center justify-center text-sm text-gray-300">Tanda tangan manager di sini</span>
+                                        </div>
+                                        <input type="hidden" name="tanda_tangan" id="tanda-tangan-input">
+                                        <p id="signature-error" class="mt-1.5 hidden text-sm text-red-500">Tanda tangan manager wajib diisi.</p>
+                                    </div>
+                                    <button type="submit" class="w-full rounded-xl bg-green-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-green-700">
+                                        Setujui Daftar Periksa
+                                    </button>
+                                </form>
+
+                                <form method="POST" action="/admin/work-inspections/{{ $inspection->id }}/reject" class="mt-4 space-y-2 border-t border-[#eef1f7] pt-4">
+                                    @csrf
+                                    <label class="wi-label">Tolak dengan alasan</label>
+                                    <textarea name="rejection_reason" rows="3" required class="wi-input" placeholder="Tuliskan alasan agar Staff HSE dapat memperbaiki...">{{ old('rejection_reason') }}</textarea>
+                                    <button type="submit" class="w-full rounded-xl border border-red-200 px-4 py-2.5 text-sm font-semibold text-red-600 transition-colors hover:bg-red-50">
+                                        Tolak Daftar Periksa
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    @else
+                        <div class="rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm text-amber-800">
+                            Menunggu persetujuan Manager HSE. Daftar periksa sudah ditandatangani Staff HSE.
                         </div>
                     @endif
                 @endif
@@ -324,7 +368,7 @@
         }
     </style>
 
-    @if($inspection->status === \App\Models\WorkInspection::STATUS_PENDING && $isStaff)
+    @if(($inspection->status === \App\Models\WorkInspection::STATUS_PENDING && $isStaff) || ($inspection->status === \App\Models\WorkInspection::STATUS_REVIEW_MANAGER && $isManager))
         <script>
             (function () {
                 const canvas = document.getElementById('signature-canvas');

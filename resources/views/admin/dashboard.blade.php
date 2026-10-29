@@ -227,8 +227,9 @@
                     <h1 class="mt-3 text-2xl sm:text-[28px] font-bold leading-tight">{{ $greeting }}, {{ auth()->user()->name }}</h1>
                     <p class="mt-1 text-sm text-white/60">
                         {{ $todayLabel }} &mdash;
-                        @if($counts['permit_pending'] + $counts['hse_review'] > 0)
-                            <span class="font-semibold text-white">{{ $counts['permit_pending'] }} permit</span> dan
+                        @if($counts['permit_pending'] + $counts['hse_review'] + $counts['inspection_pending'] > 0)
+                            <span class="font-semibold text-white">{{ $counts['permit_pending'] }} permit</span>,
+                            <span class="font-semibold text-white">{{ $counts['inspection_pending'] }} daftar periksa</span>, dan
                             <span class="font-semibold text-white">{{ $counts['hse_review'] }} HSE Plan</span> menunggu persetujuan Anda.
                         @else
                             Semua antrean sudah tertangani. Kerja bagus, tetap utamakan keselamatan!
@@ -243,6 +244,13 @@
                             <span class="inline-flex min-w-[20px] items-center justify-center rounded-full bg-accent-orange px-1.5 py-0.5 text-[11px] font-bold text-white">{{ $counts['permit_pending'] }}</span>
                         @endif
                     </a>
+                    <a href="/admin/work-inspections"
+                       class="inline-flex items-center gap-2 rounded-xl border border-white/20 bg-white/5 px-4 py-2.5 text-sm font-semibold text-white hover:bg-white/10 transition-colors">
+                        Review Daftar Periksa
+                        @if($counts['inspection_pending'] > 0)
+                            <span class="inline-flex min-w-[20px] items-center justify-center rounded-full bg-white/20 px-1.5 py-0.5 text-[11px] font-bold text-white">{{ $counts['inspection_pending'] }}</span>
+                        @endif
+                    </a>
                     <a href="/admin/hse-plans"
                        class="inline-flex items-center gap-2 rounded-xl border border-white/20 bg-white/5 px-4 py-2.5 text-sm font-semibold text-white hover:bg-white/10 transition-colors">
                         Review HSE
@@ -254,7 +262,7 @@
             </div>
         </section>
 
-        <div class="grid grid-cols-2 xl:grid-cols-5 gap-4 mb-6">
+        <div class="grid grid-cols-2 xl:grid-cols-6 gap-4 mb-6">
             <a href="/admin/approvals"
                class="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 sm:p-5 hover:shadow-md hover:border-blue-200 transition-all">
                 <div class="flex items-center justify-between gap-2 mb-3">
@@ -277,6 +285,18 @@
                 </div>
                 <p class="text-2xl sm:text-3xl font-bold text-gray-700">{{ $counts['permit_today'] }}</p>
                 <p class="text-[11px] sm:text-xs text-gray-400 mt-1">Antrean Safety Permit</p>
+            </a>
+
+            <a href="/admin/work-inspections"
+               class="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 sm:p-5 hover:shadow-md hover:border-purple-200 transition-all">
+                <div class="flex items-center justify-between gap-2 mb-3">
+                    <p class="text-[11px] sm:text-xs font-semibold text-gray-400 uppercase tracking-wide">Daftar Periksa</p>
+                    <span class="w-7 h-7 rounded-lg bg-purple-50 flex items-center justify-center shrink-0">
+                        <svg class="w-3.5 h-3.5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+                    </span>
+                </div>
+                <p class="text-2xl sm:text-3xl font-bold text-purple-500">{{ $counts['inspection_pending'] }}</p>
+                <p class="text-[11px] sm:text-xs text-gray-400 mt-1">Menunggu persetujuan Anda</p>
             </a>
 
             <a href="/admin/hse-plans"
@@ -420,5 +440,55 @@
                 @endif
             </section>
         </div>
+
+        {{-- Daftar Periksa --}}
+        <section class="table-card mt-5">
+            <div class="flex items-start justify-between gap-3 px-4 md:px-6 py-4 border-b border-gray-100">
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-purple-400"></span>
+                        <h3 class="text-sm font-bold uppercase tracking-wide text-gray-800">Daftar Periksa</h3>
+                    </div>
+                    <p class="text-xs text-gray-400 mt-1">Daftar periksa menunggu persetujuan Manager HSE</p>
+                </div>
+                <a href="/admin/work-inspections" class="text-sm font-semibold text-inka-navy hover:underline whitespace-nowrap">Lihat Semua</a>
+            </div>
+
+            @if($inspections->isEmpty())
+                <div class="flex flex-col items-center justify-center py-12 px-6 text-center">
+                    <div class="w-14 h-14 rounded-2xl bg-gray-50 border border-gray-100 flex items-center justify-center mb-4">
+                        <svg class="w-7 h-7 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+                        </svg>
+                    </div>
+                    <p class="text-sm font-semibold text-gray-700">Tidak ada daftar periksa yang menunggu persetujuan.</p>
+                    <p class="text-xs text-gray-400 mt-1">Daftar periksa baru dari Staff HSE akan muncul di sini.</p>
+                </div>
+            @else
+                <div class="divide-y divide-gray-50">
+                    @foreach($inspections as $inspection)
+                        <a href="/admin/work-inspections/{{ $inspection->id }}" class="block px-4 md:px-6 py-4 hover:bg-slate-50/70 transition-colors">
+                            <div class="flex items-center justify-between gap-3 mb-1.5">
+                                <span class="text-xs font-bold text-inka-navy font-mono">{{ $inspection->no_periksa }}</span>
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-semibold bg-orange-100 text-orange-700 shrink-0">Review Manager</span>
+                            </div>
+                            <p class="text-sm font-semibold text-gray-800 truncate">{{ $inspection->nama_pekerjaan }}</p>
+                            <p class="text-xs text-gray-400 mt-1 truncate">
+                                {{ $inspection->kontraktor }}
+                                &middot; {{ $inspection->divisi_pengaju }}
+                                &middot; {{ $inspection->site }}
+                            </p>
+                            <div class="flex items-center justify-between gap-3 mt-2.5">
+                                <span class="text-xs text-gray-400">{{ ($inspection->submitted_at ?? $inspection->created_at)?->format('d/m/Y H:i') }}</span>
+                                <span class="text-xs font-semibold text-inka-navy">Review</span>
+                            </div>
+                        </a>
+                    @endforeach
+                </div>
+                <div class="px-4 md:px-6 py-3 border-t border-gray-100">
+                    <a href="/admin/work-inspections" class="text-xs font-semibold text-gray-400 hover:text-inka-navy transition-colors">Menampilkan {{ $inspections->count() }} antrean teratas</a>
+                </div>
+            @endif
+        </section>
     @endif
 </x-app-layout>

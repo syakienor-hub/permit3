@@ -218,11 +218,14 @@ Route::middleware(['auth', 'prevent-back-history', 'role:staff,manager'])->group
     });
 
 
-// ===== DAFTAR PERIKSA IZIN PEKERJAAN (role:staff, site Madiun/Banyuwangi) =====
+// ===== DAFTAR PERIKSA IZIN PEKERJAAN (staff membuat, manager menyetujui) =====
 Route::middleware(['auth', 'prevent-back-history', 'role:staff'])->group(function () {
-    Route::get('/admin/work-inspections', [\App\Http\Controllers\Admin\WorkInspectionApprovalController::class, 'index']);
     Route::get('/admin/work-inspections/create', [\App\Http\Controllers\Admin\WorkInspectionApprovalController::class, 'create']);
     Route::post('/admin/work-inspections', [\App\Http\Controllers\Admin\WorkInspectionApprovalController::class, 'store']);
+});
+
+Route::middleware(['auth', 'prevent-back-history', 'role:staff,manager'])->group(function () {
+    Route::get('/admin/work-inspections', [\App\Http\Controllers\Admin\WorkInspectionApprovalController::class, 'index']);
     Route::get('/admin/work-inspections/history', [\App\Http\Controllers\Admin\WorkInspectionApprovalController::class, 'history']);
     Route::get('/admin/work-inspections/{id}', [\App\Http\Controllers\Admin\WorkInspectionApprovalController::class, 'show']);
     Route::get('/admin/work-inspections/{id}/pdf', [\App\Http\Controllers\Admin\WorkInspectionApprovalController::class, 'viewPdf']);

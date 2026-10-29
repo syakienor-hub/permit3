@@ -95,24 +95,30 @@ Review Staff/Manager → (revise + catatan) → Revision → (divisi edit+submit
 
 ### 4.3 Daftar Periksa Izin Pekerjaan Berisiko Tinggi
 
-Fitur ini **terpisah dari Safety Permit** dan **hanya dapat diakses Staff HSE** site Madiun / Banyuwangi melalui dashboard (`role:staff`). Tidak ada akses publik.
+Fitur ini **terpisah dari Safety Permit** dan menggunakan alur bertahap: **Staff HSE** site Madiun / Banyuwangi membuat dan menandatangani daftar periksa, lalu **Manager HSE** menyetujui dan menandatangani. Tidak ada akses publik.
 
 #### Form Dashboard (`/admin/work-inspections/create`)
-- Mengikuti form resmi **K3LH IV - Rev.0 Daftar Periksa Izin Pekerjaan Berisiko Tinggi PT INKA Banyuwangi**.
+- Mengikuti form resmi **K3LH IV - Rev.0 Daftar Periksa Izin Pekerjaan Berisiko Tinggi HSE PT INKA**.
 - Staff membuka form di dashboard, site otomatis mengikuti `users.site` (tidak dapat diubah dari form).
 - Header dokumen: No. Dokumen `FORM K3LH IV - Rev.0`, Tgl. Terbit (otomatis), Hal `1 dari 1`, serta Otorisasi.
 - Isian: Pekerjaan, Peralatan, Material, Lokasi, Mulai tanggal, dan Petugas pemeriksa.
 - 28 item pengecekan dengan pilihan **OK / NOK / N/A** (bukan YA/TIDAK).
-- Tanda tangan diambil pada **satu perangkat di site**: Plt. Manager QM&SHE Banyuwangi menandatangani (`tanda_tangan`), lalu Staff QM&SHE Banyuwangi menandatangani (`staff_signature`). Nama staff otomatis dari akun yang login.
+- Staff HSE mengisi nama petugas pemeriksa dan menandatangani (`staff_signature`). Nama staff otomatis dari akun yang login. Form tidak meminta nama/tanda tangan manager.
 - Nomor: `XXX/DPIKBT/INKA/<tahun>`
-- Setelah submit, daftar periksa langsung final berstatus `Disetujui` (kedua tanda tangan wajib terisi).
+- Setelah submit, status menjadi `Review Manager` dan daftar periksa masuk antrean Manager HSE. `tanda_tangan` dan `manager_nama` masih kosong.
+
+#### Persetujuan Manager (`/admin/work-inspections/{id}`)
+- Manager HSE melihat antrean `Review Manager` dan membuka detail.
+- Manager mengisi nama (`manager_nama`) dan menandatangani (`tanda_tangan`), lalu menyetujui atau menolak dengan alasan.
+- Setelah disetujui, status menjadi `Disetujui` dan PDF final memuat tanda tangan Staff HSE serta Manager HSE.
 
 #### Akses & Status
 - Staff hanya melihat daftar periksa site-nya (`visibleTo`), termasuk PDF.
-- Manager / staff site lain / staff tanpa site ditolak (403).
-- Status: `Menunggu Verifikasi` (warisan data lama), `Disetujui`, `Ditolak`.
-- Route approve/reject hanya dipertahankan untuk memproses data lama yang masih `Menunggu Verifikasi`.
-- PDF (`/admin/work-inspections/{id}/pdf`) berisi data pekerjaan, 28 item pengecekan OK/NOK/N/A, dan tanda tangan Plt. Manager QM&SHE serta Staff QM&SHE.
+- Manager melihat antrean semua site dan dapat memfilter site, serta dapat melihat detail/PDF dan menyetujui/menolak.
+- Staff site lain / staff tanpa site / role lain ditolak (403). Hanya staff yang dapat membuat daftar periksa.
+- Status: `Menunggu Verifikasi` (warisan data lama), `Review Manager`, `Disetujui`, `Ditolak`.
+- Route approve/reject untuk staff hanya dipertahankan untuk memproses data lama yang masih `Menunggu Verifikasi`.
+- PDF (`/admin/work-inspections/{id}/pdf`) berisi data pekerjaan, 28 item pengecekan OK/NOK/N/A, dan tanda tangan Plt. Manager HSE PT INKA serta Staff HSE PT INKA.
 
 ### 4.4 Data Kontraktor (`/data-kontraktor`)
 
@@ -158,7 +164,7 @@ Fitur ini **terpisah dari Safety Permit** dan **hanya dapat diakses Staff HSE** 
 
 - Widget antrean sesuai role:
   - Staff: antrean `Review Staff` + total daftar periksa site-nya (dibuat via dashboard)
-  - Manager: antrean `Review Manager` + HSE Plan `Review Manager`
+  - Manager: antrean permit `Review Manager`, Daftar Periksa `Review Manager`, dan HSE Plan `Review Manager`
 - Tabel permit FIFO (urut `submitted_at ASC`)
 - Permit detail: grid A (Klasifikasi) · B (Informasi) · C (Bahaya) · D (Pencegahan) · E (APD) · F (Dokumen)
 - Form approval: textarea catatan revisi + canvas tanda tangan + tombol Setujui / Kembalikan
@@ -246,7 +252,7 @@ Enam kode klasifikasi tersedia sebagai master:
 | Safety Permit | `/divisi/permits/{id}/pdf/download` | Divisi pemilik (semua status) |
 | Safety Permit | `/admin/permits/{id}/pdf/download` | Staff/Manager (gate: Review Staff/Manager, Revision, Active, Closed) |
 | Safety Permit | `/superadmin/permits/{id}/pdf/download` | Superadmin (gate: Review Staff/Manager, Revision, Active, Closed) |
-| Daftar Periksa | `/admin/work-inspections/{id}/pdf/download` | Staff HSE site terkait (semua status) |
+| Daftar Periksa | `/admin/work-inspections/{id}/pdf/download` | Staff HSE site terkait dan Manager HSE (semua status) |
 | HSE Plan | `/admin/hse-plans/{id}/pdf/download` | Staff/Manager |
 
 Semua PDF dibuat dengan `barryvdh/laravel-dompdf`, ukuran A4 portrait.

@@ -13,18 +13,18 @@ class WorkInspectionApprovalController extends Controller
 {
     public function index(Request $request)
     {
-        $this->authorizeSite();
+        $this->authorizeViewer();
 
-        $query = WorkInspection::query()
-            ->visibleTo(Auth::user())
-            ->with('reviewer');
+        $query = $this->visibleQuery()->with('reviewer');
 
-        if ($request->filled('site')) {
+        if ($this->currentRole() === 'manager' && $request->filled('site')) {
             $query->forSite($request->site);
         }
 
         if ($request->filled('status') && $request->status !== 'Semua') {
             $query->where('status', $request->status);
+        } elseif ($this->currentRole() === 'manager') {
+            $query->where('status', WorkInspection::STATUS_REVIEW_MANAGER);
         }
 
         if ($request->filled('search')) {
@@ -41,29 +41,34 @@ class WorkInspectionApprovalController extends Controller
             ->paginate(15)
             ->withQueryString();
 
-        $visible = WorkInspection::query()->visibleTo(Auth::user());
+        $visible = $this->visibleQuery();
 
         $counts = [
+            'review' => (clone $visible)->where('status', WorkInspection::STATUS_REVIEW_MANAGER)->count(),
             'pending' => (clone $visible)->where('status', WorkInspection::STATUS_PENDING)->count(),
             'approved' => (clone $visible)->where('status', WorkInspection::STATUS_APPROVED)->count(),
             'rejected' => (clone $visible)->where('status', WorkInspection::STATUS_REJECTED)->count(),
         ];
 
-        return view('admin.work-inspections.index', compact('inspections', 'counts'));
+        return view('admin.work-inspections.index', [
+            'inspections' => $inspections,
+            'counts' => $counts,
+            'isManager' => $this->currentRole() === 'manager',
+        ]);
     }
 
     public function create()
     {
-        $this->authorizeSite();
+        $site = $this->authorizeCreator();
 
         return view('admin.work-inspections.create', [
-            'site' => Auth::user()->site,
+            'site' => $site,
         ]);
     }
 
     public function store(Request $request)
     {
-        $site = $this->authorizeSite();
+        $site = $this->authorizeCreator();
 
         $rules = [
             'otorisasi' => 'nullable|string|max:255',
@@ -73,8 +78,6 @@ class WorkInspectionApprovalController extends Controller
             'lokasi' => 'required|string|max:255',
             'tanggal_mulai' => 'required|date',
             'petugas_pemeriksa' => 'required|string|max:255',
-            'manager_nama' => 'required|string|max:255',
-            'tanda_tangan' => 'required|string',
             'staff_signature' => 'required|string',
         ];
 
@@ -100,7 +103,7 @@ class WorkInspectionApprovalController extends Controller
                 'site' => $site,
                 'otorisasi' => $validated['otorisasi'] ?? null,
                 'tipe' => 'Internal',
-                'divisi_pengaju' => 'QM&SHE',
+                'divisi_pengaju' => 'HSE PT INKA',
                 'nama_pekerjaan' => $validated['nama_pekerjaan'],
                 'kontraktor' => 'PT INKA (Persero)',
                 'jenis_peralatan' => $validated['jenis_peralatan'] ?? null,
@@ -110,31 +113,30 @@ class WorkInspectionApprovalController extends Controller
                 'tanggal_mulai' => $validated['tanggal_mulai'],
                 'petugas_pemeriksa' => $validated['petugas_pemeriksa'],
                 'answers' => $answers,
-                'tanda_tangan' => $validated['tanda_tangan'],
+                'tanda_tangan' => '',
                 'safety_officer_nama' => Auth::user()->name,
-                'manager_nama' => $validated['manager_nama'],
+                'manager_nama' => null,
                 'staff_signature' => $validated['staff_signature'],
-                'status' => WorkInspection::STATUS_APPROVED,
+                'status' => WorkInspection::STATUS_REVIEW_MANAGER,
                 'submitted_at' => now(),
-                'reviewed_by' => Auth::id(),
-                'reviewed_at' => now(),
+                'reviewed_by' => null,
+                'reviewed_at' => null,
             ]);
         });
 
         return redirect('/admin/work-inspections/' . $inspection->id)
-            ->with('success', 'Daftar Periksa berhasil disimpan dan ditandatangani.');
+            ->with('success', 'Daftar Periksa berhasil ditandatangani Staff HSE dan diteruskan ke Manager HSE.');
     }
 
     public function history(Request $request)
     {
-        $this->authorizeSite();
+        $this->authorizeViewer();
 
-        $query = WorkInspection::query()
-            ->visibleTo(Auth::user())
+        $query = $this->visibleQuery()
             ->with('reviewer')
             ->whereIn('status', [WorkInspection::STATUS_APPROVED, WorkInspection::STATUS_REJECTED]);
 
-        if ($request->filled('site')) {
+        if ($this->currentRole() === 'manager' && $request->filled('site')) {
             $query->forSite($request->site);
         }
 
@@ -156,26 +158,33 @@ class WorkInspectionApprovalController extends Controller
             ->paginate(15)
             ->withQueryString();
 
-        $visible = WorkInspection::query()->visibleTo(Auth::user());
+        $visible = $this->visibleQuery();
 
         $counts = [
             'approved' => (clone $visible)->where('status', WorkInspection::STATUS_APPROVED)->count(),
             'rejected' => (clone $visible)->where('status', WorkInspection::STATUS_REJECTED)->count(),
         ];
 
-        return view('admin.work-inspections.history', compact('inspections', 'counts'));
+        return view('admin.work-inspections.history', [
+            'inspections' => $inspections,
+            'counts' => $counts,
+            'isManager' => $this->currentRole() === 'manager',
+        ]);
     }
 
     public function show($id)
     {
-        $this->authorizeSite();
+        $this->authorizeViewer();
 
-        $inspection = WorkInspection::query()
-            ->visibleTo(Auth::user())
+        $inspection = $this->visibleQuery()
             ->with('reviewer')
             ->findOrFail($id);
 
-        return view('admin.work-inspections.show', compact('inspection'));
+        return view('admin.work-inspections.show', [
+            'inspection' => $inspection,
+            'isManager' => $this->currentRole() === 'manager',
+            'isStaff' => $this->currentRole() === 'staff',
+        ]);
     }
 
     public function viewPdf($id)
@@ -194,10 +203,9 @@ class WorkInspectionApprovalController extends Controller
 
     private function pdfInspection($id): WorkInspection
     {
-        $this->authorizeSite();
+        $this->authorizeViewer();
 
-        return WorkInspection::query()
-            ->visibleTo(Auth::user())
+        return $this->visibleQuery()
             ->with('reviewer')
             ->findOrFail($id);
     }
@@ -216,12 +224,44 @@ class WorkInspectionApprovalController extends Controller
 
     public function approve(Request $request, $id)
     {
-        $this->authorizeSite();
+        $this->authorizeViewer();
 
-        $inspection = WorkInspection::query()
-            ->visibleTo(Auth::user())
-            ->findOrFail($id);
+        $inspection = $this->visibleQuery()->findOrFail($id);
 
+        if ($this->currentRole() === 'manager') {
+            return $this->approveAsManager($request, $inspection);
+        }
+
+        return $this->approveLegacyAsStaff($request, $inspection);
+    }
+
+    private function approveAsManager(Request $request, WorkInspection $inspection)
+    {
+        if ($inspection->status !== WorkInspection::STATUS_REVIEW_MANAGER) {
+            return redirect('/admin/work-inspections/' . $inspection->id)
+                ->with('error', 'Daftar periksa ini tidak menunggu persetujuan Manager HSE.');
+        }
+
+        $validated = $request->validate([
+            'manager_nama' => 'required|string|max:255',
+            'tanda_tangan' => 'required|string',
+        ]);
+
+        $inspection->forceFill([
+            'status' => WorkInspection::STATUS_APPROVED,
+            'manager_nama' => $validated['manager_nama'],
+            'tanda_tangan' => $validated['tanda_tangan'],
+            'reviewed_by' => Auth::id(),
+            'reviewed_at' => now(),
+            'rejection_reason' => null,
+        ])->save();
+
+        return redirect('/admin/work-inspections/' . $inspection->id)
+            ->with('success', 'Daftar Periksa disetujui Manager HSE.');
+    }
+
+    private function approveLegacyAsStaff(Request $request, WorkInspection $inspection)
+    {
         if ($inspection->status !== WorkInspection::STATUS_PENDING) {
             return redirect('/admin/work-inspections/' . $inspection->id)
                 ->with('error', 'Daftar periksa ini sudah diproses.');
@@ -247,13 +287,16 @@ class WorkInspectionApprovalController extends Controller
 
     public function reject(Request $request, $id)
     {
-        $this->authorizeSite();
+        $this->authorizeViewer();
 
-        $inspection = WorkInspection::query()
-            ->visibleTo(Auth::user())
-            ->findOrFail($id);
+        $inspection = $this->visibleQuery()->findOrFail($id);
 
-        if ($inspection->status !== WorkInspection::STATUS_PENDING) {
+        if ($this->currentRole() === 'manager') {
+            if ($inspection->status !== WorkInspection::STATUS_REVIEW_MANAGER) {
+                return redirect('/admin/work-inspections/' . $inspection->id)
+                    ->with('error', 'Daftar periksa ini tidak menunggu persetujuan Manager HSE.');
+            }
+        } elseif ($inspection->status !== WorkInspection::STATUS_PENDING) {
             return redirect('/admin/work-inspections/' . $inspection->id)
                 ->with('error', 'Daftar periksa ini sudah diproses.');
         }
@@ -267,22 +310,49 @@ class WorkInspectionApprovalController extends Controller
             'rejection_reason' => $validated['rejection_reason'],
             'reviewed_by' => Auth::id(),
             'reviewed_at' => now(),
-            'safety_officer_nama' => null,
-            'staff_signature' => null,
         ])->save();
 
         return redirect('/admin/work-inspections/' . $inspection->id)
             ->with('success', 'Daftar Periksa ditolak dan alasan sudah dicatat.');
     }
 
-    private function authorizeSite(): string
+    private function currentRole(): string
+    {
+        return (string) (Auth::user()->role ?? '');
+    }
+
+    private function authorizeViewer(): void
+    {
+        $user = Auth::user();
+
+        if (! in_array($user->role ?? null, ['staff', 'manager'], true)) {
+            abort(403, 'Daftar Periksa hanya dapat diakses oleh Staff HSE dan Manager HSE.');
+        }
+
+        if (($user->role ?? null) === 'staff' && ! in_array($user->site, WorkInspection::SITES, true)) {
+            abort(403, 'Daftar Periksa hanya dapat diakses oleh Staff HSE site Madiun atau Banyuwangi.');
+        }
+    }
+
+    private function authorizeCreator(): string
     {
         $user = Auth::user();
 
         if (($user->role ?? null) !== 'staff' || ! in_array($user->site, WorkInspection::SITES, true)) {
-            abort(403, 'Daftar Periksa hanya dapat diakses oleh Staff HSE site Madiun atau Banyuwangi.');
+            abort(403, 'Daftar Periksa hanya dapat dibuat oleh Staff HSE site Madiun atau Banyuwangi.');
         }
 
         return $user->site;
+    }
+
+    private function visibleQuery()
+    {
+        $query = WorkInspection::query();
+
+        if ($this->currentRole() === 'staff') {
+            $query->visibleTo(Auth::user());
+        }
+
+        return $query;
     }
 }

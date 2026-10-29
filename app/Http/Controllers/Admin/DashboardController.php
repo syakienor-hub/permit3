@@ -59,9 +59,11 @@ class DashboardController extends Controller
                 ->get();
         } elseif ($role === 'manager') {
             $permitQuery = Permit::where('status', 'Review Manager');
+            $inspectionQuery = WorkInspection::where('status', WorkInspection::STATUS_REVIEW_MANAGER);
 
             $counts['permit_pending'] = (clone $permitQuery)->count();
             $counts['permit_today'] = (clone $permitQuery)->whereDate('updated_at', $today)->count();
+            $counts['inspection_pending'] = (clone $inspectionQuery)->count();
             $counts['hse_review'] = HsePlan::where('status', HsePlan::STATUS_REVIEW)->count();
             $counts['hse_approved'] = HsePlan::where('status', HsePlan::STATUS_APPROVED)->count();
             $counts['hse_rejected'] = HsePlan::where('status', HsePlan::STATUS_REJECTED)->count();
@@ -74,6 +76,12 @@ class DashboardController extends Controller
             $hsePlans = HsePlan::where('status', HsePlan::STATUS_REVIEW)
                 ->orderByRaw('COALESCE(submitted_at, created_at) ASC')
                 ->take(6)
+                ->get();
+
+            $inspections = (clone $inspectionQuery)
+                ->with('reviewer')
+                ->orderByRaw('COALESCE(submitted_at, created_at) ASC')
+                ->take(5)
                 ->get();
         }
 

@@ -61,11 +61,7 @@
     @php
         $items = \App\Models\WorkInspection::ITEMS;
         $options = \App\Models\WorkInspection::ANSWER_OPTIONS;
-        $statusLabel = match($inspection->status) {
-            \App\Models\WorkInspection::STATUS_APPROVED => 'Disetujui',
-            \App\Models\WorkInspection::STATUS_REJECTED => 'Ditolak',
-            default => 'Menunggu Verifikasi',
-        };
+        $statusLabel = \App\Models\WorkInspection::statusLabel($inspection->status);
         $logoPath = public_path('assets/images/logoinka.svg');
         $tanggalTerbit = $inspection->tanggal_terbit ?? $inspection->created_at;
     @endphp
@@ -155,8 +151,8 @@
 
     <table class="sign-table">
         <tr>
-            <td class="sign-title" style="width: 50%;">Mengetahui<br>Plt. Manager QM&amp;SHE {{ $inspection->site }}</td>
-            <td class="sign-title" style="width: 50%;">Staff QM&amp;SHE {{ $inspection->site }}</td>
+            <td class="sign-title" style="width: 50%;">Mengetahui<br>Plt. Manager HSE PT INKA</td>
+            <td class="sign-title" style="width: 50%;">Staff HSE PT INKA</td>
         </tr>
         <tr>
             <td class="sign-space">
@@ -179,7 +175,7 @@
     <div class="footer">
         <table class="footer-table">
             <tr>
-                <td>Form K3LH IV - Rev.0 DAFTAR PERIKSA IZIN PEKERJAAN BERISIKO TINGGI PT INKA Banyuwangi</td>
+                <td>Form K3LH IV - Rev.0 DAFTAR PERIKSA IZIN PEKERJAAN BERISIKO TINGGI HSE PT INKA</td>
                 <td style="text-align: right;">Dokumen Refer : PK3LH - 08.02 Penanggulangan Keadaan Darurat</td>
             </tr>
         </table>

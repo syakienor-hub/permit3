@@ -16,11 +16,16 @@
         </div>
     @endif
 
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-        <a href="/admin/work-inspections?status={{ \App\Models\WorkInspection::STATUS_PENDING }}"
+    <div class="grid grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
+        <a href="/admin/work-inspections?status={{ \App\Models\WorkInspection::STATUS_REVIEW_MANAGER }}"
            class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 hover:shadow-md hover:border-orange-200 transition-all">
-            <p class="text-sm font-semibold text-gray-400 uppercase tracking-wide">Menunggu Verifikasi</p>
-            <p class="text-3xl font-bold text-orange-500 mt-2">{{ $counts['pending'] }}</p>
+            <p class="text-sm font-semibold text-gray-400 uppercase tracking-wide">Menunggu Manager</p>
+            <p class="text-3xl font-bold text-orange-500 mt-2">{{ $counts['review'] }}</p>
+        </a>
+        <a href="/admin/work-inspections?status={{ \App\Models\WorkInspection::STATUS_PENDING }}"
+           class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 hover:shadow-md hover:border-amber-200 transition-all">
+            <p class="text-sm font-semibold text-gray-400 uppercase tracking-wide">Data Lama</p>
+            <p class="text-3xl font-bold text-amber-500 mt-2">{{ $counts['pending'] }}</p>
         </a>
         <a href="/admin/work-inspections?status={{ \App\Models\WorkInspection::STATUS_APPROVED }}"
            class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 hover:shadow-md hover:border-green-200 transition-all">
@@ -46,17 +51,19 @@
 
         <select name="status" class="border border-gray-200 rounded-xl text-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-inka-navy/20 focus:border-inka-navy text-gray-600">
             <option value="">Semua Status</option>
-            @foreach([\App\Models\WorkInspection::STATUS_PENDING, \App\Models\WorkInspection::STATUS_APPROVED, \App\Models\WorkInspection::STATUS_REJECTED] as $status)
-                <option value="{{ $status }}" @selected(request('status') === $status)>{{ $status }}</option>
+            @foreach([\App\Models\WorkInspection::STATUS_REVIEW_MANAGER, \App\Models\WorkInspection::STATUS_PENDING, \App\Models\WorkInspection::STATUS_APPROVED, \App\Models\WorkInspection::STATUS_REJECTED] as $status)
+                <option value="{{ $status }}" @selected(request('status') === $status)>{{ \App\Models\WorkInspection::statusLabel($status) }}</option>
             @endforeach
         </select>
 
-        <select name="site" class="border border-gray-200 rounded-xl text-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-inka-navy/20 focus:border-inka-navy text-gray-600">
-            <option value="">Site: Semua</option>
-            @foreach(\App\Models\WorkInspection::SITES as $site)
-                <option value="{{ $site }}" @selected(request('site') === $site)>Site {{ $site }}</option>
-            @endforeach
-        </select>
+        @if($isManager)
+            <select name="site" class="border border-gray-200 rounded-xl text-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-inka-navy/20 focus:border-inka-navy text-gray-600">
+                <option value="">Site: Semua</option>
+                @foreach(\App\Models\WorkInspection::SITES as $site)
+                    <option value="{{ $site }}" @selected(request('site') === $site)>Site {{ $site }}</option>
+                @endforeach
+            </select>
+        @endif
 
         <button type="submit" class="px-4 py-2 bg-inka-navy text-white text-sm font-semibold rounded-xl hover:opacity-90 transition-opacity">Cari</button>
 
@@ -69,14 +76,16 @@
         <div class="flex items-center justify-between px-4 md:px-6 py-4 border-b border-gray-100">
             <div>
                 <h3 class="text-sm font-semibold text-gray-800">Daftar Periksa Izin Pekerjaan Berisiko Tinggi</h3>
-                <p class="text-xs text-gray-400 mt-0.5">Form K3LH IV-01.013 — dikelola Staff HSE site Madiun &amp; Banyuwangi</p>
+                <p class="text-xs text-gray-400 mt-0.5">{{ $isManager ? 'Menunggu persetujuan Manager HSE — PT INKA' : 'Form K3LH IV-01.013 — dikelola Staff HSE PT INKA' }}</p>
             </div>
             <div class="flex items-center gap-3">
                 <a href="/admin/work-inspections/history" class="text-xs font-semibold text-gray-400 hover:text-inka-navy">History</a>
-                <a href="/admin/work-inspections/create" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-inka-navy text-white text-xs font-semibold hover:opacity-90">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                    Buat Daftar Periksa
-                </a>
+                @unless($isManager)
+                    <a href="/admin/work-inspections/create" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-inka-navy text-white text-xs font-semibold hover:opacity-90">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                        Buat Daftar Periksa
+                    </a>
+                @endunless
             </div>
         </div>
 
@@ -112,11 +121,7 @@
                                     \App\Models\WorkInspection::STATUS_REJECTED => 'bg-red-100 text-red-700',
                                     default => 'bg-orange-100 text-orange-700',
                                 };
-                                $label = match($inspection->status) {
-                                    \App\Models\WorkInspection::STATUS_APPROVED => 'Disetujui',
-                                    \App\Models\WorkInspection::STATUS_REJECTED => 'Ditolak',
-                                    default => 'Menunggu Verifikasi',
-                                };
+                                $label = \App\Models\WorkInspection::statusLabel($inspection->status);
                             @endphp
                             <tr class="cursor-pointer transition-colors" onclick="window.location='/admin/work-inspections/{{ $inspection->id }}'">
                                 <td class="whitespace-nowrap">

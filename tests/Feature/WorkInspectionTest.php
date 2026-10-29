@@ -35,12 +35,12 @@ class WorkInspectionTest extends TestCase
             ->assertOk()
             ->assertSee('Daftar Periksa Izin Pekerjaan Berisiko Tinggi')
             ->assertSee('Madiun')
-            ->assertSee('Mengetahui')
-            ->assertSee('Staff QM&SHE Madiun')
-            ->assertSee('Item Pengecekan');
+            ->assertSee('Staff HSE PT INKA')
+            ->assertSee('Item Pengecekan')
+            ->assertDontSee('Tanda Tangan Manager');
     }
 
-    public function test_staff_can_store_completed_inspection_with_both_signatures(): void
+    public function test_staff_submission_is_forwarded_to_manager_with_staff_signature_only(): void
     {
         $staff = $this->makeUser('staff', 'Madiun');
 
@@ -51,14 +51,15 @@ class WorkInspectionTest extends TestCase
         $response->assertRedirect('/admin/work-inspections/' . $inspection->id);
 
         $this->assertSame('Madiun', $inspection->site);
-        $this->assertSame('Disetujui', $inspection->status);
-        $this->assertSame($staff->id, $inspection->reviewed_by);
+        $this->assertSame(WorkInspection::STATUS_REVIEW_MANAGER, $inspection->status);
+        $this->assertNull($inspection->reviewed_by);
         $this->assertNotNull($inspection->submitted_at);
-        $this->assertNotNull($inspection->reviewed_at);
-        $this->assertSame('data:image/png;base64,manager', $inspection->tanda_tangan);
+        $this->assertNull($inspection->reviewed_at);
+        $this->assertSame('', $inspection->tanda_tangan);
         $this->assertSame('data:image/png;base64,staff', $inspection->staff_signature);
         $this->assertSame('ok', $inspection->answer('pemutusan_listrik'));
-        $this->assertSame('Plt. Manager QM&SHE', $inspection->manager_nama);
+        $this->assertNull($inspection->manager_nama);
+        $this->assertSame('HSE PT INKA', $inspection->divisi_pengaju);
         $this->assertSame('Petugas HSE Madiun', $inspection->petugas_pemeriksa);
         $this->assertSame($staff->name, $inspection->safety_officer_nama);
         $this->assertStringStartsWith('001/DPIKBT/INKA/', $inspection->no_periksa);
@@ -75,16 +76,15 @@ class WorkInspectionTest extends TestCase
         $this->assertSame('Madiun', WorkInspection::firstOrFail()->site);
     }
 
-    public function test_store_requires_both_signatures(): void
+    public function test_store_requires_staff_signature(): void
     {
         $staff = $this->makeUser('staff', 'Madiun');
 
         $this->actingAs($staff)
             ->post('/admin/work-inspections', $this->payload([
-                'tanda_tangan' => '',
                 'staff_signature' => '',
             ]))
-            ->assertSessionHasErrors(['tanda_tangan', 'staff_signature']);
+            ->assertSessionHasErrors('staff_signature');
 
         $this->assertSame(0, WorkInspection::count());
     }
@@ -133,15 +133,107 @@ class WorkInspectionTest extends TestCase
             ->assertNotFound();
     }
 
-    public function test_non_site_staff_and_other_roles_cannot_access(): void
+    public function test_manager_can_view_queue_but_cannot_create(): void
     {
         $manager = $this->makeUser('manager', null);
+        $inspection = $this->makeInspection([
+            'no_periksa' => '001/DPIKBT/INKA/2026',
+            'status' => WorkInspection::STATUS_REVIEW_MANAGER,
+        ]);
+
+        $this->actingAs($manager)
+            ->get('/admin/work-inspections')
+            ->assertOk()
+            ->assertSee($inspection->no_periksa);
+
+        $this->actingAs($manager)
+            ->get('/admin/work-inspections/' . $inspection->id)
+            ->assertOk();
+
+        $this->actingAs($manager)
+            ->get('/admin/work-inspections/' . $inspection->id . '/pdf')
+            ->assertOk();
+
+        $this->actingAs($manager)
+            ->get('/admin/work-inspections/create')
+            ->assertForbidden();
+    }
+
+    public function test_non_site_staff_and_other_roles_cannot_access(): void
+    {
         $staffWithoutSite = $this->makeUser('staff', null);
         $staffOtherSite = $this->makeUser('staff', 'Semarang');
+        $divisi = $this->makeUser('divisi', null);
 
-        $this->actingAs($manager)->get('/admin/work-inspections')->assertForbidden();
         $this->actingAs($staffWithoutSite)->get('/admin/work-inspections')->assertForbidden();
         $this->actingAs($staffOtherSite)->get('/admin/work-inspections/create')->assertForbidden();
+        $this->actingAs($divisi)->get('/admin/work-inspections')->assertForbidden();
+    }
+
+    public function test_manager_can_approve_inspection_waiting_for_review(): void
+    {
+        $manager = $this->makeUser('manager', null);
+        $inspection = $this->makeInspection([
+            'status' => WorkInspection::STATUS_REVIEW_MANAGER,
+            'tanda_tangan' => '',
+            'manager_nama' => null,
+            'reviewed_at' => null,
+        ]);
+
+        $this->actingAs($manager)
+            ->post('/admin/work-inspections/' . $inspection->id . '/approve', [
+                'manager_nama' => 'Manager HSE PT INKA',
+                'tanda_tangan' => 'data:image/png;base64,manager',
+            ])
+            ->assertRedirect('/admin/work-inspections/' . $inspection->id);
+
+        $inspection->refresh();
+
+        $this->assertSame(WorkInspection::STATUS_APPROVED, $inspection->status);
+        $this->assertSame('Manager HSE PT INKA', $inspection->manager_nama);
+        $this->assertSame('data:image/png;base64,manager', $inspection->tanda_tangan);
+        $this->assertSame('data:image/png;base64,staff', $inspection->staff_signature);
+        $this->assertSame($manager->id, $inspection->reviewed_by);
+        $this->assertNotNull($inspection->reviewed_at);
+    }
+
+    public function test_manager_approval_requires_name_and_signature(): void
+    {
+        $manager = $this->makeUser('manager', null);
+        $inspection = $this->makeInspection([
+            'status' => WorkInspection::STATUS_REVIEW_MANAGER,
+            'tanda_tangan' => '',
+            'manager_nama' => null,
+        ]);
+
+        $this->actingAs($manager)
+            ->post('/admin/work-inspections/' . $inspection->id . '/approve', [])
+            ->assertSessionHasErrors(['manager_nama', 'tanda_tangan']);
+
+        $this->assertSame(WorkInspection::STATUS_REVIEW_MANAGER, $inspection->fresh()->status);
+    }
+
+    public function test_manager_can_reject_inspection_waiting_for_review(): void
+    {
+        $manager = $this->makeUser('manager', null);
+        $inspection = $this->makeInspection([
+            'status' => WorkInspection::STATUS_REVIEW_MANAGER,
+            'tanda_tangan' => '',
+            'manager_nama' => null,
+        ]);
+
+        $this->actingAs($manager)
+            ->post('/admin/work-inspections/' . $inspection->id . '/reject', [
+                'rejection_reason' => 'Item pengamanan belum lengkap.',
+            ])
+            ->assertRedirect('/admin/work-inspections/' . $inspection->id);
+
+        $inspection->refresh();
+
+        $this->assertSame(WorkInspection::STATUS_REJECTED, $inspection->status);
+        $this->assertSame('Item pengamanan belum lengkap.', $inspection->rejection_reason);
+        $this->assertSame('data:image/png;base64,staff', $inspection->staff_signature);
+        $this->assertSame($manager->id, $inspection->reviewed_by);
     }
 
     public function test_history_only_lists_completed_inspections(): void
@@ -245,7 +337,7 @@ class WorkInspectionTest extends TestCase
     private function payload(array $overrides = []): array
     {
         return array_merge([
-            'otorisasi' => 'QM&SHE/BWI/2026',
+            'otorisasi' => 'HSE/PT INKA/2026',
             'nama_pekerjaan' => 'Perbaikan pipa steam',
             'jenis_peralatan' => 'Mesin las',
             'material' => 'Pipa steam',
@@ -253,8 +345,6 @@ class WorkInspectionTest extends TestCase
             'tanggal_mulai' => '2026-10-25',
             'petugas_pemeriksa' => 'Petugas HSE Madiun',
             'answers' => array_fill_keys(array_keys(WorkInspection::ITEMS), 'ok'),
-            'manager_nama' => 'Plt. Manager QM&SHE',
-            'tanda_tangan' => 'data:image/png;base64,manager',
             'staff_signature' => 'data:image/png;base64,staff',
         ], $overrides);
     }
@@ -275,7 +365,7 @@ class WorkInspectionTest extends TestCase
             'answers' => array_fill_keys(array_keys(WorkInspection::ITEMS), 'ok'),
             'tanda_tangan' => 'data:image/png;base64,manager',
             'safety_officer_nama' => 'Safety Officer Madiun',
-            'manager_nama' => 'Plt. Manager QM&SHE',
+            'manager_nama' => 'Manager HSE PT INKA',
             'staff_signature' => 'data:image/png;base64,staff',
             'status' => WorkInspection::STATUS_APPROVED,
             'submitted_at' => now(),

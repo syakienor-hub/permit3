@@ -40,6 +40,25 @@ class AdminDashboardTest extends TestCase
             ->assertSee($inspection->no_periksa);
     }
 
+    public function test_manager_dashboard_shows_daftar_periksa_waiting_for_approval(): void
+    {
+        $manager = User::factory()->create(['role' => 'manager', 'site' => null]);
+
+        $inspection = $this->makeInspection([
+            'site' => 'Banyuwangi',
+            'status' => WorkInspection::STATUS_REVIEW_MANAGER,
+            'nama_pekerjaan' => 'Pekerjaan Menunggu Manager',
+        ]);
+
+        $this->actingAs($manager)
+            ->get('/admin/dashboard')
+            ->assertOk()
+            ->assertSee('Daftar Periksa')
+            ->assertSee('Review Daftar Periksa')
+            ->assertSee($inspection->no_periksa)
+            ->assertSee('Pekerjaan Menunggu Manager');
+    }
+
     private function makePermit(array $attributes = []): Permit
     {
         $permit = Permit::create([

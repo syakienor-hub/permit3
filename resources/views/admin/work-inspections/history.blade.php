@@ -27,16 +27,18 @@
         <select name="status" class="border border-gray-200 rounded-xl text-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-inka-navy/20 focus:border-inka-navy text-gray-600">
             <option value="">Status: Semua</option>
             @foreach([\App\Models\WorkInspection::STATUS_APPROVED, \App\Models\WorkInspection::STATUS_REJECTED] as $status)
-                <option value="{{ $status }}" @selected(request('status') === $status)>{{ $status }}</option>
+                <option value="{{ $status }}" @selected(request('status') === $status)>{{ \App\Models\WorkInspection::statusLabel($status) }}</option>
             @endforeach
         </select>
 
-        <select name="site" class="border border-gray-200 rounded-xl text-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-inka-navy/20 focus:border-inka-navy text-gray-600">
-            <option value="">Site: Semua</option>
-            @foreach(\App\Models\WorkInspection::SITES as $site)
-                <option value="{{ $site }}" @selected(request('site') === $site)>Site {{ $site }}</option>
-            @endforeach
-        </select>
+        @if($isManager)
+            <select name="site" class="border border-gray-200 rounded-xl text-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-inka-navy/20 focus:border-inka-navy text-gray-600">
+                <option value="">Site: Semua</option>
+                @foreach(\App\Models\WorkInspection::SITES as $site)
+                    <option value="{{ $site }}" @selected(request('site') === $site)>Site {{ $site }}</option>
+                @endforeach
+            </select>
+        @endif
 
         <button type="submit" class="px-4 py-2 bg-inka-navy text-white text-sm font-semibold rounded-xl hover:opacity-90 transition-opacity">Cari</button>
 

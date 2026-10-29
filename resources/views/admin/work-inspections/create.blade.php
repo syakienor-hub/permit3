@@ -19,25 +19,15 @@
             </span>
         </div>
 
-        <div class="wi-hero relative mb-6 overflow-hidden rounded-[28px] px-6 py-8 text-white sm:px-10 sm:py-11">
-            <div class="relative z-10 max-w-3xl">
-                <p class="mb-3 inline-flex items-center gap-2 text-[11.5px] font-bold uppercase tracking-[.08em] text-[#f5a623]">
-                    <span class="h-px w-4 bg-[#f5a623]"></span>
-                    Form K3LH IV - Rev.0
-                </p>
-                <h1 class="text-[30px] font-extrabold leading-[1.15] tracking-[-.02em] sm:text-[40px]">
-                    Daftar Periksa Izin Pekerjaan Berisiko Tinggi
-                </h1>
-                <p class="mt-3 max-w-2xl text-[14.5px] leading-relaxed text-white/70">
-                    Diisi oleh Staff QM&amp;SHE site {{ $site }} sebelum pekerjaan berisiko tinggi dimulai.
-                    Pemeriksaan dan tanda tangan dilakukan pada satu perangkat yang sama.
-                </p>
-                <div class="mt-6 flex flex-wrap gap-2.5 text-[12px] font-semibold text-white/80">
-                    <span class="rounded-full bg-white/10 px-3.5 py-1.5 ring-1 ring-white/15">PT INKA (Persero)</span>
-                    <span class="rounded-full bg-white/10 px-3.5 py-1.5 ring-1 ring-white/15">QM&amp;SHE Banyuwangi</span>
-                    <span class="rounded-full bg-white/10 px-3.5 py-1.5 ring-1 ring-white/15">28 item pemeriksaan</span>
-                </div>
-            </div>
+        <div class="mb-5">
+            <p class="text-[11px] font-bold uppercase tracking-[.08em] text-[#d9861a]">Form K3LH IV - Rev.0</p>
+            <h1 class="mt-1 text-xl font-extrabold tracking-[-.01em] text-[#141a2b] sm:text-2xl">
+                Daftar Periksa Izin Pekerjaan Berisiko Tinggi
+            </h1>
+            <p class="mt-1 max-w-2xl text-sm text-[#7a849d]">
+                Diisi oleh Staff HSE PT INKA site {{ $site }} sebelum pekerjaan berisiko tinggi dimulai.
+                Setelah Staff HSE menandatangani, daftar periksa diteruskan ke Manager HSE untuk disetujui.
+            </p>
         </div>
 
         <div class="mb-6 flex items-start gap-3 rounded-2xl border border-[#f0d090] bg-[#fdf1da] px-4 py-3.5 text-[13px] leading-relaxed text-[#8a5a12]">
@@ -164,30 +154,16 @@
                 <div class="wi-card-head">
                     <div>
                         <p class="wi-eyebrow">Pengesahan</p>
-                        <h2 class="wi-title">Tanda Tangan</h2>
-                        <p class="mt-1 text-[12.5px] text-[#7a849d]">Ditandatangani oleh Manager dan Staff QM&amp;SHE pada perangkat yang sama.</p>
+                        <h2 class="wi-title">Tanda Tangan Staff HSE</h2>
+                        <p class="mt-1 text-[12.5px] text-[#7a849d]">Staff HSE PT INKA menandatangani daftar periksa, lalu Manager HSE menyetujui pada tahap berikutnya.</p>
                     </div>
                     <span class="wi-step">03</span>
                 </div>
 
-                <div class="wi-card-body grid grid-cols-1 gap-7 sm:grid-cols-2">
-                    <div>
+                <div class="wi-card-body">
+                    <div class="max-w-xl">
                         <div class="mb-2 flex items-center justify-between gap-3">
-                            <label class="wi-label !mb-0">Mengetahui — Plt. Manager QM&amp;SHE {{ $site }} <span class="text-red-500">*</span></label>
-                            <button type="button" onclick="clearSignature('manager')" class="text-[11px] font-bold text-[#9aa6c1] hover:text-red-500">Hapus</button>
-                        </div>
-                        <input type="text" name="manager_nama" value="{{ old('manager_nama') }}" class="wi-input mb-3 @error('manager_nama') is-error @enderror" placeholder="Nama lengkap manager" required>
-                        <div id="signature-container-manager" class="wi-signature">
-                            <canvas id="signature-canvas-manager" class="block h-full w-full" style="touch-action: none;"></canvas>
-                            <span id="signature-placeholder-manager" class="wi-signature-placeholder">Tanda tangan manager di sini</span>
-                        </div>
-                        <input type="hidden" name="tanda_tangan" id="tanda-tangan-input">
-                        <p id="signature-error-manager" class="mt-1.5 hidden text-[12px] font-semibold text-red-500">Tanda tangan manager wajib diisi.</p>
-                    </div>
-
-                    <div>
-                        <div class="mb-2 flex items-center justify-between gap-3">
-                            <label class="wi-label !mb-0">Staff QM&amp;SHE {{ $site }} <span class="text-red-500">*</span></label>
+                            <label class="wi-label !mb-0">Staff HSE PT INKA <span class="text-red-500">*</span></label>
                             <button type="button" onclick="clearSignature('staff')" class="text-[11px] font-bold text-[#9aa6c1] hover:text-red-500">Hapus</button>
                         </div>
                         <p class="wi-readonly mb-3">{{ auth()->user()->name }}</p>
@@ -203,9 +179,9 @@
 
             <div class="sticky bottom-0 z-20 -mx-4 border-t border-[#e4e7ef] bg-white/95 px-4 py-3 backdrop-blur sm:static sm:mx-0 sm:rounded-2xl sm:border sm:px-5 sm:py-4 sm:shadow-[0_18px_50px_-30px_rgba(13,21,38,.25)]">
                 <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                    <p class="text-[12px] leading-relaxed text-[#7a849d]">Daftar periksa langsung tersimpan setelah kedua tanda tangan diisi.</p>
+                    <p class="text-[12px] leading-relaxed text-[#7a849d]">Daftar periksa akan diteruskan ke Manager HSE setelah tanda tangan Staff HSE diisi.</p>
                     <button type="submit" class="inline-flex items-center justify-center gap-2 rounded-xl bg-[#122040] px-6 py-3 text-sm font-bold text-white transition hover:bg-[#0d1526]">
-                        Simpan Daftar Periksa
+                        Kirim ke Manager HSE
                         <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                     </button>
                 </div>
@@ -214,25 +190,6 @@
     </div>
 
     <style>
-        .wi-hero {
-            background:
-                radial-gradient(1100px 360px at 12% -10%, rgba(245,166,35,.18), transparent 55%),
-                linear-gradient(135deg, #0d1526 0%, #122040 55%, #1a2c52 100%);
-        }
-
-        .wi-hero::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background-image:
-                linear-gradient(rgba(255,255,255,.045) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255,255,255,.045) 1px, transparent 1px);
-            background-size: 44px 44px;
-            mask-image: radial-gradient(ellipse 70% 70% at 50% 30%, #000 40%, transparent 90%);
-            -webkit-mask-image: radial-gradient(ellipse 70% 70% at 50% 30%, #000 40%, transparent 90%);
-            pointer-events: none;
-        }
-
         .wi-card {
             overflow: hidden;
             border: 1px solid #e9edf5;
@@ -426,7 +383,6 @@
     <script>
         (function () {
             const forms = [
-                { key: 'manager', input: 'tanda-tangan-input' },
                 { key: 'staff', input: 'staff-signature-input' },
             ];
 
@@ -530,12 +486,10 @@
             };
 
             document.getElementById('inspection-form').addEventListener('submit', function (e) {
-                ['manager', 'staff'].forEach(function (key) {
-                    if (!signatures[key].hasDrawn()) {
-                        e.preventDefault();
-                        signatures[key].showError();
-                    }
-                });
+                if (!signatures.staff.hasDrawn()) {
+                    e.preventDefault();
+                    signatures.staff.showError();
+                }
             });
         })();
     </script>
