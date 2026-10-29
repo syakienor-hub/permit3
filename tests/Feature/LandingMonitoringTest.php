@@ -74,15 +74,15 @@ class LandingMonitoringTest extends TestCase
     public function test_contractor_monitoring_table_lists_contractors_and_statuses(): void
     {
         $waiting = $this->makeContractor('PT Alpha Konstruksi', 'Madiun', Contractor::STATUS_WAITING);
-        $final = $this->makeContractor('CV Beta Teknik', 'Banyuwangi', Contractor::STATUS_FINAL);
+        $final = $this->makeContractor('CV Beta Teknik', 'Banyuwangi', Contractor::STATUS_FINAL, Contractor::APPROVAL_APPROVED);
 
         $this->get('/')
             ->assertOk()
             ->assertSee('Monitoring Data Kontraktor')
             ->assertSee($waiting->vendor)
             ->assertSee($final->vendor)
-            ->assertSee(Contractor::STATUS_WAITING)
-            ->assertSee(Contractor::STATUS_FINAL);
+            ->assertSee('On Hold')
+            ->assertSee('Approved');
     }
 
     public function test_contractor_monitoring_can_be_filtered_by_site_status_and_search(): void
