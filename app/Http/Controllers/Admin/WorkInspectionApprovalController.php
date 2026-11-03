@@ -71,6 +71,8 @@ class WorkInspectionApprovalController extends Controller
         $site = $this->authorizeCreator();
 
         $rules = [
+            'nomor_dokumen' => 'required|string|max:255',
+            'tanggal_terbit' => 'required|date',
             'otorisasi' => 'nullable|string|max:255',
             'nama_pekerjaan' => 'required|string|max:255',
             'jenis_peralatan' => 'nullable|string|max:255',
@@ -94,12 +96,10 @@ class WorkInspectionApprovalController extends Controller
         }
 
         $inspection = DB::transaction(function () use ($validated, $answers, $site) {
-            $year = date('Y');
-            $sequence = WorkInspection::whereYear('created_at', $year)->count() + 1;
 
             return WorkInspection::create([
-                'no_periksa' => sprintf('%03d/DPIKBT/INKA/%d', $sequence, $year),
-                'tanggal_terbit' => now()->toDateString(),
+                'no_periksa' => $validated['nomor_dokumen'],
+                'tanggal_terbit' => $validated['tanggal_terbit'],
                 'site' => $site,
                 'otorisasi' => $validated['otorisasi'] ?? null,
                 'tipe' => 'Internal',
@@ -122,8 +122,8 @@ class WorkInspectionApprovalController extends Controller
                 'reviewed_by' => null,
                 'reviewed_at' => null,
             ]);
+        
         });
-
         return redirect('/admin/work-inspections/' . $inspection->id)
             ->with('success', 'Daftar Periksa berhasil ditandatangani Staff HSE dan diteruskan ke Manager HSE.');
     }
