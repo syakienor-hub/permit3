@@ -297,7 +297,7 @@
                         @foreach($items as $key => $label)
 
                             @php
-                                $selected = old('answers.' . $key, 'ok');
+                                $selected = old('answers.' . $key);
                             @endphp
 
                             <div class="px-5 py-4 transition-colors hover:bg-[#fcfdff] sm:grid sm:grid-cols-[52px_1fr_196px] sm:items-center sm:gap-4 @error('answers.' . $key) bg-red-50/40 @enderror">
