@@ -262,7 +262,7 @@
 
                         @if($inspection->catatan_tambahan)
                             <div class="border-t border-[#eef1f7] bg-[#f8fafc] px-5 py-4">
-                                <p class="wi-label">Pernyataan tambahan</p>
+                                <p class="wi-label">Item Tambahan di Luar Tabel</p>
                                 <p class="whitespace-pre-line text-[13.5px] leading-relaxed text-[#2a3247]">{{ $inspection->catatan_tambahan }}</p>
                             </div>
                         @endif

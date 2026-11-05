@@ -38,7 +38,7 @@ class WorkInspectionTest extends TestCase
             ->assertSee('Staff HSE PT INKA')
             ->assertSee('Item Pengecekan')
             ->assertSee('Isi Otomatis')
-            ->assertSee('Pernyataan tambahan')
+            ->assertSee('Item Tambahan di Luar Tabel')
             ->assertDontSee('Tanda Tangan Manager');
     }
 

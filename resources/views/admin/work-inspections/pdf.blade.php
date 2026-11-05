@@ -150,7 +150,7 @@
     </div>
 
     @if($inspection->catatan_tambahan)
-        <div class="section-title">PERNYATAAN TAMBAHAN</div>
+        <div class="section-title">ITEM TAMBAHAN DI LUAR TABEL</div>
         <p style="font-size: 11px; line-height: 1.5; margin: 0 0 12px 0;">{!! nl2br(e($inspection->catatan_tambahan)) !!}</p>
     @endif
 
