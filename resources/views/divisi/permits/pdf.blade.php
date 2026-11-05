@@ -32,13 +32,10 @@
         <tr>
             <td width="25%" align="center" class="text-center" style="vertical-align: middle; text-align: center;">
                 @php
-                    $path = public_path('assets/images/logoinka.svg');
-                    // DomPDF sometimes struggles with SVG directly, so we use base64 or fallback to text if missing
+                    $path = public_path('assets/images/LOGO-INKA-PDF.png');
                     if(file_exists($path)) {
-                        $type = pathinfo($path, PATHINFO_EXTENSION);
-                        $data = file_get_contents($path);
-                        $base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
-                        echo '<img src="'.$base64.'" class="logo" style="display:block; margin-left:auto; margin-right:auto; padding-left:25px; padding-top:6px;" alt="Logo INKA">';
+                        $base64 = 'data:image/png;base64,' . base64_encode(file_get_contents($path));
+                        echo '<div style="text-align:center; width:100%;"><img src="'.$base64.'" class="logo" alt="Logo INKA"></div>';
                     } else {
                         echo '<h1 style="color:#d32f2f; margin:0;">INKA</h1>';
                     }
