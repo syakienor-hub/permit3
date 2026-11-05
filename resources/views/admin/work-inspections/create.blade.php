@@ -291,41 +291,16 @@
                             @endphp
 
                             <div class="px-5 py-4 transition-colors hover:bg-[#fcfdff] sm:grid sm:grid-cols-[52px_1fr_196px] sm:items-center sm:gap-4 @error('answers.' . $key) bg-red-50/40 @enderror">
-
-                            <div class="mb-3 flex items-start gap-3 sm:mb-0">
-
-<span class="inline-flex h-6 min-w-6 shrink-0 items-center justify-center rounded-lg bg-[#f2f5fa] px-1.5 text-[11px] font-bold text-[#5b6b8c]">
-    {{ $loop->iteration }}
-</span>
-
-<p class="text-[13.5px] leading-relaxed text-[#2a3247]">
-    {{ $label }}
-</p>
-
-</div>
-
+                                <span class="mb-2 inline-flex h-6 min-w-6 items-center justify-center rounded-lg bg-[#f2f5fa] px-1.5 text-[11px] font-bold text-[#5b6b8c] sm:mb-0">{{ $loop->iteration }}</span>
+                                <p class="mb-3 text-[13.5px] leading-relaxed text-[#2a3247] sm:mb-0">{{ $label }}</p>
                                 <div class="flex items-center gap-1.5">
-
                                     @foreach($options as $value => $optionLabel)
-
                                         <label class="wi-option">
-
-                                            <input type="radio"
-                                                   name="answers[{{ $key }}]"
-                                                   value="{{ $value }}"
-                                                   @checked($selected === $value)
-                                                   required>
-
-                                            <span class="opt-{{ $value }}">
-                                                {{ $optionLabel }}
-                                            </span>
-
+                                            <input type="radio" name="answers[{{ $key }}]" value="{{ $value }}" @checked($selected === $value) required>
+                                            <span class="opt-{{ $value }}">{{ $optionLabel }}</span>
                                         </label>
-
                                     @endforeach
-
                                 </div>
-
                             </div>
 
                         @endforeach
