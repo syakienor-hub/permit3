@@ -337,6 +337,16 @@
 
                     </div>
 
+                    <div class="border-t border-[#eef1f7] px-5 py-4">
+                        <label class="wi-label" for="catatan_tambahan">Pernyataan tambahan (opsional)</label>
+                        <textarea id="catatan_tambahan"
+                                  name="catatan_tambahan"
+                                  rows="3"
+                                  class="wi-input min-h-[90px] @error('catatan_tambahan') is-error @enderror"
+                                  placeholder="Tulis pernyataan atau item lain yang tidak tercantum / tidak sesuai dengan tabel di atas">{{ old('catatan_tambahan') }}</textarea>
+                        <p class="mt-1 text-[12px] text-[#7a849d]">Isi jika ada pernyataan yang tidak ada atau tidak sesuai dengan tabel di atas.</p>
+                    </div>
+
                 </div>
             </section>
 

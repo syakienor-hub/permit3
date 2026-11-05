@@ -38,6 +38,7 @@ class WorkInspectionTest extends TestCase
             ->assertSee('Staff HSE PT INKA')
             ->assertSee('Item Pengecekan')
             ->assertSee('Isi Otomatis')
+            ->assertSee('Pernyataan tambahan')
             ->assertDontSee('Tanda Tangan Manager');
     }
 
@@ -98,6 +99,23 @@ class WorkInspectionTest extends TestCase
         $this->assertSame($staff->name, $inspection->petugas_pemeriksa);
         $this->assertSame($staff->name, $inspection->safety_officer_nama);
         $this->assertStringStartsWith('001/DPIKBT/INKA/', $inspection->no_periksa);
+    }
+
+    public function test_store_saves_additional_statement(): void
+    {
+        $staff = $this->makeUser('staff', 'Madiun');
+
+        $this->actingAs($staff)
+            ->post('/admin/work-inspections', $this->payload([
+                'petugas_pemeriksa' => $staff->name,
+                'catatan_tambahan' => 'Pekerjaan dilakukan di ketinggian, tidak tercantum di tabel.',
+            ]))
+            ->assertRedirect();
+
+        $this->assertSame(
+            'Pekerjaan dilakukan di ketinggian, tidak tercantum di tabel.',
+            WorkInspection::firstOrFail()->catatan_tambahan
+        );
     }
 
     public function test_store_always_uses_staff_site_even_when_site_is_tampered(): void

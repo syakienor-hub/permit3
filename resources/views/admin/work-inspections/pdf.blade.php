@@ -149,6 +149,11 @@
         <span><strong>N/A</strong> : Tidak relevan</span>
     </div>
 
+    @if($inspection->catatan_tambahan)
+        <div class="section-title">PERNYATAAN TAMBAHAN</div>
+        <p style="font-size: 11px; line-height: 1.5; margin: 0 0 12px 0;">{!! nl2br(e($inspection->catatan_tambahan)) !!}</p>
+    @endif
+
     <table class="sign-table">
         <tr>
             <td class="sign-title" style="width: 50%;">Mengetahui<br>Plt. Manager HSE PT INKA</td>

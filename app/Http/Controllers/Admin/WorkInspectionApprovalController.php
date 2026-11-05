@@ -79,6 +79,7 @@ class WorkInspectionApprovalController extends Controller
             'material' => 'nullable|string|max:255',
             'lokasi' => 'required|string|max:255',
             'tanggal_mulai' => 'required|date',
+            'catatan_tambahan' => 'nullable|string|max:2000',
             'staff_signature' => 'required|string',
         ];
 
@@ -112,6 +113,7 @@ class WorkInspectionApprovalController extends Controller
                 'tanggal_mulai' => $validated['tanggal_mulai'],
                 'petugas_pemeriksa' => Auth::user()->name,
                 'answers' => $answers,
+                'catatan_tambahan' => $validated['catatan_tambahan'] ?? null,
                 'tanda_tangan' => '',
                 'safety_officer_nama' => Auth::user()->name,
                 'manager_nama' => null,
