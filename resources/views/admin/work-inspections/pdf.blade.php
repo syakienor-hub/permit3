@@ -62,7 +62,7 @@
         $items = \App\Models\WorkInspection::ITEMS;
         $options = \App\Models\WorkInspection::ANSWER_OPTIONS;
         $statusLabel = \App\Models\WorkInspection::statusLabel($inspection->status);
-        $logoPath = public_path('assets/images/logoinka.svg');
+        $logoPath = public_path('assets/images/LOGO-INKA-PDF.png');
         $tanggalTerbit = $inspection->tanggal_terbit ?? $inspection->created_at;
     @endphp
 
