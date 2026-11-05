@@ -40,6 +40,21 @@ class WorkInspectionTest extends TestCase
             ->assertDontSee('Tanda Tangan Manager');
     }
 
+    public function test_create_form_prefills_every_item_with_ok(): void
+    {
+        $staff = $this->makeUser('staff', 'Madiun');
+
+        $html = $this->actingAs($staff)
+            ->get('/admin/work-inspections/create')
+            ->assertOk()
+            ->getContent();
+
+        $this->assertSame(
+            count(WorkInspection::ITEMS),
+            substr_count($html, 'value="ok" checked')
+        );
+    }
+
     public function test_inspector_name_is_locked_to_logged_in_staff(): void
     {
         $staff = $this->makeUser('staff', 'Madiun');
