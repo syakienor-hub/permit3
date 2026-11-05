@@ -126,11 +126,18 @@ class WorkInspectionApprovalController extends Controller
 
         $inspection = DB::transaction(function () use ($validated, $answers, $site) {
 
+            $permitId = null;
+            if (! empty($validated['no_permit_terkait'])) {
+                $permit = \App\Models\Permit::where('no_permit', trim($validated['no_permit_terkait']))->first();
+                $permitId = $permit?->id;
+            }
+
             return WorkInspection::create([
-                'no_periksa' => $validated['nomor_dokumen'],
-                'tanggal_terbit' => $validated['tanggal_terbit'],
-                'site' => $site,
-                'otorisasi' => $validated['otorisasi'] ?? null,
+                'no_periksa'         => $validated['nomor_dokumen'],
+                'tanggal_terbit'     => $validated['tanggal_terbit'],
+                'site'               => $site,
+                'requested_permit_id'=> $permitId,
+                'otorisasi'          => $validated['otorisasi'] ?? null,
                 'tipe' => 'Internal',
                 'divisi_pengaju' => 'HSE PT INKA',
                 'nama_pekerjaan' => $validated['nama_pekerjaan'],
