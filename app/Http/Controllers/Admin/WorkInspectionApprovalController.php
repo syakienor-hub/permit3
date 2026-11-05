@@ -98,6 +98,7 @@ class WorkInspectionApprovalController extends Controller
         $site = $this->authorizeCreator();
 
         $rules = [
+            'no_permit_terkait'  => 'nullable|string|max:50',
             'nomor_dokumen' => 'required|string|max:255',
             'tanggal_terbit' => 'required|date',
             'otorisasi' => 'nullable|string|max:255',
