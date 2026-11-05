@@ -587,6 +587,55 @@
             }
         }
 
+        <script>
+(function () {
+    const forms = [
+        {
+            key: 'staff',
+            input: 'staff-signature-input'
+        },
+    ];
+
+    const signatures = {};
+
+    forms.forEach(function (config) {
+        const canvas = document.getElementById('signature-canvas-' + config.key);
+        const placeholder = document.getElementById('signature-placeholder-' + config.key);
+        const container = document.getElementById('signature-container-' + config.key);
+        const hiddenInput = document.getElementById(config.input);
+        const error = document.getElementById('signature-error-' + config.key);
+        const ctx = canvas.getContext('2d');
+
+        let drawing = false;
+        let hasDrawn = false;
+
+        function resizeCanvas() {
+            const rect = container.getBoundingClientRect();
+            const dpr = window.devicePixelRatio || 1;
+            const snapshot = hasDrawn ? canvas.toDataURL('image/png') : null;
+
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+            canvas.style.width = rect.width + 'px';
+            canvas.style.height = rect.height + 'px';
+
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, rect.width, rect.height);
+            ctx.strokeStyle = '#122040';
+            ctx.lineWidth = 2;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+
+            if (snapshot) {
+                const img = new Image();
+                img.onload = function () {
+                    ctx.drawImage(img, 0, 0, rect.width, rect.height);
+                };
+                img.src = snapshot;
+            }
+        }
+
         function position(e) {
             const rect = canvas.getBoundingClientRect();
             const point = e.touches ? e.touches[0] : e;
@@ -681,6 +730,35 @@
         }
     };
 
+    // Isi otomatis semua jawaban OK
+    const fillAllOk = document.getElementById('fill-all-ok');
+
+    if (fillAllOk) {
+        fillAllOk.addEventListener('click', function () {
+            document
+                .querySelectorAll('input[type="radio"][name^="answers["]')
+                .forEach(function (radio) {
+                    if (radio.value === 'ok') {
+                        radio.checked = true;
+                    }
+                });
+        });
+    }
+
+    // Validasi tanda tangan sebelum formulir dikirim
+    const inspectionForm = document.getElementById('inspection-form');
+
+    if (inspectionForm) {
+        inspectionForm.addEventListener('submit', function (e) {
+            if (!signatures.staff.hasDrawn()) {
+                e.preventDefault();
+                signatures.staff.showError();
+            }
+        });
+    }
+})();
+</script>
+</x-app-layout>
     document.getElementById('inspection-form').addEventListener('submit', function (e) {
         if (!signatures.staff.hasDrawn()) {
             e.preventDefault();

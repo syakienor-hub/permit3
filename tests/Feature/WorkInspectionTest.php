@@ -37,14 +37,50 @@ class WorkInspectionTest extends TestCase
             ->assertSee('Madiun')
             ->assertSee('Staff HSE PT INKA')
             ->assertSee('Item Pengecekan')
+            ->assertSee('Isi Otomatis')
+            ->assertSee('Item Tambahan di Luar Tabel')
             ->assertDontSee('Tanda Tangan Manager');
+    }
+
+    public function test_create_form_starts_with_empty_answers(): void
+    {
+        $staff = $this->makeUser('staff', 'Madiun');
+
+        $html = $this->actingAs($staff)
+            ->get('/admin/work-inspections/create')
+            ->assertOk()
+            ->getContent();
+
+        $this->assertSame(0, substr_count($html, ' checked'));
+    }
+
+    public function test_inspector_name_is_locked_to_logged_in_staff(): void
+    {
+        $staff = $this->makeUser('staff', 'Madiun');
+        $otherStaff = $this->makeUser('staff', 'Banyuwangi');
+
+        $this->actingAs($staff)
+            ->get('/admin/work-inspections/create')
+            ->assertOk()
+            ->assertSee($staff->name)
+            ->assertDontSee('name="petugas_pemeriksa"', false);
+
+        $this->actingAs($staff)
+            ->post('/admin/work-inspections', $this->payload([
+                'petugas_pemeriksa' => $otherStaff->name,
+            ]))
+            ->assertRedirect();
+
+        $this->assertSame($staff->name, WorkInspection::firstOrFail()->petugas_pemeriksa);
     }
 
     public function test_staff_submission_is_forwarded_to_manager_with_staff_signature_only(): void
     {
         $staff = $this->makeUser('staff', 'Madiun');
 
-        $response = $this->actingAs($staff)->post('/admin/work-inspections', $this->payload());
+        $response = $this->actingAs($staff)->post('/admin/work-inspections', $this->payload([
+            'petugas_pemeriksa' => $staff->name,
+        ]));
 
         $inspection = WorkInspection::firstOrFail();
 
@@ -60,9 +96,26 @@ class WorkInspectionTest extends TestCase
         $this->assertSame('ok', $inspection->answer('pemutusan_listrik'));
         $this->assertNull($inspection->manager_nama);
         $this->assertSame('HSE PT INKA', $inspection->divisi_pengaju);
-        $this->assertSame('Petugas HSE Madiun', $inspection->petugas_pemeriksa);
+        $this->assertSame($staff->name, $inspection->petugas_pemeriksa);
         $this->assertSame($staff->name, $inspection->safety_officer_nama);
         $this->assertStringStartsWith('001/DPIKBT/INKA/', $inspection->no_periksa);
+    }
+
+    public function test_store_saves_additional_statement(): void
+    {
+        $staff = $this->makeUser('staff', 'Madiun');
+
+        $this->actingAs($staff)
+            ->post('/admin/work-inspections', $this->payload([
+                'petugas_pemeriksa' => $staff->name,
+                'catatan_tambahan' => 'Pekerjaan dilakukan di ketinggian, tidak tercantum di tabel.',
+            ]))
+            ->assertRedirect();
+
+        $this->assertSame(
+            'Pekerjaan dilakukan di ketinggian, tidak tercantum di tabel.',
+            WorkInspection::firstOrFail()->catatan_tambahan
+        );
     }
 
     public function test_store_always_uses_staff_site_even_when_site_is_tampered(): void
@@ -71,6 +124,7 @@ class WorkInspectionTest extends TestCase
 
         $this->actingAs($staff)->post('/admin/work-inspections', $this->payload([
             'site' => 'Banyuwangi',
+            'petugas_pemeriksa' => $staff->name,
         ]))->assertRedirect();
 
         $this->assertSame('Madiun', WorkInspection::firstOrFail()->site);
@@ -83,6 +137,7 @@ class WorkInspectionTest extends TestCase
         $this->actingAs($staff)
             ->post('/admin/work-inspections', $this->payload([
                 'staff_signature' => '',
+                'petugas_pemeriksa' => $staff->name,
             ]))
             ->assertSessionHasErrors('staff_signature');
 
@@ -97,7 +152,10 @@ class WorkInspectionTest extends TestCase
         unset($answers['jalur_akses']);
 
         $this->actingAs($staff)
-            ->post('/admin/work-inspections', $this->payload(['answers' => $answers]))
+            ->post('/admin/work-inspections', $this->payload([
+                'answers' => $answers,
+                'petugas_pemeriksa' => $staff->name,
+            ]))
             ->assertSessionHasErrors('answers.jalur_akses');
 
         $this->assertSame(0, WorkInspection::count());
@@ -106,7 +164,10 @@ class WorkInspectionTest extends TestCase
         $invalid['jalur_akses'] = 'ya';
 
         $this->actingAs($staff)
-            ->post('/admin/work-inspections', $this->payload(['answers' => $invalid]))
+            ->post('/admin/work-inspections', $this->payload([
+                'answers' => $invalid,
+                'petugas_pemeriksa' => $staff->name,
+            ]))
             ->assertSessionHasErrors('answers.jalur_akses');
 
         $this->assertSame(0, WorkInspection::count());
@@ -337,6 +398,8 @@ class WorkInspectionTest extends TestCase
     private function payload(array $overrides = []): array
     {
         return array_merge([
+            'nomor_dokumen' => '001/DPIKBT/INKA/2026',
+            'tanggal_terbit' => '2026-10-25',
             'otorisasi' => 'HSE/PT INKA/2026',
             'nama_pekerjaan' => 'Perbaikan pipa steam',
             'jenis_peralatan' => 'Mesin las',
