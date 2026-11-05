@@ -261,8 +261,25 @@
                         </div>
 
                         @if($inspection->catatan_tambahan)
+                            @php
+                                $extraValue = $inspection->catatan_tambahan_hasil;
+
+                                $extraChip = match($extraValue) {
+                                    'ok' => 'bg-[#e8f7f1] text-[#0f6b5d] ring-[#1f9d8a]/30',
+                                    'nok' => 'bg-[#fdecea] text-[#b03a2e] ring-[#dc5a4b]/30',
+                                    'na' => 'bg-[#eef1f7] text-[#4b5470] ring-[#9aa6c1]/30',
+                                    default => 'bg-gray-100 text-gray-500 ring-gray-200',
+                                };
+                            @endphp
+
                             <div class="border-t border-[#eef1f7] bg-[#f8fafc] px-5 py-4">
-                                <p class="wi-label">Item Tambahan di Luar Tabel</p>
+                                <div class="flex items-start justify-between gap-3">
+                                    <p class="wi-label">Item Tambahan di Luar Tabel</p>
+
+                                    <span class="inline-flex min-w-[54px] justify-center rounded-lg px-2.5 py-1 text-[11.5px] font-bold ring-1 {{ $extraChip }}">
+                                        {{ $extraValue ? $options[$extraValue] : '—' }}
+                                    </span>
+                                </div>
                                 <p class="whitespace-pre-line text-[13.5px] leading-relaxed text-[#2a3247]">{{ $inspection->catatan_tambahan }}</p>
                             </div>
                         @endif

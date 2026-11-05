@@ -101,7 +101,7 @@ class WorkInspectionTest extends TestCase
         $this->assertStringStartsWith('001/DPIKBT/INKA/', $inspection->no_periksa);
     }
 
-    public function test_store_saves_additional_statement(): void
+    public function test_store_saves_additional_statement_with_its_result(): void
     {
         $staff = $this->makeUser('staff', 'Madiun');
 
@@ -109,13 +109,31 @@ class WorkInspectionTest extends TestCase
             ->post('/admin/work-inspections', $this->payload([
                 'petugas_pemeriksa' => $staff->name,
                 'catatan_tambahan' => 'Pekerjaan dilakukan di ketinggian, tidak tercantum di tabel.',
+                'catatan_tambahan_hasil' => 'nok',
             ]))
             ->assertRedirect();
 
+        $inspection = WorkInspection::firstOrFail();
+
         $this->assertSame(
             'Pekerjaan dilakukan di ketinggian, tidak tercantum di tabel.',
-            WorkInspection::firstOrFail()->catatan_tambahan
+            $inspection->catatan_tambahan
         );
+        $this->assertSame('nok', $inspection->catatan_tambahan_hasil);
+    }
+
+    public function test_store_requires_result_when_additional_statement_is_filled(): void
+    {
+        $staff = $this->makeUser('staff', 'Madiun');
+
+        $this->actingAs($staff)
+            ->post('/admin/work-inspections', $this->payload([
+                'petugas_pemeriksa' => $staff->name,
+                'catatan_tambahan' => 'Item tambahan tanpa hasil.',
+            ]))
+            ->assertSessionHasErrors('catatan_tambahan_hasil');
+
+        $this->assertSame(0, WorkInspection::count());
     }
 
     public function test_store_always_uses_staff_site_even_when_site_is_tampered(): void

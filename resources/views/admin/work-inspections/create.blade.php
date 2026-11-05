@@ -338,13 +338,33 @@
                     </div>
 
                     <div class="border-t border-[#eef1f7] px-5 py-4">
-                        <label class="wi-label" for="catatan_tambahan">Item Tambahan di Luar Tabel (opsional)</label>
+                        <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                            <div>
+                                <label class="wi-label" for="catatan_tambahan">Item Tambahan di Luar Tabel (opsional)</label>
+                                <p class="text-[12px] text-[#7a849d]">Isi jika ada pernyataan yang tidak ada atau tidak sesuai dengan tabel di atas.</p>
+                            </div>
+
+                            <div class="flex shrink-0 items-center gap-1.5">
+                                @foreach($options as $value => $optionLabel)
+                                    <label class="wi-option">
+                                        <input type="radio"
+                                               name="catatan_tambahan_hasil"
+                                               value="{{ $value }}"
+                                               @checked(old('catatan_tambahan_hasil') === $value)>
+                                        <span class="opt-{{ $value }}">{{ $optionLabel }}</span>
+                                    </label>
+                                @endforeach
+                            </div>
+                        </div>
+
                         <textarea id="catatan_tambahan"
                                   name="catatan_tambahan"
                                   rows="3"
-                                  class="wi-input min-h-[90px] @error('catatan_tambahan') is-error @enderror"
+                                  class="wi-input mt-3 min-h-[90px] @error('catatan_tambahan') is-error @enderror"
                                   placeholder="Tulis pernyataan atau item lain yang tidak tercantum / tidak sesuai dengan tabel di atas">{{ old('catatan_tambahan') }}</textarea>
-                        <p class="mt-1 text-[12px] text-[#7a849d]">Isi jika ada pernyataan yang tidak ada atau tidak sesuai dengan tabel di atas.</p>
+                        @error('catatan_tambahan_hasil')
+                            <p class="mt-1 text-[12px] font-semibold text-red-500">Pilih OK / NOK / N/A untuk item tambahan.</p>
+                        @enderror
                     </div>
 
                 </div>
