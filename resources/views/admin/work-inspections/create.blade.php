@@ -338,7 +338,7 @@
                     </div>
 
                     <div class="border-t border-[#eef1f7] px-5 py-4">
-                        <label class="wi-label" for="catatan_tambahan">Item Tambahan di Luar Tabel</label>
+                        <label class="wi-label" for="catatan_tambahan">Item Tambahan di Luar Tabel (opsional)</label>
                         <textarea id="catatan_tambahan"
                                   name="catatan_tambahan"
                                   rows="3"
