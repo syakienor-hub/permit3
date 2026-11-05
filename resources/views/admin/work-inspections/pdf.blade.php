@@ -69,11 +69,13 @@
     <table class="header">
         <tr>
             <td class="header-logo">
+                <div style="text-align: center; width: 100%;">
                 @if(file_exists($logoPath))
                     <img src="data:image/svg+xml;base64,{{ base64_encode(file_get_contents($logoPath)) }}" class="logo" alt="Logo INKA">
                 @else
                     <strong style="font-size: 15px;">INKA</strong>
                 @endif
+                </div>
             </td>
             <td class="header-title">
                 DAFTAR PERIKSA IZIN PEKERJAAN<br>BERISIKO TINGGI
