@@ -269,7 +269,17 @@
                         </p>
                     </div>
 
-                    <span class="wi-step">02</span>
+                    <div class="flex shrink-0 items-center gap-3">
+                        <button type="button" id="fill-all-ok"
+                                class="inline-flex items-center gap-1.5 rounded-lg border border-[#cfd8e8] bg-white px-3 py-2 text-[11.5px] font-bold text-[#122040] transition-colors hover:bg-[#f2f5fa]">
+                            <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            Isi Otomatis (OK)
+                        </button>
+
+                        <span class="wi-step">02</span>
+                    </div>
                 </div>
 
                 <div class="wi-card-body !p-0 sm:!p-0">
@@ -863,6 +873,26 @@
                 }
 
             };
+
+            const fillAllOk = document.getElementById('fill-all-ok');
+
+            if (fillAllOk) {
+
+                fillAllOk.addEventListener('click', function () {
+
+                    document
+                        .querySelectorAll('input[type="radio"][name^="answers["]')
+                        .forEach(function (radio) {
+
+                            if (radio.value === 'ok') {
+                                radio.checked = true;
+                            }
+
+                        });
+
+                });
+
+            }
 
             document
                 .getElementById('inspection-form')
