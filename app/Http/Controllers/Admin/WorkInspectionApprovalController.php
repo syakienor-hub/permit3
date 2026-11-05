@@ -3,13 +3,11 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
 use App\Models\WorkInspection;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\Rule;
 
 class WorkInspectionApprovalController extends Controller
 {
@@ -65,7 +63,6 @@ class WorkInspectionApprovalController extends Controller
 
         return view('admin.work-inspections.create', [
             'site' => $site,
-            'staffOptions' => $this->staffOptionsForSite($site),
         ]);
     }
 
@@ -82,7 +79,6 @@ class WorkInspectionApprovalController extends Controller
             'material' => 'nullable|string|max:255',
             'lokasi' => 'required|string|max:255',
             'tanggal_mulai' => 'required|date',
-            'petugas_pemeriksa' => ['required', 'string', 'max:255', Rule::in($this->staffOptionsForSite($site)->all())],
             'staff_signature' => 'required|string',
         ];
 
@@ -114,7 +110,7 @@ class WorkInspectionApprovalController extends Controller
                 'lokasi' => $validated['lokasi'],
                 'telepon' => '-',
                 'tanggal_mulai' => $validated['tanggal_mulai'],
-                'petugas_pemeriksa' => $validated['petugas_pemeriksa'],
+                'petugas_pemeriksa' => Auth::user()->name,
                 'answers' => $answers,
                 'tanda_tangan' => '',
                 'safety_officer_nama' => Auth::user()->name,
@@ -317,21 +313,6 @@ class WorkInspectionApprovalController extends Controller
 
         return redirect('/admin/work-inspections/' . $inspection->id)
             ->with('success', 'Daftar Periksa ditolak dan alasan sudah dicatat.');
-    }
-
-    private function staffOptionsForSite(string $site)
-    {
-        $staff = User::query()
-            ->where('role', 'staff')
-            ->where('site', $site)
-            ->orderBy('name')
-            ->pluck('name');
-
-        if ($staff->isEmpty()) {
-            $staff = collect([Auth::user()->name]);
-        }
-
-        return $staff;
     }
 
     private function currentRole(): string

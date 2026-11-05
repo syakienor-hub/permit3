@@ -246,16 +246,9 @@
                         </div>
 
                         <div class="sm:col-span-2">
-                            <label class="wi-label">
-                                Petugas pemeriksa <span class="text-red-500">*</span>
-                            </label>
-
-                            <select name="petugas_pemeriksa" class="wi-input @error('petugas_pemeriksa') is-error @enderror" required>
-                                @foreach($staffOptions as $staffName)
-                                    <option value="{{ $staffName }}" @selected(old('petugas_pemeriksa', auth()->user()->name) === $staffName)>{{ $staffName }}</option>
-                                @endforeach
-                            </select>
-                            <p class="mt-1 text-[12px] text-[#7a849d]">Pilih Staff HSE site {{ $site }} yang melakukan pemeriksaan.</p>
+                            <label class="wi-label">Petugas pemeriksa</label>
+                            <p class="wi-readonly">{{ auth()->user()->name }}</p>
+                            <p class="mt-1 text-[12px] text-[#7a849d]">Otomatis terisi Staff HSE site {{ $site }} yang sedang login.</p>
                         </div>
 
                     </div>
@@ -397,9 +390,7 @@
 
                         </div>
 
-                        <p id="nama-staff-hse" class="wi-readonly mb-3">
-    {{ old('petugas_pemeriksa') ?: 'Nama Staff HSE akan muncul di sini' }}
-</p>
+                        <p id="nama-staff-hse" class="wi-readonly mb-3">{{ auth()->user()->name }}</p>
 
                         <div id="signature-container-staff" class="wi-signature">
 
@@ -890,22 +881,6 @@
                 };
 
             });
-            // Sinkronisasi nama Petugas Pemeriksa dengan nama Staff HSE
-const inputPetugas = document.getElementById('petugas-pemeriksa');
-const namaStaff = document.getElementById('nama-staff-hse');
-
-if (inputPetugas && namaStaff) {
-
-    function updateNamaStaff() {
-        const nama = inputPetugas.value.trim();
-
-        namaStaff.textContent = nama || 'Nama Staff HSE akan muncul di sini';
-    }
-
-    inputPetugas.addEventListener('input', updateNamaStaff);
-
-    updateNamaStaff();
-}
             window.clearSignature = function (key) {
 
                 if (signatures[key]) {

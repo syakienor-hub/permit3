@@ -40,32 +40,24 @@ class WorkInspectionTest extends TestCase
             ->assertDontSee('Tanda Tangan Manager');
     }
 
-    public function test_create_form_lists_only_staff_from_own_site(): void
+    public function test_inspector_name_is_locked_to_logged_in_staff(): void
     {
         $staff = $this->makeUser('staff', 'Madiun');
-        $otherMadiun = $this->makeUser('staff', 'Madiun');
-        $staffBanyuwangi = $this->makeUser('staff', 'Banyuwangi');
+        $otherStaff = $this->makeUser('staff', 'Banyuwangi');
 
         $this->actingAs($staff)
             ->get('/admin/work-inspections/create')
             ->assertOk()
             ->assertSee($staff->name)
-            ->assertSee($otherMadiun->name)
-            ->assertDontSee($staffBanyuwangi->name);
-    }
-
-    public function test_store_rejects_inspector_who_is_not_staff_of_the_site(): void
-    {
-        $staff = $this->makeUser('staff', 'Madiun');
-        $staffBanyuwangi = $this->makeUser('staff', 'Banyuwangi');
+            ->assertDontSee('name="petugas_pemeriksa"', false);
 
         $this->actingAs($staff)
             ->post('/admin/work-inspections', $this->payload([
-                'petugas_pemeriksa' => $staffBanyuwangi->name,
+                'petugas_pemeriksa' => $otherStaff->name,
             ]))
-            ->assertSessionHasErrors('petugas_pemeriksa');
+            ->assertRedirect();
 
-        $this->assertSame(0, WorkInspection::count());
+        $this->assertSame($staff->name, WorkInspection::firstOrFail()->petugas_pemeriksa);
     }
 
     public function test_staff_submission_is_forwarded_to_manager_with_staff_signature_only(): void
