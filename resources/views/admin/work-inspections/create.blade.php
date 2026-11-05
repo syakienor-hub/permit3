@@ -278,6 +278,7 @@
 
                             <input type="text"
                                    name="lokasi"
+                                   x-model="lokasi"
                                    value="{{ old('lokasi') }}"
                                    class="wi-input @error('lokasi') is-error @enderror"
                                    placeholder="Contoh: Area Produksi, Gedung B"
@@ -291,6 +292,7 @@
 
                             <input type="date"
                                    name="tanggal_mulai"
+                                   x-model="tanggalMulai"
                                    value="{{ old('tanggal_mulai', $today) }}"
                                    class="wi-input @error('tanggal_mulai') is-error @enderror"
                                    required>
