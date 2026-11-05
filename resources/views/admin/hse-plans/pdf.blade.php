@@ -88,7 +88,7 @@
         $tanggal = $hsePlan->submitted_at ?? $hsePlan->created_at;
         $manager = $hsePlan->reviewer;
         $approved = $hsePlan->status === \App\Models\HsePlan::STATUS_APPROVED;
-        $logoPath = public_path('assets/images/logoinka.svg');
+        $logoPath = public_path('assets/images/LOGO-INKA-PDF.png');
     @endphp
 
     <div class="page">
@@ -96,7 +96,9 @@
             <tr>
                 <td class="header-logo">
                     @if(file_exists($logoPath))
-                        <img src="data:image/svg+xml;base64,{{ base64_encode(file_get_contents($logoPath)) }}" class="logo" alt="Logo INKA">
+                        <div style="text-align:center; width:100%;">
+                            <img src="data:image/png;base64,{{ base64_encode(file_get_contents($logoPath)) }}" class="logo" alt="Logo INKA">
+                        </div>
                     @else
                         <strong style="font-size: 18px;">INKA</strong>
                     @endif
