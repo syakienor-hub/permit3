@@ -16,28 +16,24 @@
         </div>
     @endif
 
-    <div class="grid grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
-        <a href="/admin/work-inspections?status={{ \App\Models\WorkInspection::STATUS_REVIEW_MANAGER }}"
-           class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 hover:shadow-md hover:border-orange-200 transition-all">
-            <p class="text-sm font-semibold text-gray-400 uppercase tracking-wide">Menunggu Manager</p>
-            <p class="text-3xl font-bold text-orange-500 mt-2">{{ $counts['review'] }}</p>
-        </a>
-        <a href="/admin/work-inspections?status={{ \App\Models\WorkInspection::STATUS_PENDING }}"
-           class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 hover:shadow-md hover:border-amber-200 transition-all">
-            <p class="text-sm font-semibold text-gray-400 uppercase tracking-wide">Data Lama</p>
-            <p class="text-3xl font-bold text-amber-500 mt-2">{{ $counts['pending'] }}</p>
-        </a>
-        <a href="/admin/work-inspections?status={{ \App\Models\WorkInspection::STATUS_APPROVED }}"
-           class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 hover:shadow-md hover:border-green-200 transition-all">
-            <p class="text-sm font-semibold text-gray-400 uppercase tracking-wide">Disetujui</p>
-            <p class="text-3xl font-bold text-green-500 mt-2">{{ $counts['approved'] }}</p>
-        </a>
-        <a href="/admin/work-inspections?status={{ \App\Models\WorkInspection::STATUS_REJECTED }}"
-           class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 hover:shadow-md hover:border-red-200 transition-all">
-            <p class="text-sm font-semibold text-gray-400 uppercase tracking-wide">Ditolak</p>
-            <p class="text-3xl font-bold text-red-500 mt-2">{{ $counts['rejected'] }}</p>
-        </a>
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+    <a href="/admin/work-inspections?status={{ \App\Models\WorkInspection::STATUS_REVIEW_MANAGER }}"
+       class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 hover:shadow-md hover:border-orange-200 transition-all">
+        <p class="text-sm font-semibold text-gray-400 uppercase tracking-wide">Menunggu Manager</p>
+        <p class="text-3xl font-bold text-orange-500 mt-2">{{ $counts['review'] }}</p>
+    </a>
+
+    <a href="/admin/work-inspections?status={{ \App\Models\WorkInspection::STATUS_APPROVED }}"
+       class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 hover:shadow-md hover:border-green-200 transition-all">
+        <p class="text-sm font-semibold text-gray-400 uppercase tracking-wide">Disetujui</p>
+        <p class="text-3xl font-bold text-green-500 mt-2">{{ $counts['approved'] }}</p>
+    </a>
+
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+        <p class="text-sm font-semibold text-gray-400 uppercase tracking-wide">Total Semua Daftar Periksa Izin Kerja</p>
+        <p class="text-3xl font-bold text-inka-navy mt-2">{{ $counts['total'] }}</p>
     </div>
+</div>
 
     <form method="GET" action="/admin/work-inspections" class="bg-white rounded-2xl border border-gray-100 shadow-sm px-4 md:px-6 py-4 mb-5 flex flex-wrap items-center gap-3">
         <div class="relative flex-1 min-w-[200px]">
@@ -50,11 +46,13 @@
         </div>
 
         <select name="status" class="border border-gray-200 rounded-xl text-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-inka-navy/20 focus:border-inka-navy text-gray-600">
-            <option value="">Semua Status</option>
-            @foreach([\App\Models\WorkInspection::STATUS_REVIEW_MANAGER, \App\Models\WorkInspection::STATUS_PENDING, \App\Models\WorkInspection::STATUS_APPROVED, \App\Models\WorkInspection::STATUS_REJECTED] as $status)
-                <option value="{{ $status }}" @selected(request('status') === $status)>{{ \App\Models\WorkInspection::statusLabel($status) }}</option>
-            @endforeach
-        </select>
+    <option value="">Semua Status</option>
+    @foreach([\App\Models\WorkInspection::STATUS_REVIEW_MANAGER, \App\Models\WorkInspection::STATUS_APPROVED] as $status)
+        <option value="{{ $status }}" @selected(request('status') === $status)>
+            {{ \App\Models\WorkInspection::statusLabel($status) }}
+        </option>
+    @endforeach
+</select>
 
         @if($isManager)
             <select name="site" class="border border-gray-200 rounded-xl text-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-inka-navy/20 focus:border-inka-navy text-gray-600">
@@ -79,7 +77,7 @@
                 <p class="text-xs text-gray-400 mt-0.5">{{ $isManager ? 'Menunggu persetujuan Manager HSE — PT INKA' : 'Form K3LH IV-01.013 — dikelola Staff HSE PT INKA' }}</p>
             </div>
             <div class="flex items-center gap-3">
-                <a href="/admin/work-inspections/history" class="text-xs font-semibold text-gray-400 hover:text-inka-navy">History</a>
+                <!-- <a href="/admin/work-inspections/history" class="text-xs font-semibold text-gray-400 hover:text-inka-navy">History</a> -->
                 @unless($isManager)
                     <a href="/admin/work-inspections/create" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-inka-navy text-white text-xs font-semibold hover:opacity-90">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
@@ -108,7 +106,7 @@
                             <th>Tanggal</th>
                             <th>Pekerjaan</th>
                             <th>Kontraktor</th>
-                            <th>Site</th>
+                            <th>Petugas</th>
                             <th>Status</th>
                             <th class="text-right">Aksi</th>
                         </tr>
@@ -130,11 +128,23 @@
                                 <td class="whitespace-nowrap text-sm text-gray-600">{{ ($inspection->submitted_at ?? $inspection->created_at)?->format('d/m/Y') }}</td>
                                 <td class="text-sm text-gray-700">{{ $inspection->nama_pekerjaan }}</td>
                                 <td class="text-sm text-gray-600">{{ $inspection->kontraktor }}</td>
-                                <td class="text-sm text-gray-600">{{ $inspection->site }}</td>
+                                <td class="text-sm text-gray-600">{{ $inspection->petugas_pemeriksa }}</td>
                                 <td><span class="text-xs font-bold px-2.5 py-1 rounded-full {{ $badge }}">{{ $label }}</span></td>
-                                <td class="text-right">
-                                    <a href="/admin/work-inspections/{{ $inspection->id }}" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold bg-inka-navy text-white hover:opacity-90" onclick="event.stopPropagation()">Lihat</a>
-                                </td>
+<td class="text-right">
+    <div class="flex items-center justify-end gap-2">
+    <a href="/admin/work-inspections/{{ $inspection->id }}/edit"
+   style="display: inline-flex; align-items: center; padding: 6px 12px; border-radius: 8px; background-color: #f59e0b; color: white; font-size: 12px; font-weight: 600;"
+   onclick="event.stopPropagation()">
+    Edit
+</a>
+
+        <a href="/admin/work-inspections/{{ $inspection->id }}"
+           class="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-semibold bg-inka-navy text-white hover:opacity-90"
+           onclick="event.stopPropagation()">
+            Lihat
+        </a>
+    </div>
+</td>
                             </tr>
                         @endforeach
                     </tbody>

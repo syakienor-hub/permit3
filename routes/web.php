@@ -232,6 +232,8 @@ Route::middleware(['auth', 'prevent-back-history', 'role:staff,manager'])->group
     Route::get('/admin/work-inspections/{id}/pdf/download', [\App\Http\Controllers\Admin\WorkInspectionApprovalController::class, 'downloadPdf']);
     Route::post('/admin/work-inspections/{id}/approve', [\App\Http\Controllers\Admin\WorkInspectionApprovalController::class, 'approve']);
     Route::post('/admin/work-inspections/{id}/reject', [\App\Http\Controllers\Admin\WorkInspectionApprovalController::class, 'reject']);
+    Route::get('/admin/work-inspections/{id}/edit', [\App\Http\Controllers\Admin\WorkInspectionApprovalController::class, 'edit']);
+    Route::put('/admin/work-inspections/{id}', [\App\Http\Controllers\Admin\WorkInspectionApprovalController::class, 'update']);
 });
 
 // ===== ADMIN (role:staff, manager) =====

@@ -80,6 +80,7 @@
                 </div>
 
                 {{-- TOMBOL PDF --}}
+                @if($inspection->status === \App\Models\WorkInspection::STATUS_APPROVED)
                 <div class="flex shrink-0 flex-wrap items-center gap-2">
 
                     <a href="/admin/work-inspections/{{ $inspection->id }}/pdf"
@@ -109,8 +110,10 @@
                     </a>
 
                 </div>
+                @endif
             </div>
         </div>
+      
 
         {{-- ALASAN PENOLAKAN --}}
         @if($inspection->status === \App\Models\WorkInspection::STATUS_REJECTED && $inspection->rejection_reason)
@@ -281,7 +284,7 @@
             <div class="min-w-0">
 
                 <p class="wi-label">
-                    Mengetahui — Plt. Manager HSE PT INKA
+                   Manager HSE PT INKA
                 </p>
 
                 @if($inspection->tanda_tangan)

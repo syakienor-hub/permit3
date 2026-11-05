@@ -45,9 +45,10 @@ class WorkInspectionApprovalController extends Controller
 
         $counts = [
             'review' => (clone $visible)->where('status', WorkInspection::STATUS_REVIEW_MANAGER)->count(),
-            'pending' => (clone $visible)->where('status', WorkInspection::STATUS_PENDING)->count(),
+        
             'approved' => (clone $visible)->where('status', WorkInspection::STATUS_APPROVED)->count(),
-            'rejected' => (clone $visible)->where('status', WorkInspection::STATUS_REJECTED)->count(),
+        
+            'total' => (clone $visible)->count(),
         ];
 
         return view('admin.work-inspections.index', [
@@ -126,6 +127,91 @@ class WorkInspectionApprovalController extends Controller
         });
         return redirect('/admin/work-inspections/' . $inspection->id)
             ->with('success', 'Daftar Periksa berhasil ditandatangani Staff HSE dan diteruskan ke Manager HSE.');
+    }
+    
+    public function edit($id)
+    {
+        $site = $this->authorizeCreator();
+
+        $inspection = $this->visibleQuery()->findOrFail($id);
+
+        if ($inspection->site !== $site) {
+            abort(403, 'Anda tidak memiliki akses untuk mengedit data ini.');
+        }
+
+        if ($inspection->status === WorkInspection::STATUS_APPROVED) {
+            abort(403, 'Daftar periksa yang sudah disetujui tidak dapat diedit.');
+        }
+
+        return view('admin.work-inspections.edit', [
+            'inspection' => $inspection,
+            'site' => $site,
+        ]);
+    }
+
+    public function update(Request $request, $id)
+    {
+        $site = $this->authorizeCreator();
+
+        $inspection = $this->visibleQuery()->findOrFail($id);
+
+        if ($inspection->site !== $site) {
+            abort(403, 'Anda tidak memiliki akses untuk mengedit data ini.');
+        }
+
+        if ($inspection->status === WorkInspection::STATUS_APPROVED) {
+            abort(403, 'Daftar periksa yang sudah disetujui tidak dapat diedit.');
+        }
+
+        $rules = [
+            'nomor_dokumen' => 'required|string|max:255',
+            'tanggal_terbit' => 'required|date',
+            'otorisasi' => 'nullable|string|max:255',
+            'nama_pekerjaan' => 'required|string|max:255',
+            'jenis_peralatan' => 'nullable|string|max:255',
+            'material' => 'nullable|string|max:255',
+            'lokasi' => 'required|string|max:255',
+            'tanggal_mulai' => 'required|date',
+            'petugas_pemeriksa' => 'required|string|max:255',
+            'staff_signature' => 'required|string',
+        ];
+
+        foreach (array_keys(WorkInspection::ITEMS) as $key) {
+            $rules['answers.' . $key] = 'required|in:ok,nok,na';
+        }
+
+        $validated = $request->validate($rules);
+
+        $answers = [];
+
+        foreach (array_keys(WorkInspection::ITEMS) as $key) {
+            $answers[$key] = $validated['answers'][$key];
+        }
+
+        $inspection->forceFill([
+            'no_periksa' => $validated['nomor_dokumen'],
+            'tanggal_terbit' => $validated['tanggal_terbit'],
+            'otorisasi' => $validated['otorisasi'] ?? null,
+            'nama_pekerjaan' => $validated['nama_pekerjaan'],
+            'jenis_peralatan' => $validated['jenis_peralatan'] ?? null,
+            'material' => $validated['material'] ?? null,
+            'lokasi' => $validated['lokasi'],
+            'tanggal_mulai' => $validated['tanggal_mulai'],
+            'petugas_pemeriksa' => $validated['petugas_pemeriksa'],
+            'answers' => $answers,
+            'staff_signature' => $validated['staff_signature'],
+            'safety_officer_nama' => Auth::user()->name,
+            'status' => WorkInspection::STATUS_REVIEW_MANAGER,
+            'submitted_at' => now(),
+            'manager_nama' => null,
+            'tanda_tangan' => '',
+            'reviewed_by' => null,
+            'reviewed_at' => null,
+            'rejection_reason' => null,
+        ])->save();
+
+        return redirect('/admin/work-inspections/' . $inspection->id)
+            ->with('success', 'Daftar periksa berhasil diperbarui dan diteruskan kembali ke Manager HSE.');
     }
 
     public function history(Request $request)
