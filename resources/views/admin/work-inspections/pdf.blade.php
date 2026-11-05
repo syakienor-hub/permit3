@@ -10,11 +10,11 @@
         td, th { vertical-align: top; }
 
         .header td { border: 1px solid #000; padding: 4px 6px; vertical-align: middle; }
-        .header-logo { width: 20%; text-align: center; }
-        .header-title { width: 52%; text-align: center; font-size: 12.5px; font-weight: bold; letter-spacing: .2px; }
+        .header-logo { width: 22%; text-align: center; vertical-align: middle; }
+        .header-title { width: 50%; text-align: center; font-size: 12.5px; font-weight: bold; letter-spacing: .2px; }
         .header-meta { width: 28%; font-size: 7.8px; }
         .header-meta table td { border: none; padding: 0; }
-        .logo { width: 92px; height: auto; }
+        .logo { width: 130px; height: auto; display: block; margin: 0 auto; }
 
         .meta-table { margin-top: 6px; }
         .meta-table td { border: 1px solid #000; padding: 3px 5px; }
