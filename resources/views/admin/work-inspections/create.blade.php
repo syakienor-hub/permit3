@@ -994,4 +994,49 @@
         })();
     </script>
 
+    <script>
+        function permitSync() {
+            return {
+                noPermit: '{{ old('no_permit_terkait', '') }}',
+                namaPekerjaan: '{{ old('nama_pekerjaan', '') }}',
+                lokasi: '{{ old('lokasi', '') }}',
+                tanggalMulai: '{{ old('tanggal_mulai', $today) }}',
+                loading: false,
+                found: false,
+                message: '',
+
+                async fetchPermit() {
+                    const no = this.noPermit.trim();
+                    if (!no) { this.message = ''; return; }
+
+                    this.loading = true;
+                    this.message = '';
+
+                    try {
+                        const res = await fetch('/admin/work-inspections/permit-info?no_permit=' + encodeURIComponent(no), {
+                            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                        });
+                        const data = await res.json();
+
+                        if (data.found) {
+                            this.namaPekerjaan = data.nama_pekerjaan;
+                            this.lokasi        = data.lokasi;
+                            this.tanggalMulai  = data.tanggal_mulai;
+                            this.found         = true;
+                            this.message       = 'Data dari Safety Permit ' + data.no_permit + ' berhasil disinkronkan.';
+                        } else {
+                            this.found   = false;
+                            this.message = data.message || 'Nomor Safety Permit tidak ditemukan.';
+                        }
+                    } catch (e) {
+                        this.found   = false;
+                        this.message = 'Gagal menghubungi server. Coba lagi.';
+                    } finally {
+                        this.loading = false;
+                    }
+                }
+            };
+        }
+    </script>
+
 </x-app-layout>
