@@ -244,6 +244,7 @@
 
                             <input type="text"
                                    name="nama_pekerjaan"
+                                   x-model="namaPekerjaan"
                                    value="{{ old('nama_pekerjaan') }}"
                                    class="wi-input @error('nama_pekerjaan') is-error @enderror"
                                    placeholder="Contoh: Perbaikan pipa steam di Area Produksi"
