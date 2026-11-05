@@ -85,27 +85,14 @@
 
                     <a href="/admin/work-inspections/{{ $inspection->id }}/pdf"
                        target="_blank"
-                       class="inline-flex items-center justify-center gap-2 rounded-xl border border-[#e4e7ef] bg-white px-4 py-2.5 text-sm font-semibold text-[#4b5470] transition hover:border-[#c9d1e2] hover:bg-[#f8fafc]">
-                        <svg class="h-4 w-4" fill="none" stroke="currentColor"
-                             viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                  stroke-width="2"
-                                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                  stroke-width="2"
-                                  d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                        </svg>
+                       class="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-semibold text-gray-600 bg-white border border-gray-200 rounded-xl hover:border-gray-300 transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                         Lihat PDF
                     </a>
 
                     <a href="/admin/work-inspections/{{ $inspection->id }}/pdf/download"
-                       class="inline-flex items-center justify-center gap-2 rounded-xl border border-red-200 bg-red-50 px-4 py-2.5 text-sm font-semibold text-red-600 transition hover:bg-red-100">
-                        <svg class="h-4 w-4" fill="none" stroke="currentColor"
-                             viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                  stroke-width="2"
-                                  d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a2 2 0 01.707.293l5.414 5.414a2 2 0 01.293.707V19a2 2 0 01-2 2z"/>
-                        </svg>
+                       class="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-semibold text-red-600 bg-red-50 border border-red-200 rounded-xl hover:bg-red-100 transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                         Unduh PDF
                     </a>
 
@@ -264,8 +251,25 @@
                         </div>
 
                         @if($inspection->catatan_tambahan)
+                            @php
+                                $extraValue = $inspection->catatan_tambahan_hasil;
+
+                                $extraChip = match($extraValue) {
+                                    'ok' => 'bg-[#e8f7f1] text-[#0f6b5d] ring-[#1f9d8a]/30',
+                                    'nok' => 'bg-[#fdecea] text-[#b03a2e] ring-[#dc5a4b]/30',
+                                    'na' => 'bg-[#eef1f7] text-[#4b5470] ring-[#9aa6c1]/30',
+                                    default => 'bg-gray-100 text-gray-500 ring-gray-200',
+                                };
+                            @endphp
+
                             <div class="border-t border-[#eef1f7] bg-[#f8fafc] px-5 py-4">
-                                <p class="wi-label">Item Tambahan di Luar Tabel</p>
+                                <div class="flex items-start justify-between gap-3">
+                                    <p class="wi-label">Item Tambahan di Luar Tabel</p>
+
+                                    <span class="inline-flex min-w-[54px] justify-center rounded-lg px-2.5 py-1 text-[11.5px] font-bold ring-1 {{ $extraChip }}">
+                                        {{ $extraValue ? $options[$extraValue] : '—' }}
+                                    </span>
+                                </div>
                                 <p class="whitespace-pre-line text-[13.5px] leading-relaxed text-[#2a3247]">{{ $inspection->catatan_tambahan }}</p>
                             </div>
                         @endif

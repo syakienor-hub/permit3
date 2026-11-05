@@ -68,6 +68,7 @@ class WorkInspection extends Model
         'petugas_pemeriksa',
         'answers',
         'catatan_tambahan',
+        'catatan_tambahan_hasil',
         'loto_nama',
         'loto_tanggal',
         'loto_jam',

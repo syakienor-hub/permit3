@@ -10,11 +10,11 @@
         td, th { vertical-align: top; }
 
         .header td { border: 1px solid #000; padding: 4px 6px; vertical-align: middle; }
-        .header-logo { width: 20%; text-align: center; }
-        .header-title { width: 52%; text-align: center; font-size: 12.5px; font-weight: bold; letter-spacing: .2px; }
-        .header-meta { width: 28%; font-size: 7.8px; }
+        .header-logo { width: 22%; text-align: center; vertical-align: middle; padding: 6px; }
+        .header-title { width: 50%; text-align: center; font-size: 12.5px; font-weight: bold; letter-spacing: .2px; vertical-align: middle; }
+        .header-meta { width: 28%; font-size: 7.8px; vertical-align: middle; }
         .header-meta table td { border: none; padding: 0; }
-        .logo { width: 92px; height: auto; }
+        .logo { width: 130px; height: auto; display: inline; }
 
         .meta-table { margin-top: 6px; }
         .meta-table td { border: 1px solid #000; padding: 3px 5px; }
@@ -62,18 +62,20 @@
         $items = \App\Models\WorkInspection::ITEMS;
         $options = \App\Models\WorkInspection::ANSWER_OPTIONS;
         $statusLabel = \App\Models\WorkInspection::statusLabel($inspection->status);
-        $logoPath = public_path('assets/images/logoinka.svg');
+        $logoPath = public_path('assets/images/LOGO-INKA-PDF.png');
         $tanggalTerbit = $inspection->tanggal_terbit ?? $inspection->created_at;
     @endphp
 
     <table class="header">
         <tr>
             <td class="header-logo">
+                <div style="text-align: center; width: 100%;">
                 @if(file_exists($logoPath))
-                    <img src="data:image/svg+xml;base64,{{ base64_encode(file_get_contents($logoPath)) }}" class="logo" alt="Logo INKA">
+                    <img src="data:image/png;base64,{{ base64_encode(file_get_contents($logoPath)) }}" class="logo" alt="Logo INKA">
                 @else
                     <strong style="font-size: 15px;">INKA</strong>
                 @endif
+                </div>
             </td>
             <td class="header-title">
                 DAFTAR PERIKSA IZIN PEKERJAAN<br>BERISIKO TINGGI
@@ -151,6 +153,10 @@
 
     @if($inspection->catatan_tambahan)
         <div class="section-title">ITEM TAMBAHAN DI LUAR TABEL</div>
+        <p style="font-size: 11px; line-height: 1.5; margin: 0 0 4px 0;">
+            <strong>Hasil:</strong>
+            {{ $inspection->catatan_tambahan_hasil ? \App\Models\WorkInspection::ANSWER_OPTIONS[$inspection->catatan_tambahan_hasil] : '-' }}
+        </p>
         <p style="font-size: 11px; line-height: 1.5; margin: 0 0 12px 0;">{!! nl2br(e($inspection->catatan_tambahan)) !!}</p>
     @endif
 
