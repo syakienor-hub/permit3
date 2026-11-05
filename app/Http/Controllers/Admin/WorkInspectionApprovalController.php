@@ -66,6 +66,33 @@ class WorkInspectionApprovalController extends Controller
         ]);
     }
 
+    /** API: ambil data permit berdasarkan no_permit untuk auto-fill form. */
+    public function permitInfo(Request $request)
+    {
+        $request->validate(['no_permit' => 'required|string|max:50']);
+
+        $permit = \App\Models\Permit::where('no_permit', trim($request->no_permit))
+            ->select(['id', 'no_permit', 'nama_pekerjaan', 'kontraktor', 'lokasi', 'telepon', 'site', 'tipe', 'tanggal_mulai', 'status'])
+            ->first();
+
+        if (! $permit) {
+            return response()->json(['found' => false, 'message' => 'Nomor Safety Permit tidak ditemukan.'], 404);
+        }
+
+        return response()->json([
+            'found'           => true,
+            'no_permit'       => $permit->no_permit,
+            'nama_pekerjaan'  => $permit->nama_pekerjaan,
+            'kontraktor'      => $permit->kontraktor,
+            'lokasi'          => $permit->lokasi,
+            'telepon'         => $permit->telepon ?? '',
+            'site'            => $permit->site,
+            'tipe'            => $permit->tipe,
+            'tanggal_mulai'   => $permit->tanggal_mulai?->format('Y-m-d') ?? '',
+            'status'          => $permit->status,
+        ]);
+    }
+
     public function store(Request $request)
     {
         $site = $this->authorizeCreator();
