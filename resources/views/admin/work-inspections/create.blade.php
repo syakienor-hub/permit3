@@ -250,13 +250,12 @@
                                 Petugas pemeriksa <span class="text-red-500">*</span>
                             </label>
 
-                            <input type="text"
-       id="petugas-pemeriksa"
-       name="petugas_pemeriksa"
-       value="{{ old('petugas_pemeriksa') }}"
-       class="wi-input @error('petugas_pemeriksa') is-error @enderror"
-       placeholder="Masukkan nama petugas pemeriksa"
-       required>
+                            <select name="petugas_pemeriksa" class="wi-input @error('petugas_pemeriksa') is-error @enderror" required>
+                                @foreach($staffOptions as $staffName)
+                                    <option value="{{ $staffName }}" @selected(old('petugas_pemeriksa', auth()->user()->name) === $staffName)>{{ $staffName }}</option>
+                                @endforeach
+                            </select>
+                            <p class="mt-1 text-[12px] text-[#7a849d]">Pilih Staff HSE site {{ $site }} yang melakukan pemeriksaan.</p>
                         </div>
 
                     </div>

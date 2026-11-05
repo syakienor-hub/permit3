@@ -40,11 +40,41 @@ class WorkInspectionTest extends TestCase
             ->assertDontSee('Tanda Tangan Manager');
     }
 
+    public function test_create_form_lists_only_staff_from_own_site(): void
+    {
+        $staff = $this->makeUser('staff', 'Madiun');
+        $otherMadiun = $this->makeUser('staff', 'Madiun');
+        $staffBanyuwangi = $this->makeUser('staff', 'Banyuwangi');
+
+        $this->actingAs($staff)
+            ->get('/admin/work-inspections/create')
+            ->assertOk()
+            ->assertSee($staff->name)
+            ->assertSee($otherMadiun->name)
+            ->assertDontSee($staffBanyuwangi->name);
+    }
+
+    public function test_store_rejects_inspector_who_is_not_staff_of_the_site(): void
+    {
+        $staff = $this->makeUser('staff', 'Madiun');
+        $staffBanyuwangi = $this->makeUser('staff', 'Banyuwangi');
+
+        $this->actingAs($staff)
+            ->post('/admin/work-inspections', $this->payload([
+                'petugas_pemeriksa' => $staffBanyuwangi->name,
+            ]))
+            ->assertSessionHasErrors('petugas_pemeriksa');
+
+        $this->assertSame(0, WorkInspection::count());
+    }
+
     public function test_staff_submission_is_forwarded_to_manager_with_staff_signature_only(): void
     {
         $staff = $this->makeUser('staff', 'Madiun');
 
-        $response = $this->actingAs($staff)->post('/admin/work-inspections', $this->payload());
+        $response = $this->actingAs($staff)->post('/admin/work-inspections', $this->payload([
+            'petugas_pemeriksa' => $staff->name,
+        ]));
 
         $inspection = WorkInspection::firstOrFail();
 
@@ -60,7 +90,7 @@ class WorkInspectionTest extends TestCase
         $this->assertSame('ok', $inspection->answer('pemutusan_listrik'));
         $this->assertNull($inspection->manager_nama);
         $this->assertSame('HSE PT INKA', $inspection->divisi_pengaju);
-        $this->assertSame('Petugas HSE Madiun', $inspection->petugas_pemeriksa);
+        $this->assertSame($staff->name, $inspection->petugas_pemeriksa);
         $this->assertSame($staff->name, $inspection->safety_officer_nama);
         $this->assertStringStartsWith('001/DPIKBT/INKA/', $inspection->no_periksa);
     }
@@ -71,6 +101,7 @@ class WorkInspectionTest extends TestCase
 
         $this->actingAs($staff)->post('/admin/work-inspections', $this->payload([
             'site' => 'Banyuwangi',
+            'petugas_pemeriksa' => $staff->name,
         ]))->assertRedirect();
 
         $this->assertSame('Madiun', WorkInspection::firstOrFail()->site);
@@ -83,6 +114,7 @@ class WorkInspectionTest extends TestCase
         $this->actingAs($staff)
             ->post('/admin/work-inspections', $this->payload([
                 'staff_signature' => '',
+                'petugas_pemeriksa' => $staff->name,
             ]))
             ->assertSessionHasErrors('staff_signature');
 
@@ -97,7 +129,10 @@ class WorkInspectionTest extends TestCase
         unset($answers['jalur_akses']);
 
         $this->actingAs($staff)
-            ->post('/admin/work-inspections', $this->payload(['answers' => $answers]))
+            ->post('/admin/work-inspections', $this->payload([
+                'answers' => $answers,
+                'petugas_pemeriksa' => $staff->name,
+            ]))
             ->assertSessionHasErrors('answers.jalur_akses');
 
         $this->assertSame(0, WorkInspection::count());
@@ -106,7 +141,10 @@ class WorkInspectionTest extends TestCase
         $invalid['jalur_akses'] = 'ya';
 
         $this->actingAs($staff)
-            ->post('/admin/work-inspections', $this->payload(['answers' => $invalid]))
+            ->post('/admin/work-inspections', $this->payload([
+                'answers' => $invalid,
+                'petugas_pemeriksa' => $staff->name,
+            ]))
             ->assertSessionHasErrors('answers.jalur_akses');
 
         $this->assertSame(0, WorkInspection::count());
@@ -337,6 +375,8 @@ class WorkInspectionTest extends TestCase
     private function payload(array $overrides = []): array
     {
         return array_merge([
+            'nomor_dokumen' => '001/DPIKBT/INKA/2026',
+            'tanggal_terbit' => '2026-10-25',
             'otorisasi' => 'HSE/PT INKA/2026',
             'nama_pekerjaan' => 'Perbaikan pipa steam',
             'jenis_peralatan' => 'Mesin las',
