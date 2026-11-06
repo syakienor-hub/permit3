@@ -124,54 +124,6 @@
 
             @csrf
 
-            {{-- SINKRONISASI SAFETY PERMIT --}}
-            <section class="wi-card">
-                <div class="wi-card-head">
-                    <div>
-                        <p class="wi-eyebrow">Opsional</p>
-                        <h2 class="wi-title">Tautkan Safety Permit</h2>
-                        <p class="mt-1 text-[12.5px] text-[#7a849d]">Isi nomor Safety Permit agar data pekerjaan otomatis tersinkronisasi.</p>
-                    </div>
-                    <span class="wi-step">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
-                        </svg>
-                    </span>
-                </div>
-                <div class="wi-card-body">
-                    <div class="flex flex-col sm:flex-row gap-3 items-start sm:items-end">
-                        <div class="flex-1">
-                            <label class="wi-label">Nomor Safety Permit</label>
-                            <input type="text"
-                                   name="no_permit_terkait"
-                                   x-model="noPermit"
-                                   @input.debounce.600ms="fetchPermit()"
-                                   class="wi-input"
-                                   placeholder="Contoh: WP-2026-A3F9C1D2"
-                                   autocomplete="off">
-                        </div>
-                        <div class="shrink-0 pb-0.5">
-                            <button type="button" @click="fetchPermit()"
-                                    class="inline-flex items-center gap-2 px-4 py-[11px] rounded-xl border border-[#e4e7ef] bg-white text-sm font-semibold text-[#4b5470] hover:border-inka-navy hover:text-inka-navy transition-colors">
-                                <svg class="w-4 h-4" :class="loading ? 'animate-spin' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-                                </svg>
-                                Sinkronkan
-                            </button>
-                        </div>
-                    </div>
-
-                    {{-- STATUS HASIL SINKRONISASI --}}
-                    <div x-show="message" x-transition class="mt-3 rounded-xl px-4 py-3 text-sm font-semibold flex items-center gap-2"
-                         :class="found ? 'bg-green-50 border border-green-200 text-green-700' : 'bg-red-50 border border-red-200 text-red-600'">
-                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path x-show="found" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                            <path x-show="!found" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
-                        <span x-text="message"></span>
-                    </div>
-                </div>
-            </section>
 
             {{-- DATA PEKERJAAN --}}
             <section class="wi-card">
@@ -298,11 +250,30 @@
                                    required>
                         </div>
 
-                        <div class="sm:col-span-2">
-                            <label class="wi-label">Petugas pemeriksa</label>
-                            <p class="wi-readonly">{{ auth()->user()->name }}</p>
-                            <p class="mt-1 text-[12px] text-[#7a849d]">Otomatis terisi Staff HSE site {{ $site }} yang sedang login.</p>
-                        </div>
+                        
+<div class="sm:col-span-2">
+    <label class="wi-label">
+        Petugas pemeriksa <span class="text-red-500">*</span>
+    </label>
+
+    <input type="text"
+   name="petugas_pemeriksa"
+   x-model="namaPetugas"
+   value="{{ old('petugas_pemeriksa') }}"
+   class="wi-input @error('petugas_pemeriksa') is-error @enderror"
+   placeholder="Masukkan nama petugas pemeriksa"
+   maxlength="255"
+   required>
+
+    @error('petugas_pemeriksa')
+        <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
+    @enderror
+
+    <p class="mt-1 text-[12px] text-[#7a849d]">
+        Nama petugas pemeriksa dapat diisi atau disesuaikan sebelum pemeriksaan disimpan.
+    </p>
+</div>
+
 
                     </div>
                 </div>
@@ -337,36 +308,65 @@
 
                 <div class="wi-card-body !p-0 sm:!p-0">
 
-                    <div class="hidden border-b border-[#eef1f7] bg-[#f8fafc] px-5 py-3 text-[11px] font-bold uppercase tracking-[.06em] text-[#7a849d] sm:grid sm:grid-cols-[52px_1fr_196px] sm:gap-4">
+               
 
-                        <span>No.</span>
-                        <span>Item Pengecekan</span>
-                        <span class="text-center">Hasil</span>
+                <div class="border-b border-[#eef1f7] bg-[#f8fafc] px-5 py-3 text-[11px] font-bold uppercase tracking-[.06em] text-[#7a849d]"
+     style="display: flex; align-items: center; gap: 8px;">
 
-                    </div>
+    <span style="width: 26px; flex-shrink: 0;">
+        No.
+    </span>
+
+    <span style="flex: 1; min-width: 0;">
+        Item Pengecekan
+    </span>
+
+</div>
+
+
 
                     <div class="divide-y divide-[#eef1f7]">
 
-                        @foreach($items as $key => $label)
+                      
+@foreach($items as $key => $label)
 
-                            @php
-                                $selected = old('answers.' . $key);
-                            @endphp
+@php
+    $selected = old('answers.' . $key);
+@endphp
 
-                            <div class="px-5 py-4 transition-colors hover:bg-[#fcfdff] sm:grid sm:grid-cols-[52px_1fr_196px] sm:items-center sm:gap-4 @error('answers.' . $key) bg-red-50/40 @enderror">
-                                <span class="mb-2 inline-flex h-6 min-w-6 items-center justify-center rounded-lg bg-[#f2f5fa] px-1.5 text-[11px] font-bold text-[#5b6b8c] sm:mb-0">{{ $loop->iteration }}</span>
-                                <p class="mb-3 text-[13.5px] leading-relaxed text-[#2a3247] sm:mb-0">{{ $label }}</p>
-                                <div class="flex items-center gap-1.5">
-                                    @foreach($options as $value => $optionLabel)
-                                        <label class="wi-option">
-                                            <input type="radio" name="answers[{{ $key }}]" value="{{ $value }}" @checked($selected === $value) required>
-                                            <span class="opt-{{ $value }}">{{ $optionLabel }}</span>
-                                        </label>
-                                    @endforeach
-                                </div>
-                            </div>
+<div class="px-5 py-4 transition-colors hover:bg-[#fcfdff] @error('answers.' . $key) bg-red-50/40 @enderror">
 
-                        @endforeach
+    {{-- NOMOR DAN KALIMAT PEMERIKSAAN --}}
+    <div class="flex items-start gap-3">
+
+        <span class="inline-flex h-6 min-w-6 shrink-0 items-center justify-center rounded-lg bg-[#f2f5fa] px-1.5 text-[11px] font-bold text-[#5b6b8c]">
+            {{ $loop->iteration }}
+        </span>
+
+        <p class="text-[13.5px] leading-relaxed text-[#2a3247]">
+            {{ $label }}
+        </p>
+
+    </div>
+
+    {{-- PILIHAN HASIL PEMERIKSAAN --}}
+    <div class="mt-3 flex items-center gap-1.5">
+        @foreach($options as $value => $optionLabel)
+            <label class="wi-option">
+                <input type="radio"
+                       name="answers[{{ $key }}]"
+                       value="{{ $value }}"
+                       @checked($selected === $value)
+                       required>
+                <span class="opt-{{ $value }}">{{ $optionLabel }}</span>
+            </label>
+        @endforeach
+    </div>
+
+</div>
+
+@endforeach
+
 
                     </div>
 
@@ -422,7 +422,7 @@
 
                 </div>
             </section>
-            <div>
+            <!-- <div>
     <label class="wi-label">Peralatan</label>
     <input type="text"
            name="jenis_peralatan"
@@ -438,7 +438,7 @@
            value="{{ old('material') }}"
            class="wi-input"
            placeholder="Contoh: Pipa steam, elektroda">
-</div>
+</div> -->
             {{-- TANDA TANGAN STAFF HSE --}}
             <section class="wi-card">
 
@@ -474,7 +474,7 @@
 
                         </div>
 
-                        <p id="nama-staff-hse" class="wi-readonly mb-3">{{ auth()->user()->name }}</p>
+                        <p class="wi-readonly mb-3" x-text="namaPetugas || 'Nama petugas pemeriksa'"></p>
 
                         <div id="signature-container-staff" class="wi-signature">
 
@@ -1012,8 +1012,9 @@
 
     <script>
         function permitSync() {
-            return {
-                noPermit: '{{ old('no_permit_terkait', '') }}',
+    return {
+        namaPetugas: @js(old('petugas_pemeriksa', '')),
+        noPermit: '{{ old('no_permit_terkait', '') }}',
                 namaPekerjaan: '{{ old('nama_pekerjaan', '') }}',
                 lokasi: '{{ old('lokasi', '') }}',
                 tanggalMulai: '{{ old('tanggal_mulai', $today) }}',
