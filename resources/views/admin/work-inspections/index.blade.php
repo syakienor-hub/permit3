@@ -130,21 +130,27 @@
                                 <td class="text-sm text-gray-600">{{ $inspection->kontraktor }}</td>
                                 <td class="text-sm text-gray-600">{{ $inspection->petugas_pemeriksa }}</td>
                                 <td><span class="text-xs font-bold px-2.5 py-1 rounded-full {{ $badge }}">{{ $label }}</span></td>
-<td class="text-right">
+
+                                <td class="text-right">
     <div class="flex items-center justify-end gap-2">
-    <a href="/admin/work-inspections/{{ $inspection->id }}/edit"
-   style="display: inline-flex; align-items: center; padding: 6px 12px; border-radius: 8px; background-color: #f59e0b; color: white; font-size: 12px; font-weight: 600;"
-   onclick="event.stopPropagation()">
-    Edit
-</a>
+
+        @if(!$isManager)
+            <a href="/admin/work-inspections/{{ $inspection->id }}/edit"
+               style="display: inline-flex; align-items: center; padding: 6px 12px; border-radius: 8px; background-color: #f59e0b; color: white; font-size: 12px; font-weight: 600;"
+               onclick="event.stopPropagation()">
+                Edit
+            </a>
+        @endif
 
         <a href="/admin/work-inspections/{{ $inspection->id }}"
            class="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-semibold bg-inka-navy text-white hover:opacity-90"
            onclick="event.stopPropagation()">
-            Lihat
+            {{ $isManager ? 'Review' : 'Lihat' }}
         </a>
+
     </div>
 </td>
+
                             </tr>
                         @endforeach
                     </tbody>
