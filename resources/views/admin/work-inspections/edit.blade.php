@@ -162,17 +162,26 @@
                                required>
                     </div>
 
-                    <div class="sm:col-span-2">
-                        <label class="wi-label">
-                            Petugas pemeriksa <span class="text-red-500">*</span>
-                        </label>
-                        <input type="text" id="petugas-pemeriksa"
-                               name="petugas_pemeriksa"
-                               value="{{ old('petugas_pemeriksa', $inspection->petugas_pemeriksa) }}"
-                               class="wi-input @error('petugas_pemeriksa') is-error @enderror"
-                               placeholder="Masukkan nama petugas pemeriksa"
-                               required>
-                    </div>
+                    
+<div class="sm:col-span-2">
+    <label class="wi-label">
+        Petugas pemeriksa <span class="text-red-500">*</span>
+    </label>
+
+    <input type="text"
+           id="petugas-pemeriksa"
+           name="petugas_pemeriksa"
+           value="{{ old('petugas_pemeriksa', $inspection->petugas_pemeriksa) }}"
+           class="wi-input @error('petugas_pemeriksa') is-error @enderror"
+           placeholder="Masukkan nama petugas pemeriksa"
+           maxlength="255"
+           required>
+
+    @error('petugas_pemeriksa')
+        <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
+    @enderror
+</div>
+
                 </div>
             </div>
         </section>

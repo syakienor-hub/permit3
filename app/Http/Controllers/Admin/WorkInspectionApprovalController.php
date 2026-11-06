@@ -108,9 +108,11 @@ class WorkInspectionApprovalController extends Controller
             'material' => 'nullable|string|max:255',
             'lokasi' => 'required|string|max:255',
             'tanggal_mulai' => 'required|date',
+            'petugas_pemeriksa' => 'required|string|max:255',
             'catatan_tambahan' => 'nullable|string|max:2000',
             'catatan_tambahan_hasil' => 'nullable|required_with:catatan_tambahan|in:ok,nok,na',
             'staff_signature' => 'required|string',
+          
         ];
 
         foreach (array_keys(WorkInspection::ITEMS) as $key) {
@@ -148,7 +150,7 @@ class WorkInspectionApprovalController extends Controller
                 'lokasi' => $validated['lokasi'],
                 'telepon' => '-',
                 'tanggal_mulai' => $validated['tanggal_mulai'],
-                'petugas_pemeriksa' => Auth::user()->name,
+                'petugas_pemeriksa' => $validated['petugas_pemeriksa'],
                 'answers' => $answers,
                 'catatan_tambahan' => $validated['catatan_tambahan'] ?? null,
                 'catatan_tambahan_hasil' => $validated['catatan_tambahan_hasil'] ?? null,
