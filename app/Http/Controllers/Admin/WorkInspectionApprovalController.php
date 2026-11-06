@@ -100,7 +100,7 @@ class WorkInspectionApprovalController extends Controller
 
         $rules = [
             'no_permit_terkait'  => 'nullable|string|max:50',
-            'nomor_dokumen' => 'required|string|max:255',
+            'nomor_dokumen' => 'required|string|max:255|unique:work_inspections,no_periksa',
             'tanggal_terbit' => 'required|date',
             'otorisasi' => 'nullable|string|max:255',
             'nama_pekerjaan' => 'required|string|max:255',
