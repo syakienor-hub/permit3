@@ -67,11 +67,39 @@ class WorkInspectionApprovalController extends Controller
         ]);
     }
 
+    /** API: ambil data permit berdasarkan no_permit untuk auto-fill form. */
+    public function permitInfo(Request $request)
+    {
+        $request->validate(['no_permit' => 'required|string|max:50']);
+
+        $permit = \App\Models\Permit::where('no_permit', trim($request->no_permit))
+            ->select(['id', 'no_permit', 'nama_pekerjaan', 'kontraktor', 'lokasi', 'telepon', 'site', 'tipe', 'tanggal_mulai', 'status'])
+            ->first();
+
+        if (! $permit) {
+            return response()->json(['found' => false, 'message' => 'Nomor Safety Permit tidak ditemukan.'], 404);
+        }
+
+        return response()->json([
+            'found'           => true,
+            'no_permit'       => $permit->no_permit,
+            'nama_pekerjaan'  => $permit->nama_pekerjaan,
+            'kontraktor'      => $permit->kontraktor,
+            'lokasi'          => $permit->lokasi,
+            'telepon'         => $permit->telepon ?? '',
+            'site'            => $permit->site,
+            'tipe'            => $permit->tipe,
+            'tanggal_mulai'   => $permit->tanggal_mulai?->format('Y-m-d') ?? '',
+            'status'          => $permit->status,
+        ]);
+    }
+
     public function store(Request $request)
     {
         $site = $this->authorizeCreator();
 
         $rules = [
+            'no_permit_terkait'  => 'nullable|string|max:50',
             'nomor_dokumen' => 'required|string|max:255',
             'tanggal_terbit' => 'required|date',
             'otorisasi' => 'nullable|string|max:255',
@@ -99,11 +127,18 @@ class WorkInspectionApprovalController extends Controller
 
         $inspection = DB::transaction(function () use ($validated, $answers, $site) {
 
+            $permitId = null;
+            if (! empty($validated['no_permit_terkait'])) {
+                $permit = \App\Models\Permit::where('no_permit', trim($validated['no_permit_terkait']))->first();
+                $permitId = $permit?->id;
+            }
+
             return WorkInspection::create([
-                'no_periksa' => $validated['nomor_dokumen'],
-                'tanggal_terbit' => $validated['tanggal_terbit'],
-                'site' => $site,
-                'otorisasi' => $validated['otorisasi'] ?? null,
+                'no_periksa'         => $validated['nomor_dokumen'],
+                'tanggal_terbit'     => $validated['tanggal_terbit'],
+                'site'               => $site,
+                'requested_permit_id'=> $permitId,
+                'otorisasi'          => $validated['otorisasi'] ?? null,
                 'tipe' => 'Internal',
                 'divisi_pengaju' => 'HSE PT INKA',
                 'nama_pekerjaan' => $validated['nama_pekerjaan'],

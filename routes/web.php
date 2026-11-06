@@ -221,6 +221,7 @@ Route::middleware(['auth', 'prevent-back-history', 'role:staff,manager'])->group
 // ===== DAFTAR PERIKSA IZIN PEKERJAAN (staff membuat, manager menyetujui) =====
 Route::middleware(['auth', 'prevent-back-history', 'role:staff'])->group(function () {
     Route::get('/admin/work-inspections/create', [\App\Http\Controllers\Admin\WorkInspectionApprovalController::class, 'create']);
+    Route::get('/admin/work-inspections/permit-info', [\App\Http\Controllers\Admin\WorkInspectionApprovalController::class, 'permitInfo']);
     Route::post('/admin/work-inspections', [\App\Http\Controllers\Admin\WorkInspectionApprovalController::class, 'store']);
 });
 
