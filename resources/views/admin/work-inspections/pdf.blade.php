@@ -82,7 +82,10 @@
             </td>
             <td class="header-meta">
                 <table>
-                    <tr><td style="width: 34%; font-weight: bold;">No. Dokumen</td><td>: FORM K3LH IV - Rev.0</td></tr>
+                <tr>
+    <td style="width: 34%; font-weight: bold;">No. Dokumen</td>
+    <td>: {{ $inspection->no_periksa ?: '-' }}</td>
+</tr>
                     <tr><td style="font-weight: bold;">Tgl. Terbit</td><td>: {{ $tanggalTerbit?->format('d/m/Y') ?? '-' }}</td></tr>
                     <tr><td style="font-weight: bold;">Hal</td><td>: 1 dari 1</td></tr>
                     <tr><td style="font-weight: bold;">Otorisasi</td><td>: {{ $inspection->otorisasi ?: '-' }}</td></tr>
@@ -179,7 +182,7 @@
         </tr>
         <tr>
             <td class="sign-name">({{ $inspection->manager_nama ?: '.............................' }})</td>
-            <td class="sign-name">({{ $inspection->safety_officer_nama ?: '.............................' }})</td>
+            <td class="sign-name">({{ $inspection->petugas_pemeriksa ?: '.............................' }})</td>
         </tr>
     </table>
 
