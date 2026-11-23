@@ -28,6 +28,22 @@
         }
         .form-input:focus { outline: none; border-color: #111d33; box-shadow: 0 0 0 3px rgba(17,29,51,0.08); }
         .form-input:disabled { background: #f9fafb; color: #9ca3af; }
+        .form-input.is-invalid {
+            border-color: #dc2626 !important;
+            box-shadow: 0 0 0 1px rgba(220, 38, 38, 0.08);
+        }
+        .form-input.is-invalid:focus {
+            border-color: #dc2626 !important;
+            box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.10);
+        }
+        .field-error {
+            display: none;
+            margin-top: 6px;
+            color: #dc2626;
+            font-size: 12px;
+            line-height: 1.4;
+        }
+        .field-error.is-visible { display: block; }
     </style>
 </head>
 <body class="bg-slate-50 text-gray-900 min-h-screen">
@@ -85,7 +101,7 @@
             </div>
         @endif
 
-        <form action="/data-kontraktor" method="POST" enctype="multipart/form-data" class="space-y-5">
+        <form action="/data-kontraktor" method="POST" enctype="multipart/form-data" class="space-y-5" novalidate id="contractorForm">
             @csrf
 
             <section class="bg-white rounded-2xl border border-gray-100 shadow-sm">
@@ -97,10 +113,12 @@
                     <div>
                         <label class="form-label">Vendor / Perusahaan <span class="text-red-500">*</span></label>
                         <input type="text" name="vendor" class="form-input" value="{{ old('vendor') }}" placeholder="Nama PT Vendor" required>
+                        <p class="field-error" data-error-for="vendor">@error('vendor'){{ $message }}@enderror</p>
                     </div>
                     <div>
                         <label class="form-label">PIC <span class="text-red-500">*</span></label>
                         <input type="text" name="pic" class="form-input" value="{{ old('pic') }}" placeholder="Nama Penanggungjawab" required>
+                        <p class="field-error" data-error-for="pic">@error('pic'){{ $message }}@enderror</p>
                     </div>
                     <div>
                         <label class="form-label">Jenis Pekerjaan <span class="text-red-500">*</span></label>
@@ -113,30 +131,37 @@
         Pekerjaan Risiko Tinggi
     </option>
 </select>
+                        <p class="field-error" data-error-for="jenis_pekerjaan">@error('jenis_pekerjaan'){{ $message }}@enderror</p>
                     </div>
                     <div>
                         <label class="form-label">No. Telepon <span class="text-red-500">*</span></label>
                         <input type="text" name="telepon" class="form-input" value="{{ old('telepon') }}" placeholder="08xx..." required>
+                        <p class="field-error" data-error-for="telepon">@error('telepon'){{ $message }}@enderror</p>
                     </div>
                     <div class="md:col-span-2">
                         <label class="form-label">Nama Pekerjaan <span class="text-red-500">*</span></label>
                         <textarea name="nama_pekerjaan" rows="3" class="form-input" placeholder="Uraikan nama dan lingkup pekerjaan" required>{{ old('nama_pekerjaan') }}</textarea>
+                        <p class="field-error" data-error-for="nama_pekerjaan">@error('nama_pekerjaan'){{ $message }}@enderror</p>
                     </div>
                     <div>
                         <label class="form-label">Tanggal Mulai <span class="text-red-500">*</span></label>
                         <input type="date" name="tanggal_mulai" class="form-input" value="{{ old('tanggal_mulai') }}" required>
+                        <p class="field-error" data-error-for="tanggal_mulai">@error('tanggal_mulai'){{ $message }}@enderror</p>
                     </div>
                     <div>
                         <label class="form-label">Tanggal Selesai <span class="text-red-500">*</span></label>
                         <input type="date" name="tanggal_selesai" class="form-input" value="{{ old('tanggal_selesai') }}" required>
+                        <p class="field-error" data-error-for="tanggal_selesai">@error('tanggal_selesai'){{ $message }}@enderror</p>
                     </div>
                     <div>
                         <label class="form-label">Jumlah Pekerja <span class="text-red-500">*</span></label>
                         <input type="number" name="jumlah_pekerja" class="form-input" value="{{ old('jumlah_pekerja') }}" placeholder="Jumlah pekerja" min="1" required>
+                        <p class="field-error" data-error-for="jumlah_pekerja">@error('jumlah_pekerja'){{ $message }}@enderror</p>
                     </div>
                     <div>
                         <label class="form-label">Lokasi <span class="text-red-500">*</span></label>
                         <input type="text" name="lokasi" class="form-input" value="{{ old('lokasi') }}" placeholder="Ketik lokasi pekerjaan" required>
+                        <p class="field-error" data-error-for="lokasi">@error('lokasi'){{ $message }}@enderror</p>
                     </div>
                     <div>
                         <label class="form-label">Site <span class="text-red-500">*</span></label>
@@ -144,6 +169,7 @@
                             <option value="Madiun" @selected(old('site', 'Madiun') === 'Madiun')>Madiun</option>
                             <option value="Banyuwangi" @selected(old('site') === 'Banyuwangi')>Banyuwangi</option>
                         </select>
+                        <p class="field-error" data-error-for="site">@error('site'){{ $message }}@enderror</p>
                     </div>
                 </div>
             </section>
@@ -187,5 +213,80 @@
             </div>
         </form>
     </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const form = document.getElementById('contractorForm');
+            if (!form) return;
+
+            const messages = {
+                vendor: 'Nama vendor/perusahaan wajib diisi.',
+                pic: 'Nama PIC atau penanggung jawab wajib diisi.',
+                jenis_pekerjaan: 'Jenis pekerjaan wajib dipilih.',
+                telepon: 'Nomor telepon wajib diisi.',
+                nama_pekerjaan: 'Nama dan lingkup pekerjaan wajib diisi.',
+                tanggal_mulai: 'Tanggal mulai wajib diisi.',
+                tanggal_selesai: 'Tanggal selesai wajib diisi.',
+                jumlah_pekerja: 'Jumlah pekerja wajib diisi.',
+                lokasi: 'Lokasi pekerjaan wajib diisi.',
+                site: 'Site wajib dipilih.'
+            };
+
+            function showError(field, message) {
+                const error = form.querySelector('[data-error-for="' + field.name + '"]');
+                field.classList.add('is-invalid');
+                if (error) {
+                    error.textContent = message;
+                    error.classList.add('is-visible');
+                }
+            }
+
+            function clearError(field) {
+                const error = form.querySelector('[data-error-for="' + field.name + '"]');
+                field.classList.remove('is-invalid');
+                if (error) {
+                    error.textContent = '';
+                    error.classList.remove('is-visible');
+                }
+            }
+
+            form.querySelectorAll('[required]').forEach(function (field) {
+                field.addEventListener('input', function () {
+                    if (field.value.trim() !== '') clearError(field);
+                });
+                field.addEventListener('change', function () {
+                    if (field.value.trim() !== '') clearError(field);
+                });
+            });
+
+            form.addEventListener('submit', function (event) {
+                let firstInvalid = null;
+
+                form.querySelectorAll('[required]').forEach(function (field) {
+                    if (field.value.trim() === '') {
+                        showError(field, messages[field.name] || 'Kolom ini wajib diisi.');
+                        if (!firstInvalid) firstInvalid = field;
+                    } else {
+                        clearError(field);
+                    }
+                });
+
+                if (firstInvalid) {
+                    event.preventDefault();
+                    firstInvalid.focus();
+                    firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            });
+
+            // Tampilkan border dan pesan merah untuk error validasi Laravel setelah halaman dimuat ulang.
+            form.querySelectorAll('.field-error').forEach(function (error) {
+                if (error.textContent.trim() !== '') {
+                    const field = form.querySelector('[name="' + error.dataset.errorFor + '"]');
+                    if (field) field.classList.add('is-invalid');
+                    error.classList.add('is-visible');
+                }
+            });
+        });
+    </script>
 </body>
 </html>
